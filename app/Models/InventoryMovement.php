@@ -1,0 +1,90 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use App\Enums\InventoryMovementType;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class InventoryMovement extends Model
+{
+    const UPDATED_AT = null;
+
+    protected $fillable = [
+        'stock_id',
+        'inventory_id',
+        'product_id',
+        'moveable_id',
+        'movement_type',
+        'quantity',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'movement_type' => InventoryMovementType::class,
+            'quantity'      => 'integer',
+            'created_at'    => 'datetime',
+        ];
+    }
+
+    public function scopeOfType(Builder $query, InventoryMovementType $type): void
+    {
+        $query->where('movement_type', $type);
+    }
+
+    public function scopeInbound(Builder $query): void
+    {
+        $query->whereIn('movement_type', [
+            InventoryMovementType::RECEIVE,
+            InventoryMovementType::TRANSFER_IN,
+            InventoryMovementType::RESTOCK_RECEIVED,
+        ]);
+    }
+
+    public function scopeOutbound(Builder $query): void
+    {
+        $query->whereIn('movement_type', [
+            InventoryMovementType::RETURN,
+            InventoryMovementType::TRANSFER_OUT,
+            InventoryMovementType::SALE,
+            InventoryMovementType::EXPIRED,
+        ]);
+    }
+
+    public function stock(): BelongsTo
+    {
+        return $this->belongsTo(Stock::class);
+    }
+
+    public function inventory(): BelongsTo
+    {
+        return $this->belongsTo(Inventory::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Resolve the polymorphic moveable based on movement_type.
+     * No type column exists in DB; movement_type determines the model.
+     */
+    public function getMoveable(): ?Model
+    {
+        return match ($this->movement_type) {
+            InventoryMovementType::RECEIVE          => Purchase::find($this->moveable_id),
+            InventoryMovementType::RETURN           => PurchaseReturn::find($this->moveable_id),
+            InventoryMovementType::TRANSFER_IN,
+            InventoryMovementType::TRANSFER_OUT     => Transfer::find($this->moveable_id),
+            InventoryMovementType::SALE             => Sale::find($this->moveable_id),
+            InventoryMovementType::EXPIRED          => ProductExpiration::find($this->moveable_id),
+            InventoryMovementType::RESTOCK_RECEIVED => RestockOrder::find($this->moveable_id),
+            default                                 => null,
+        };
+    }
+}

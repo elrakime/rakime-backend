@@ -1,0 +1,3536 @@
+opencollection: 0.1.0
+info:
+  name: Rakime
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ''
+      port: ''
+      auth:
+        username: ''
+        password: ''
+      bypassProxy: ''
+  environments:
+    - name: local
+      variables:
+        - name: url
+          value: 127.0.0.1:8000
+        - name: admin-token
+          value: 2|U5zB8yhluJRY3LFzygdHw4nzJhOrOtZs8M1iWxDW2d5f9ec3
+items:
+  - info:
+      name: Web
+      type: folder
+      seq: 1
+    request:
+      auth: inherit
+    items:
+      - info:
+          name: Auth
+          type: folder
+          seq: 1
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: login
+              type: http
+              seq: 1
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/login'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: email
+                    type: text
+                    value: admin@example.com
+                  - name: password
+                    type: text
+                    value: password
+              auth: inherit
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: logout
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/logout'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: me
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/auth/me'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: change-password
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/change-password'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: current_password
+                    type: text
+                    value: password
+                  - name: new_password
+                    type: text
+                    value: new_password
+                  - name: new_password_confirmation
+                    type: text
+                    value: new_password
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update-profile
+              type: http
+              seq: 5
+            http:
+              method: PUT
+              url: '{{url}}/v1/auth/update-profile'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"John Doe","email":"john@example.com","phone":"0550123456"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Users
+          type: folder
+          seq: 2
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list users
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/users'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[email]
+                  value: ''
+                  enabled: false
+                - name: filter[phone]
+                  value: ''
+                  enabled: false
+                - name: filter[is_active]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create user
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/users'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: John Doe
+                  - name: email
+                    type: text
+                    value: john@example.com
+                  - name: password
+                    type: text
+                    value: password
+                  - name: password_confirmation
+                    type: text
+                    value: password
+                  - name: phone
+                    type: text
+                    value: '0555123456'
+                  - name: is_active
+                    type: text
+                    value: '1'
+                  - name: roles[]
+                    type: text
+                    value: admin
+                  - name: branches[]
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show user
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update user
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: John Doe
+                  - name: email
+                    type: text
+                    value: john@example.com
+                  - name: phone
+                    type: text
+                    value: '0555123456'
+                  - name: is_active
+                    type: text
+                    value: '1'
+                  - name: roles[]
+                    type: text
+                    value: admin
+                  - name: branches[]
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete user
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Roles
+          type: folder
+          seq: 3
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list roles
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/roles'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create role
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/roles'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: manager
+                  - name: permissions[]
+                    type: text
+                    value: users.view
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show role
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update role
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: manager
+                  - name: permissions[]
+                    type: text
+                    value: users.view
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete role
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Branches
+          type: folder
+          seq: 4
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list branches
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[code]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create branch
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Main Branch
+                  - name: code
+                    type: text
+                    value: M
+                  - name: accounts[]
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show branch
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update branch
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Main Branch
+                  - name: code
+                    type: text
+                    value: M
+                  - name: accounts[]
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete branch
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Accounts
+          type: folder
+          seq: 5
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list accounts
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[ccp_number]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create account
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: CCP Account
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                  - name: draw_day
+                    type: text
+                    value: '15'
+                  - name: min_withdraw_amount
+                    type: text
+                    value: '1000'
+                  - name: max_withdraw_count
+                    type: text
+                    value: '3'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show account
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update account
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: CCP Account
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                  - name: draw_day
+                    type: text
+                    value: '15'
+                  - name: min_withdraw_amount
+                    type: text
+                    value: '1000'
+                  - name: max_withdraw_count
+                    type: text
+                    value: '3'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete account
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Wilayas
+          type: folder
+          seq: 6
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list wilayas
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/wilayas'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: 'name'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create wilaya
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/wilayas'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Alger
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show wilaya
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update wilaya
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Alger
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete wilaya
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Categories
+          type: folder
+          seq: 7
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list categories
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create category
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Cuisine
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show category
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update category
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Cuisine
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete category
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Brands
+          type: folder
+          seq: 8
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list brands
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create brand
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Samsung
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show brand
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update brand
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Samsung
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete brand
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Types
+          type: folder
+          seq: 9
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list types
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[category_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create type
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: category_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Réfrigérateur
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show type
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update type
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: category_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Réfrigérateur
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete type
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Colors
+          type: folder
+          seq: 10
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list colors
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/colors'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[code]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create color
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/colors'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Rouge
+                  - name: code
+                    type: text
+                    value: '#FF0000'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show color
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update color
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Rouge
+                  - name: code
+                    type: text
+                    value: '#FF0000'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete color
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Clients
+          type: folder
+          seq: 11
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list clients
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/clients'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[phone]
+                  value: ''
+                  enabled: false
+                - name: filter[nin]
+                  value: ''
+                  enabled: false
+                - name: filter[branch_id]
+                  value: ''
+                  enabled: false
+                - name: filter[wilaya_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create client
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/clients'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: branch_id
+                    type: text
+                    value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Ahmed Benali
+                  - name: phone
+                    type: text
+                    value: '0555123456'
+                  - name: birthdate
+                    type: text
+                    value: '1990-01-15'
+                  - name: address
+                    type: text
+                    value: '12 Rue des Fleurs, Alger'
+                  - name: occupation
+                    type: text
+                    value: Ingénieur
+                  - name: employer
+                    type: text
+                    value: Sonatrach
+                  - name: salary
+                    type: text
+                    value: '80000'
+                  - name: nin
+                    type: text
+                    value: '199001234567890'
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                  - name: eccp
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show client
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update client
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: branch_id
+                    type: text
+                    value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Ahmed Benali
+                  - name: phone
+                    type: text
+                    value: '0555123456'
+                  - name: birthdate
+                    type: text
+                    value: '1990-01-15'
+                  - name: address
+                    type: text
+                    value: '12 Rue des Fleurs, Alger'
+                  - name: occupation
+                    type: text
+                    value: Ingénieur
+                  - name: employer
+                    type: text
+                    value: Sonatrach
+                  - name: salary
+                    type: text
+                    value: '80000'
+                  - name: nin
+                    type: text
+                    value: '199001234567890'
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                  - name: eccp
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete client
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Products
+          type: folder
+          seq: 12
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list products
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[barcode]
+                  value: ''
+                  enabled: false
+                - name: filter[type_id]
+                  value: ''
+                  enabled: false
+                - name: filter[color_id]
+                  value: ''
+                  enabled: false
+                - name: filter[brand_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create product
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '1'
+                  - name: brand_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Samsung RT38 Réfrigérateur
+                  - name: barcode
+                    type: text
+                    value: '8801643033569'
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: min_quantity
+                    type: text
+                    value: '5'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show product
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update product
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '1'
+                  - name: brand_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Samsung RT38 Réfrigérateur
+                  - name: barcode
+                    type: text
+                    value: '8801643033569'
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: min_quantity
+                    type: text
+                    value: '5'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: delete product
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Permissions
+          type: folder
+          seq: 13
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list permissions
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/permissions'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: change-password
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/change-password'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"current_password":"password","new_password":"new_password","new_password_confirmation":"new_password"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Users
+          type: folder
+          seq: 2
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/users'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[email]
+                  value: ''
+                  enabled: false
+                - name: filter[phone]
+                  value: ''
+                  enabled: false
+                - name: filter[is_active]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/users'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"John Doe","email":"john@example.com","password":"password","password_confirmation":"password","phone":"0123456789","is_active":true,"roles":[],"branches":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"John Doe Updated","email":"john@example.com","phone":"0123456789","is_active":true,"roles":[],"branches":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/users/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Roles
+          type: folder
+          seq: 3
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/roles'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/roles'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Manager","permissions":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Manager Updated","permissions":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/roles/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Branches
+          type: folder
+          seq: 4
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[code]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Main Branch","code":"A","accounts":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Main Branch Updated","code":"A","accounts":[]}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/branches/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Accounts
+          type: folder
+          seq: 5
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[ccp_number]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"CCP Account","ccp_number":"1234567890","ccp_key":"12","draw_day":15,"min_withdraw_amount":1000,"max_withdraw_count":5}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"CCP Account Updated","ccp_number":"1234567890","ccp_key":"12","draw_day":15,"min_withdraw_amount":1000,"max_withdraw_count":5}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/accounts/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Wilayas
+          type: folder
+          seq: 6
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/wilayas'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: 'name'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/wilayas'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Alger"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Alger Updated"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/wilayas/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Categories
+          type: folder
+          seq: 7
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Electronics
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: _method
+                    type: text
+                    value: PUT
+                  - name: name
+                    type: text
+                    value: Electronics Updated
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/categories/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Brands
+          type: folder
+          seq: 8
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Samsung
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: _method
+                    type: text
+                    value: PUT
+                  - name: name
+                    type: text
+                    value: Samsung Updated
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/brands/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Types
+          type: folder
+          seq: 9
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[category_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"category_id":1,"name":"Refrigerators"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"category_id":1,"name":"Refrigerators Updated"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/types/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Colors
+          type: folder
+          seq: 10
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/colors'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[code]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/colors'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Red","code":"#FF0000"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"name":"Red Updated","code":"#FF0000"}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/colors/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Clients
+          type: folder
+          seq: 11
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/clients'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[phone]
+                  value: ''
+                  enabled: false
+                - name: filter[nin]
+                  value: ''
+                  enabled: false
+                - name: filter[branch_id]
+                  value: ''
+                  enabled: false
+                - name: filter[wilaya_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/clients'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"branch_id":1,"wilaya_id":1,"name":"Ahmed Benali","phone":"0550123456","birthdate":"1990-01-15","address":"123 Rue Didouche Mourad","occupation":"Engineer","employer":"SONATRACH","salary":80000,"nin":"1234567890123456","ccp_number":"1234567890","ccp_key":"12","eccp":null}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: json
+                data: '{"branch_id":1,"wilaya_id":1,"name":"Ahmed Benali Updated","phone":"0550123456","birthdate":"1990-01-15","address":"123 Rue Didouche Mourad","occupation":"Engineer","employer":"SONATRACH","salary":80000,"nin":"1234567890123456","ccp_number":"1234567890","ccp_key":"12","eccp":null}'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/clients/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Products
+          type: folder
+          seq: 12
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[search]
+                  value: ''
+                  enabled: false
+                - name: filter[name]
+                  value: ''
+                  enabled: false
+                - name: filter[barcode]
+                  value: ''
+                  enabled: false
+                - name: filter[type_id]
+                  value: ''
+                  enabled: false
+                - name: filter[color_id]
+                  value: ''
+                  enabled: false
+                - name: filter[brand_id]
+                  value: ''
+                  enabled: false
+                - name: sort
+                  value: '-created_at'
+                  enabled: false
+                - name: page
+                  value: '1'
+                  enabled: false
+                - name: per_page
+                  value: '15'
+                  enabled: false
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: store
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '1'
+                  - name: brand_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Samsung Refrigerator 350L
+                  - name: barcode
+                    type: text
+                    value: '1234567890123'
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: min_quantity
+                    type: text
+                    value: '5'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: update
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: _method
+                    type: text
+                    value: PUT
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '1'
+                  - name: brand_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Samsung Refrigerator 350L Updated
+                  - name: barcode
+                    type: text
+                    value: '1234567890123'
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: min_quantity
+                    type: text
+                    value: '5'
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: destroy
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/products/1'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+      - info:
+          name: Permissions
+          type: folder
+          seq: 13
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: index
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/permissions'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{admin-token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5

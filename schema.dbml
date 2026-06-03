@@ -1,0 +1,471 @@
+// ============================================================
+// ENUMS
+// ============================================================
+
+ENUM actor_type {
+  USER
+  EMPLOYEE
+}
+
+ENUM inventory_movement_type {
+  RECEIVE
+  RETURN
+  TRANSFER_IN
+  TRANSFER_OUT
+  SALE
+  EXPIRED
+  RESTOCK_RECEIVED
+}
+
+ENUM treasury_movement_type {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+  INSTALLMENT_PAYMENT
+  PURCHASE_PAYMENT
+  SALE_PAYMENT
+  ADJUSTMENT
+}
+
+ENUM purchase_status {
+  DRAFT
+  RECEIVED
+  PAID
+  PARTIALLY_PAID
+}
+
+ENUM purchase_payment_method {
+  CASH
+  BANK
+}
+
+ENUM restock_order_status {
+  DRAFT
+  SUBMITTED
+  FULFILLED
+  CANCELLED
+}
+
+ENUM contract_status {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CLOSED
+  CANCELLED
+}
+
+ENUM installment_status {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+ENUM installment_payment_method {
+  BANK
+  CASH
+}
+
+ENUM subscription_status {
+  ACTIVE
+  CANCELLED [note: "manually cancelled, e.g. client paid cash early"]
+  COMPLETED [note: "all draws received"]
+}
+
+ENUM draw_status {
+  PENDING    [note: "bank has not yet processed this draw"]
+  RECEIVED   [note: "bank confirmed the draw came through"]
+  CANCELLED  [note: "client paid cash this month; draw was cancelled at bank"]
+  FAILED     [note: "bank attempted but draw was rejected"]
+}
+
+// ============================================================
+// CORE IDENTITY
+// ============================================================
+
+Table users {
+  id              int      [pk]
+  name            varchar
+  email           varchar  [unique]
+  password_hash   varchar
+  role            varchar  [note: "e.g. admin, manager, staff"]
+  is_active       boolean  [default: true]
+  created_at      timestamp
+}
+
+Table wilayas {
+  id   int     [pk]
+  name varchar
+}
+
+// ============================================================
+// ORGANISATION
+// ============================================================
+
+Table branches {
+  id   int     [pk]
+  name varchar
+  code varchar [note: "A to Z"]
+}
+
+Table employees {
+  id         int       [pk]
+  branch_id  int       [ref: > branches.id]
+  user_id    int       [ref: > users.id, null, note: "linked login account if any"]
+  name       varchar
+  phone      varchar   [null]
+  role       varchar   [note: "e.g. cashier, manager, warehouse"]
+  is_active  boolean   [default: true]
+  created_at timestamp
+}
+
+Table accounts {
+  id                  int     [pk]
+  name                varchar
+  ccp_number          varchar [unique]
+  ccp_key             varchar
+  draw_day            int     [note: "1 to 30"]
+  min_withdraw_amount int     [note: "max amount per bank chunk"]
+  max_withdraw_count  int     [note: "max number of chunks per installment"]
+}
+
+Table branch_accounts {
+  id         int [pk]
+  account_id int [ref: > accounts.id]
+  branch_id  int [ref: > branches.id]
+}
+
+// ============================================================
+// INVENTORY
+// ============================================================
+
+Table inventories {
+  id        int     [pk]
+  branch_id int     [ref: > branches.id, null]
+  name      varchar
+}
+
+Table inventory_movements {
+  id            int                     [pk]
+  stock_id      int                     [ref: > stocks.id]
+  inventory_id  int                     [ref: > inventories.id]
+  product_id    int                     [ref: > products.id]
+  moveable_id   int                     [ref: > purchases.id, ref: > purchase_returns.id, ref: > transfers.id, ref: > sales.id, ref: > product_expirations.id, ref: > restock_orders.id]
+  movement_type inventory_movement_type
+  quantity      int
+  created_at    timestamp
+}
+
+// ============================================================
+// TREASURY
+// ============================================================
+
+Table treasuries {
+  id        int     [pk]
+  branch_id int     [ref: > branches.id, null, note: "null = central/head treasury"]
+  name      varchar
+  balance   decimal [default: 0, note: "running balance, updated on each movement"]
+}
+
+Table treasury_movements {
+  id                    int                    [pk]
+  treasury_id           int                    [ref: > treasuries.id]
+  movement_type         treasury_movement_type
+  amount                decimal                [note: "positive = inflow, negative = outflow"]
+  reference_type        varchar                [null, note: "e.g. installment_cash_payments, purchase_payments, transfers"]
+  reference_id          int                    [null, note: "FK to the source document"]
+  note                  varchar                [null]
+  performed_by_type     actor_type
+  performed_by_id       int
+  created_at            timestamp
+}
+
+// ============================================================
+// CATALOGUE
+// ============================================================
+
+Table categories {
+  id    int     [pk]
+  name  varchar
+  image file
+}
+
+Table brands {
+  id    int     [pk]
+  name  varchar
+  image file    [null]
+}
+
+Table products {
+  id           int     [pk]
+  category_id  int     [ref: > categories.id]
+  brand_id     int     [ref: > brands.id]
+  name         varchar
+  image        file
+  min_quantity int
+}
+
+// ============================================================
+// CLIENTS & SUPPLIERS
+// ============================================================
+
+Table clients {
+  id          int     [pk]
+  wilaya_id   int     [ref: > wilayas.id]
+  name        varchar
+  phone       varchar [unique]
+  birthdate   date    [null]
+  address     varchar [null]
+  occupation  varchar [null]
+  employer    varchar [null]
+  salary      decimal
+  nin         varchar [unique]
+  ccp_number  varchar [unique]
+  ccp_key     varchar
+  eccp        varchar [null]
+}
+
+Table suppliers {
+  id        int     [pk]
+  name      varchar
+  phone     varchar
+  email     varchar [null]
+  address   varchar
+  is_active boolean
+}
+
+// ============================================================
+// TRANSFERS
+// ============================================================
+
+Table transfers {
+  id                int       [pk]
+  from_inventory_id int       [ref: > inventories.id]
+  to_inventory_id   int       [ref: > inventories.id]
+  note              varchar
+  transferred_at    timestamp
+}
+
+Table transfer_items {
+  id          int [pk]
+  transfer_id int [ref: > transfers.id]
+  product_id  int [ref: > products.id]
+  quantity    int
+}
+
+// ============================================================
+// PURCHASES
+// ============================================================
+
+Table purchases {
+  id           int             [pk]
+  supplier_id  int             [ref: > suppliers.id]
+  reference    varchar
+  status       purchase_status
+  total_amount int
+  paid_amount  int             [default: 0]
+  note         varchar
+  purchased_at timestamp
+  received_at  timestamp       [null]
+}
+
+Table purchase_items {
+  id          int [pk]
+  purchase_id int [ref: > purchases.id]
+  product_id  int [ref: > products.id]
+  quantity    int
+  price       int
+}
+
+Table purchase_payments {
+  id             int                     [pk]
+  purchase_id    int                     [ref: > purchases.id]
+  amount         int
+  payment_method purchase_payment_method
+  paid_at        timestamp
+}
+
+Table purchase_returns {
+  id          int     [pk]
+  purchase_id int     [ref: > purchases.id]
+  reference   varchar
+  returned_at timestamp
+}
+
+Table purchase_return_items {
+  id                 int     [pk]
+  purchase_return_id int     [ref: > purchase_returns.id]
+  product_id         int     [ref: > products.id]
+  quantity           int
+  reason             varchar
+}
+
+// ============================================================
+// STOCKS
+// ============================================================
+
+Table stocks {
+  id                int       [pk]
+  inventory_id      int       [ref: > inventories.id]
+  product_id        int       [ref: > products.id]
+  source_id         int       [ref: > purchase_items.id, ref: > transfer_items.id]
+  initial_quantity  int
+  current_quantity  int
+  purchase_price    int
+  selling_price     int
+  installment_price int
+  purchased_at      timestamp
+}
+
+// ============================================================
+// SALES
+// ============================================================
+
+Table sales {
+  id           int             [pk]
+  user_id      int             [ref: > users.id]
+  client_id    int             [ref: > clients.id]
+  reference    varchar
+  status       purchase_status
+  total_amount int
+  paid_amount  int             [default: 0]
+  note         varchar
+  sold_at      timestamp
+}
+
+Table sale_items {
+  id         int [pk]
+  sale_id    int [ref: > sales.id]
+  product_id int [ref: > products.id]
+  stock_id   int [ref: > stocks.id]
+  quantity   int
+}
+
+// ============================================================
+// PRODUCT EXPIRATIONS
+// ============================================================
+
+Table product_expirations {
+  id           int        [pk]
+  actor_type   actor_type
+  actor_id     int
+  inventory_id int        [ref: > inventories.id]
+  reference    varchar
+  note         varchar    [null]
+  reported_at  timestamp
+}
+
+Table product_expiration_items {
+  id            int     [pk]
+  expiration_id int     [ref: > product_expirations.id]
+  product_id    int     [ref: > products.id]
+  stock_id      int     [ref: > stocks.id]
+  quantity      int
+  reason        varchar [null]
+}
+
+// ============================================================
+// RESTOCK ORDERS
+// ============================================================
+
+Table restock_orders {
+  id           int                  [pk]
+  employee_id  int                  [ref: > employees.id]
+  branch_id    int                  [ref: > branches.id]
+  reference    varchar
+  status       restock_order_status
+  note         varchar              [null]
+  created_at   timestamp
+  fulfilled_at timestamp            [null]
+}
+
+Table restock_order_items {
+  id                 int [pk]
+  restock_order_id   int [ref: > restock_orders.id]
+  product_id         int [ref: > products.id]
+  requested_quantity int
+  fulfilled_quantity int [default: 0, null]
+}
+
+// ============================================================
+// INSTALLMENT CONTRACTS
+// ============================================================
+
+Table installment_contracts {
+  id              int             [pk]
+  actor_type      actor_type
+  actor_id        int
+  client_id       int             [ref: > clients.id]
+  account_id      int             [ref: > accounts.id]
+  branch_id       int             [ref: > branches.id]
+  reference       varchar         [null, note: "generated at confirmation"]
+  status          contract_status [default: "DRAFT"]
+  max_amount      int             [null, note: "set by admin at approval"]
+  advance_amount  int             [null, note: "set by employee after approval, deducted from total"]
+  months_count    int             [null, note: "set by employee after approval"]
+  total_amount    int             [null, note: "snapshotted at confirmation (sum of installment_price × qty)"]
+  monthly_amount  int             [null, note: "total_amount / months_count, computed at confirmation"]
+  note            varchar         [null]
+  confirmed_at    timestamp       [null]
+  created_at      timestamp
+}
+
+Table installment_contract_items {
+  id                         int [pk]
+  contract_id                int [ref: > installment_contracts.id]
+  product_id                 int [ref: > products.id]
+  stock_id                   int [ref: > stocks.id]
+  quantity                   int
+  unit_price_snapshot        int [note: "selling_price at time of confirmation"]
+  installment_price_snapshot int [note: "installment_price at time of confirmation"]
+}
+
+// ============================================================
+// INSTALLMENTS
+// ============================================================
+
+Table installments {
+  id             int                        [pk]
+  contract_id    int                        [ref: > installment_contracts.id]
+  month_number   int                        [note: "1 to months_count"]
+  amount         int                        [note: "= monthly_amount"]
+  status         installment_status         [default: "PENDING"]
+  payment_method installment_payment_method
+  due_date       date                       [note: "draw_day of the corresponding month"]
+}
+
+Table installment_subscriptions {
+  id                  int                 [pk]
+  contract_id         int                 [ref: > installment_contracts.id]
+  reference           varchar             [unique, note: "fixed bank reference, stable across all months"]
+  subscription_number int                 [note: "1 to subscription_count (e.g. 1–4)"]
+  amount              int                 [note: "draw amount per month (≤ account.max_draw_amount)"]
+  total_months        int                 [note: "mirrors contract.months_count"]
+  status              subscription_status [default: "ACTIVE"]
+  created_at          timestamp
+  cancelled_at        timestamp           [null]
+}
+
+Table installment_draws {
+  id              int         [pk]
+  subscription_id int         [ref: > installment_subscriptions.id]
+  installment_id  int         [ref: > installments.id]
+  month_number    int
+  amount          int
+  status          draw_status [default: "PENDING"]
+  scheduled_date  date        [note: "account.draw_day of month_number's month"]
+  processed_at    timestamp   [null]
+}
+
+Table installment_cash_payments {
+  id             int       [pk]
+  installment_id int       [ref: > installments.id, unique, note: "one cash payment per month max"]
+  amount         int       [note: "must equal installment.amount"]
+  received_by    int       [ref: > employees.id]
+  paid_at        timestamp
+  note           varchar   [null]
+}
