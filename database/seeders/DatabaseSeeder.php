@@ -12,6 +12,15 @@ class DatabaseSeeder extends Seeder
             WilayaSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
+            AccountSeeder::class,
+            BranchSeeder::class,
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ColorSeeder::class,
+            TypeSeeder::class,
+            SupplierSeeder::class,
+            ClientSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
