@@ -16,6 +16,7 @@ class ProductExpirationItem extends Model
         'expiration_id',
         'product_id',
         'stock_id',
+        'batch_id',
         'quantity',
         'reason',
     ];
@@ -40,5 +41,10 @@ class ProductExpirationItem extends Model
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(Batch::class);
     }
 }

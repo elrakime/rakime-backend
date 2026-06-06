@@ -26,7 +26,7 @@ class UpdateStockRequest extends FormRequest
             'product_id'        => ['sometimes', 'required', 'integer', 'exists:products,id'],
             'source_id'         => ['nullable', 'integer'],
             'source_type'       => ['nullable', 'string'],
-            'initial_quantity'  => ['sometimes', 'required', 'integer', 'min:0'],
+            'initial_quantity'  => ['nullable', 'integer', 'min:0'],
             'current_quantity'  => ['nullable', 'integer', 'min:0'],
             'purchase_price'    => ['nullable', 'integer', 'min:0'],
             'selling_price'     => ['nullable', 'integer', 'min:0'],

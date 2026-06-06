@@ -26,7 +26,7 @@ class StoreStockRequest extends FormRequest
             'product_id'        => ['required', 'integer', 'exists:products,id'],
             'source_id'         => ['nullable', 'integer'],
             'source_type'       => ['nullable', 'string'],
-            'initial_quantity'  => ['required', 'integer', 'min:0'],
+            'initial_quantity'  => ['nullable', 'integer', 'min:0'],
             'current_quantity'  => ['nullable', 'integer', 'min:0'],
             'purchase_price'    => ['nullable', 'integer', 'min:0'],
             'selling_price'     => ['nullable', 'integer', 'min:0'],

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
-use App\Enums\PurchasePaymentMethod;
 use App\Enums\PurchaseStatus;
 use App\Enums\TreasuryMovementType;
 use App\Models\InventoryMovement;
@@ -152,20 +151,33 @@ class PurchaseService
                 $pricing = $pricingByProduct->get($item->product_id, []);
 
                 $stock = Stock::create([
-                    'inventory_id'      => $inventoryId,
-                    'product_id'        => $item->product_id,
-                    'source_id'         => $item->id,
-                    'source_type'       => 'purchase_items',
-                    'initial_quantity'  => $item->quantity,
-                    'current_quantity'  => $item->quantity,
-                    'purchase_price'    => $item->price,
-                    'selling_price'     => $pricing['selling_price'] ?? 0,
-                    'installment_price' => $pricing['installment_price'] ?? 0,
-                    'purchased_at'      => $purchase->purchased_at,
+                    'inventory_id' => $inventoryId,
+                    'product_id'   => $item->product_id,
                 ]);
+
+                $batch = $stock->batches()->create([
+                    'source_id'        => $item->id,
+                    'source_type'      => 'purchase_items',
+                    'purchase_price'   => $item->price,
+                    'initial_quantity' => $item->quantity,
+                    'current_quantity' => $item->quantity,
+                    'purchased_at'     => $purchase->purchased_at,
+                ]);
+
+                $prices = [];
+                if (isset($pricing['selling_price'])) {
+                    $prices[] = new \App\Models\Price(['type' => 'selling', 'amount' => $pricing['selling_price']]);
+                }
+                if (isset($pricing['installment_price'])) {
+                    $prices[] = new \App\Models\Price(['type' => 'installment', 'amount' => $pricing['installment_price']]);
+                }
+                if (!empty($prices)) {
+                    $stock->prices()->saveMany($prices);
+                }
 
                 InventoryMovement::create([
                     'stock_id'      => $stock->id,
+                    'batch_id'      => $batch->id,
                     'inventory_id'  => $inventoryId,
                     'product_id'    => $item->product_id,
                     'moveable_id'   => $purchase->id,

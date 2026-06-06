@@ -14,7 +14,10 @@ class InstallmentContractItem extends Model
         'contract_id',
         'product_id',
         'stock_id',
+        'batch_id',
+        'price_id',
         'quantity',
+        'unit_price',
         'unit_price_snapshot',
         'installment_price_snapshot',
     ];
@@ -23,6 +26,7 @@ class InstallmentContractItem extends Model
     {
         return [
             'quantity'                   => 'integer',
+            'unit_price'                 => 'integer',
             'unit_price_snapshot'        => 'integer',
             'installment_price_snapshot' => 'integer',
         ];
@@ -41,5 +45,15 @@ class InstallmentContractItem extends Model
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(Batch::class);
+    }
+
+    public function price(): BelongsTo
+    {
+        return $this->belongsTo(Price::class);
     }
 }

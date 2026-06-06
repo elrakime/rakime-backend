@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Price;
 use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -14,12 +15,10 @@ class StockService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Stock::class, $request)
-            ->with(['inventory', 'product', 'source'])
+            ->with(['inventory', 'product', 'batches', 'prices'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('product_id'),
-                AllowedFilter::exact('source_id'),
-                AllowedFilter::exact('source_type'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->whereHas('product', function ($q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")
@@ -28,8 +27,6 @@ class StockService
                 }),
             )
             ->allowedSorts(
-                AllowedSort::field('current_quantity'),
-                AllowedSort::field('purchased_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -40,42 +37,55 @@ class StockService
     public function create(array $data, Request $request): Stock
     {
         $stock = Stock::create([
-            'inventory_id'      => $data['inventory_id'],
-            'product_id'        => $data['product_id'],
-            'source_id'         => $data['source_id'] ?? null,
-            'source_type'       => $data['source_type'] ?? null,
-            'initial_quantity'  => $data['initial_quantity'],
-            'current_quantity'  => $data['current_quantity'] ?? $data['initial_quantity'],
-            'purchase_price'    => $data['purchase_price'] ?? 0,
-            'selling_price'     => $data['selling_price'] ?? 0,
-            'installment_price' => $data['installment_price'] ?? 0,
-            'purchased_at'      => $data['purchased_at'] ?? now(),
+            'inventory_id' => $data['inventory_id'],
+            'product_id'   => $data['product_id'],
         ]);
 
-        return $stock->load(['inventory', 'product', 'source']);
+        if (isset($data['purchase_price']) || isset($data['selling_price']) || isset($data['installment_price'])) {
+            $prices = [];
+
+            if (isset($data['selling_price'])) {
+                $prices[] = new Price(['type' => 'selling', 'amount' => $data['selling_price']]);
+            }
+            if (isset($data['installment_price'])) {
+                $prices[] = new Price(['type' => 'installment', 'amount' => $data['installment_price']]);
+            }
+            if (isset($data['wholesale_price'])) {
+                $prices[] = new Price(['type' => 'wholesale', 'amount' => $data['wholesale_price']]);
+            }
+
+            if (!empty($prices)) {
+                $stock->prices()->saveMany($prices);
+            }
+        }
+
+        if (isset($data['initial_quantity'])) {
+            $batch = $stock->batches()->create([
+                'source_id'         => $data['source_id'] ?? null,
+                'source_type'       => $data['source_type'] ?? null,
+                'purchase_price'    => $data['purchase_price'] ?? 0,
+                'initial_quantity'  => $data['initial_quantity'],
+                'current_quantity'  => $data['current_quantity'] ?? $data['initial_quantity'],
+                'purchased_at'      => $data['purchased_at'] ?? now(),
+            ]);
+        }
+
+        return $stock->load(['inventory', 'product', 'batches', 'prices']);
     }
 
     public function show(Stock $stock): Stock
     {
-        return $stock->loadMissing(['inventory', 'product', 'source']);
+        return $stock->loadMissing(['inventory', 'product', 'batches', 'prices']);
     }
 
     public function update(Stock $stock, array $data, Request $request): Stock
     {
         $stock->update(array_filter([
-            'inventory_id'      => $data['inventory_id'] ?? null,
-            'product_id'        => $data['product_id'] ?? null,
-            'source_id'         => array_key_exists('source_id', $data) ? $data['source_id'] : null,
-            'source_type'       => array_key_exists('source_type', $data) ? $data['source_type'] : null,
-            'initial_quantity'  => $data['initial_quantity'] ?? null,
-            'current_quantity'  => $data['current_quantity'] ?? null,
-            'purchase_price'    => $data['purchase_price'] ?? null,
-            'selling_price'     => $data['selling_price'] ?? null,
-            'installment_price' => $data['installment_price'] ?? null,
-            'purchased_at'      => $data['purchased_at'] ?? null,
+            'inventory_id' => $data['inventory_id'] ?? null,
+            'product_id'   => $data['product_id'] ?? null,
         ], fn ($v) => $v !== null));
 
-        return $stock->refresh()->loadMissing(['inventory', 'product', 'source']);
+        return $stock->refresh()->loadMissing(['inventory', 'product', 'batches', 'prices']);
     }
 
     public function delete(Stock $stock): void
