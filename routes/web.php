@@ -17,6 +17,7 @@ use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\TreasuryController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\UserController;
+use App\Http\Controllers\Web\StockController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -54,6 +55,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('treasuries', TreasuryController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('purchases', PurchaseController::class);
+    Route::apiResource('stocks', StockController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);

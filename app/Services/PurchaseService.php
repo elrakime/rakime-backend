@@ -13,6 +13,7 @@ use App\Models\Stock;
 use App\Models\Treasury;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -139,7 +140,7 @@ class PurchaseService
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update([
                 'status'      => PurchaseStatus::RECEIVED,
-                'received_at' => $data['received_at'],
+                'received_at' => $data['received_at'] ?? Carbon::now(),
             ]);
 
             $inventoryId = $data['inventory_id'];
