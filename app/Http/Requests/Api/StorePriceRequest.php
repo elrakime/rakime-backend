@@ -16,7 +16,6 @@ class StorePriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stock_id' => ['required', 'exists:stocks,id'],
             'type'     => ['required', new Enum(PriceType::class)],
             'amount'   => ['required', 'integer', 'min:0'],
         ];

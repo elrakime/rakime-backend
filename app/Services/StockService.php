@@ -18,7 +18,7 @@ class StockService
             ->with([
                 'inventory', 'product',
                 'batches', 'prices',
-                'cashPrice', 'installmentPrice', 'wholesalePrice',
+                'sellingPrice', 'installmentPrice', 'wholesalePrice',
                 'currentQuantity', 'initialQuantity',
             ])
             ->allowedFilters(
@@ -46,11 +46,11 @@ class StockService
             'product_id'   => $data['product_id'],
         ]);
 
-        if (isset($data['purchase_price']) || isset($data['cash_price']) || isset($data['installment_price'])) {
+        if (isset($data['purchase_price']) || isset($data['selling_price']) || isset($data['installment_price'])) {
             $prices = [];
 
-            if (isset($data['cash_price'])) {
-                $prices[] = new Price(['type' => 'cash', 'amount' => $data['cash_price']]);
+            if (isset($data['selling_price'])) {
+                $prices[] = new Price(['type' => 'selling', 'amount' => $data['selling_price']]);
             }
             if (isset($data['installment_price'])) {
                 $prices[] = new Price(['type' => 'installment', 'amount' => $data['installment_price']]);
@@ -77,7 +77,7 @@ class StockService
 
         return $stock->load([
             'inventory', 'product', 'batches', 'prices',
-            'cashPrice', 'installmentPrice', 'wholesalePrice',
+            'sellingPrice', 'installmentPrice', 'wholesalePrice',
             'currentQuantity', 'initialQuantity',
         ]);
     }
@@ -86,7 +86,7 @@ class StockService
     {
         return $stock->loadMissing([
             'inventory', 'product', 'batches', 'prices',
-            'cashPrice', 'installmentPrice', 'wholesalePrice',
+            'sellingPrice', 'installmentPrice', 'wholesalePrice',
             'currentQuantity', 'initialQuantity',
         ]);
     }

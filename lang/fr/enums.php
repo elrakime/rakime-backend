@@ -81,7 +81,7 @@ return [
     ],
 
     'price_type' => [
-        'cash'        => 'Comptant',
+        'selling'     => 'Vente',
         'installment' => 'Tranche',
         'wholesale'   => 'Gros',
     ],

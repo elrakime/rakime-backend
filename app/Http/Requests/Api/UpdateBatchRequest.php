@@ -14,7 +14,6 @@ class UpdateBatchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stock_id'         => ['sometimes', 'exists:stocks,id'],
             'source_id'        => ['nullable', 'integer'],
             'source_type'      => ['nullable', 'string', 'max:50'],
             'purchase_price'   => ['sometimes', 'integer', 'min:0'],

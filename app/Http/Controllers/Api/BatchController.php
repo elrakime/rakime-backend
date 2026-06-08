@@ -7,6 +7,7 @@ use App\Http\Requests\Api\StoreBatchRequest;
 use App\Http\Requests\Api\UpdateBatchRequest;
 use App\Http\Resources\Api\BatchResource;
 use App\Models\Batch;
+use App\Models\Stock;
 use App\Services\BatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,18 +16,18 @@ class BatchController extends Controller
 {
     public function __construct(private readonly BatchService $batchService) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, Stock $stock): JsonResponse
     {
-        $batches = $this->batchService->list($request);
+        $batches = $this->batchService->list($request, $stock);
 
         return $this->successResponse(BatchResource::collection($batches));
     }
 
-    public function store(StoreBatchRequest $request): JsonResponse
+    public function store(StoreBatchRequest $request, Stock $stock): JsonResponse
     {
         $validated = $this->validateRequest($request);
 
-        $batch = $this->batchService->create($validated);
+        $batch = $this->batchService->create($stock, $validated);
 
         return $this->successResponse(
             new BatchResource($batch),
@@ -35,14 +36,14 @@ class BatchController extends Controller
         );
     }
 
-    public function show(Batch $batch): JsonResponse
+    public function show(Stock $stock, Batch $batch): JsonResponse
     {
         $batch = $this->batchService->show($batch);
 
         return $this->successResponse(new BatchResource($batch));
     }
 
-    public function update(UpdateBatchRequest $request, Batch $batch): JsonResponse
+    public function update(UpdateBatchRequest $request, Stock $stock, Batch $batch): JsonResponse
     {
         $validated = $this->validateRequest($request);
 
@@ -51,7 +52,7 @@ class BatchController extends Controller
         return $this->successResponse(new BatchResource($batch));
     }
 
-    public function destroy(Batch $batch): JsonResponse
+    public function destroy(Stock $stock, Batch $batch): JsonResponse
     {
         $this->batchService->delete($batch);
 

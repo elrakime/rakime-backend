@@ -81,7 +81,7 @@ return [
     ],
 
     'price_type' => [
-        'cash'        => 'Cash',
+        'selling'     => 'Selling',
         'installment' => 'Installment',
         'wholesale'   => 'Wholesale',
     ],

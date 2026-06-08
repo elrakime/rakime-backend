@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Batch;
+use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -11,11 +12,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class BatchService
 {
-    public function list(Request $request): LengthAwarePaginator
+    public function list(Request $request, Stock $stock): LengthAwarePaginator
     {
         return QueryBuilder::for(Batch::class, $request)
+            ->where('stock_id', $stock->id)
             ->allowedFilters(
-                AllowedFilter::exact('stock_id'),
                 AllowedFilter::partial('source_type'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
@@ -35,10 +36,9 @@ class BatchService
             ->appends($request->query());
     }
 
-    public function create(array $data): Batch
+    public function create(Stock $stock, array $data): Batch
     {
-        return Batch::create([
-            'stock_id'         => $data['stock_id'],
+        return $stock->batches()->create([
             'source_id'        => $data['source_id'] ?? null,
             'source_type'      => $data['source_type'] ?? null,
             'purchase_price'   => $data['purchase_price'],
@@ -56,7 +56,6 @@ class BatchService
     public function update(Batch $batch, array $data): Batch
     {
         $batch->update(array_filter([
-            'stock_id'         => $data['stock_id'] ?? null,
             'source_id'        => $data['source_id'] ?? null,
             'source_type'      => $data['source_type'] ?? null,
             'purchase_price'   => $data['purchase_price'] ?? null,

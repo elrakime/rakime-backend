@@ -42,6 +42,7 @@ Route::prefix('v1/auth')->group(function () {
 Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('roles', RoleController::class);
+    Route::get('permissions', [PermissionController::class, 'index']);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
     Route::apiResource('wilayas', WilayaController::class);
@@ -55,9 +56,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('treasuries', TreasuryController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('purchases', PurchaseController::class);
-    Route::apiResource('stocks', StockController::class)->except(['update']);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
-    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::apiResource('stocks', StockController::class)->except(['update']);
+
+    Route::apiResource('stocks.prices', \App\Http\Controllers\Api\PriceController::class);
+    Route::apiResource('stocks.batches', \App\Http\Controllers\Api\BatchController::class);
 });

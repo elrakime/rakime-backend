@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum PriceType: string
 {
-    case CASH         = 'cash';
+    case SELLING      = 'selling';
     case INSTALLMENT  = 'installment';
     case WHOLESALE    = 'wholesale';
 
@@ -39,7 +39,7 @@ enum PriceType: string
     public function get_color(): string
     {
         return match ($this) {
-            self::CASH        => 'green',
+            self::SELLING     => 'blue',
             self::INSTALLMENT => 'purple',
             self::WHOLESALE   => 'orange',
         };

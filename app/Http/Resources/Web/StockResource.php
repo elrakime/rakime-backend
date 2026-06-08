@@ -20,12 +20,8 @@ class StockResource extends JsonResource
             'product_id'   => $this->product_id,
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
-
-            'quantity' => $this->whenLoaded('batches', function () {
-                return $this->batches->sum('current_quantity');
-            }),
-
-            'cash_price' => $this->whenLoaded('cashPrice', fn () => $this->cashPrice?->amount),
+            
+            'selling_price' => $this->whenLoaded('sellingPrice', fn () => $this->sellingPrice?->amount),
             'installment_price' => $this->whenLoaded('installmentPrice', fn () => $this->installmentPrice?->amount),
             'wholesale_price'   => $this->whenLoaded('wholesalePrice', fn () => $this->wholesalePrice?->amount),
 

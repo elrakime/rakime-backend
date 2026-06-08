@@ -81,7 +81,7 @@ return [
     ],
 
     'price_type' => [
-        'cash'        => 'نقداً',
+        'selling'     => 'البيع',
         'installment' => 'التقسيط',
         'wholesale'   => 'الجملة',
     ],

@@ -15,8 +15,3 @@ Route::prefix('auth')->group(function () {
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
 });
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('prices', PriceController::class);
-    Route::apiResource('batches', BatchController::class);
-});

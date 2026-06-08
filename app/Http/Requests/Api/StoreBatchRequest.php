@@ -14,7 +14,6 @@ class StoreBatchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stock_id'         => ['required', 'exists:stocks,id'],
             'source_id'        => ['nullable', 'integer'],
             'source_type'      => ['nullable', 'string', 'max:50'],
             'purchase_price'   => ['required', 'integer', 'min:0'],

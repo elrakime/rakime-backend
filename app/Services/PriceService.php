@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Price;
+use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -11,11 +12,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PriceService
 {
-    public function list(Request $request): LengthAwarePaginator
+    public function list(Request $request, Stock $stock): LengthAwarePaginator
     {
         return QueryBuilder::for(Price::class, $request)
+            ->where('stock_id', $stock->id)
             ->allowedFilters(
-                AllowedFilter::exact('stock_id'),
                 AllowedFilter::partial('type'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
@@ -33,10 +34,9 @@ class PriceService
             ->appends($request->query());
     }
 
-    public function create(array $data): Price
+    public function create(Stock $stock, array $data): Price
     {
-        return Price::create([
-            'stock_id' => $data['stock_id'],
+        return $stock->prices()->create([
             'type'     => $data['type'],
             'amount'   => $data['amount'],
         ]);
@@ -50,7 +50,6 @@ class PriceService
     public function update(Price $price, array $data): Price
     {
         $price->update(array_filter([
-            'stock_id' => $data['stock_id'] ?? null,
             'type'     => $data['type'] ?? null,
             'amount'   => $data['amount'] ?? null,
         ], fn ($v) => $v !== null));

@@ -52,9 +52,9 @@ class Stock extends Model
         return $this->hasMany(Price::class);
     }
 
-    public function cashPrice(): HasOne
+    public function sellingPrice(): HasOne
     {
-        return $this->hasOne(Price::class)->where('type', PriceType::CASH)->latest();
+        return $this->hasOne(Price::class)->where('type', PriceType::SELLING)->latest();
     }
 
     public function installmentPrice(): HasOne
