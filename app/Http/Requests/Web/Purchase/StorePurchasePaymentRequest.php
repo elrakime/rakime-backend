@@ -16,7 +16,7 @@ class StorePurchasePaymentRequest extends FormRequest
         return [
             'treasury_id'    => ['required', 'integer', 'exists:treasuries,id'],
             'amount'         => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', 'string', 'in:CASH,BANK'],
+            'payment_method' => ['required', 'string'],
             'paid_at'        => ['required', 'date'],
             'note'           => ['nullable', 'string'],
         ];

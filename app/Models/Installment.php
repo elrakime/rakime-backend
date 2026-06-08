@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\InstallmentPaymentMethod;
 use App\Enums\InstallmentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +27,6 @@ class Installment extends Model
     {
         return [
             'status'         => InstallmentStatus::class,
-            'payment_method' => InstallmentPaymentMethod::class,
             'month_number'   => 'integer',
             'amount'         => 'integer',
             'due_date'       => 'date',
@@ -52,12 +50,12 @@ class Installment extends Model
 
     public function scopeBankMethod(Builder $query): void
     {
-        $query->where('payment_method', InstallmentPaymentMethod::BANK);
+        $query->where('payment_method', 'BANK');
     }
 
     public function scopeCashMethod(Builder $query): void
     {
-        $query->where('payment_method', InstallmentPaymentMethod::CASH);
+        $query->where('payment_method', 'CASH');
     }
 
     public function contract(): BelongsTo

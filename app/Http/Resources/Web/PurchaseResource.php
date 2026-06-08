@@ -34,7 +34,7 @@ class PurchaseResource extends JsonResource
             'payments'         => $this->whenLoaded('payments', fn () => $this->payments->map(fn ($p) => [
                 'id'             => $p->id,
                 'amount'         => $p->amount,
-                'payment_method' => $p->payment_method->value,
+                'payment_method' => $p->payment_method,
                 'paid_at'        => $p->paid_at,
             ])),
             'total_amount'     => $this->total_amount,

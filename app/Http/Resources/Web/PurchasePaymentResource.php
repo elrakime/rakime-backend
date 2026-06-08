@@ -13,11 +13,7 @@ class PurchasePaymentResource extends JsonResource
             'id'             => $this->id,
             'purchase_id'    => $this->purchase_id,
             'amount'         => $this->amount,
-            'payment_method' => [
-                'value' => $this->payment_method->value,
-                'name'  => $this->payment_method->get_name(),
-                'color' => $this->payment_method->get_color(),
-            ],
+            'payment_method' => $this->payment_method,
             'paid_at'        => $this->paid_at,
             'created_at'     => $this->created_at,
         ];
