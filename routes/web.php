@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\WilayaController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\PurchaseController;
+use App\Http\Controllers\Web\PurchaseReturnController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\TreasuryController;
 use App\Http\Controllers\Web\RoleController;
@@ -60,6 +61,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
+    Route::apiResource('purchases.returns', PurchaseReturnController::class)->except(['update']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
 
     Route::apiResource('stocks.prices', \App\Http\Controllers\Api\PriceController::class);

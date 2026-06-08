@@ -12,7 +12,7 @@ class PurchaseReturnItem extends Model
 
     protected $fillable = [
         'purchase_return_id',
-        'product_id',
+        'purchase_item_id',
         'quantity',
         'reason',
     ];
@@ -29,8 +29,8 @@ class PurchaseReturnItem extends Model
         return $this->belongsTo(PurchaseReturn::class);
     }
 
-    public function product(): BelongsTo
+    public function purchaseItem(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(PurchaseItem::class);
     }
 }
