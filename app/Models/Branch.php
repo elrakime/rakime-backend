@@ -44,12 +44,12 @@ class Branch extends Model
 
     public function restockOrders(): HasMany
     {
-        return $this->hasMany(RestockOrder::class);
+        return $this->hasMany(Restock::class);
     }
 
     public function installmentContracts(): HasMany
     {
-        return $this->hasMany(InstallmentContract::class);
+        return $this->hasMany(Contract::class);
     }
 
     public function accounts(): BelongsToMany

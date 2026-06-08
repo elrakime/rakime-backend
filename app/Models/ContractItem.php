@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InstallmentContractItem extends Model
+class ContractItem extends Model
 {
 
     protected $fillable = [
@@ -34,7 +34,7 @@ class InstallmentContractItem extends Model
 
     public function contract(): BelongsTo
     {
-        return $this->belongsTo(InstallmentContract::class, 'contract_id');
+        return $this->belongsTo(Contract::class, 'contract_id');
     }
 
     public function product(): BelongsTo

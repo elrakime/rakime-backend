@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\ProductExpiration;
+namespace App\Http\Requests\Web\Expiration;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProductExpirationRequest extends FormRequest
+class UpdateExpirationRequest extends FormRequest
 {
     public function authorize(): bool
     {

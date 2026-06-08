@@ -5,7 +5,7 @@ namespace App\Http\Resources\Web;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductExpirationResource extends JsonResource
+class ExpirationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -21,7 +21,7 @@ class ProductExpirationResource extends JsonResource
 
             'user'      => new UserResource($this->whenLoaded('user')),
             'inventory' => new InventoryResource($this->whenLoaded('inventory')),
-            'items'     => ProductExpirationItemResource::collection($this->whenLoaded('items')),
+            'items'     => ExpirationItemResource::collection($this->whenLoaded('items')),
         ];
     }
 }

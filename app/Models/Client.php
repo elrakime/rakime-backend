@@ -62,6 +62,6 @@ class Client extends Model
 
     public function installmentContracts(): HasMany
     {
-        return $this->hasMany(InstallmentContract::class);
+        return $this->hasMany(Contract::class);
     }
 }

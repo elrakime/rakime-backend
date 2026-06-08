@@ -10,9 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class InstallmentSubscription extends Model
+class Subscription extends Model
 {
-    
 
     protected $fillable = [
         'contract_id',
@@ -53,11 +52,11 @@ class InstallmentSubscription extends Model
 
     public function contract(): BelongsTo
     {
-        return $this->belongsTo(InstallmentContract::class, 'contract_id');
+        return $this->belongsTo(Contract::class, 'contract_id');
     }
 
     public function draws(): HasMany
     {
-        return $this->hasMany(InstallmentDraw::class, 'subscription_id');
+        return $this->hasMany(Draw::class, 'subscription_id');
     }
 }

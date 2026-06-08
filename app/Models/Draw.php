@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InstallmentDraw extends Model
+class Draw extends Model
 {
 
     protected $fillable = [
@@ -60,7 +60,7 @@ class InstallmentDraw extends Model
 
     public function subscription(): BelongsTo
     {
-        return $this->belongsTo(InstallmentSubscription::class, 'subscription_id');
+        return $this->belongsTo(Subscription::class, 'subscription_id');
     }
 
     public function installment(): BelongsTo

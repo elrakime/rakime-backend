@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProductExpiration extends Model
+class Expiration extends Model
 {
 
     protected $fillable = [
@@ -38,7 +38,7 @@ class ProductExpiration extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(ProductExpirationItem::class, 'expiration_id');
+        return $this->hasMany(ExpirationItem::class, 'expiration_id');
     }
 
     public function inventoryMovements(): HasMany

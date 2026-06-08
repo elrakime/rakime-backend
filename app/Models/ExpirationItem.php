@@ -7,10 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProductExpirationItem extends Model
+class ExpirationItem extends Model
 {
 
-    protected $table = 'product_expiration_items';
+    protected $table = 'expiration_items';
 
     protected $fillable = [
         'expiration_id',
@@ -30,7 +30,7 @@ class ProductExpirationItem extends Model
 
     public function expiration(): BelongsTo
     {
-        return $this->belongsTo(ProductExpiration::class, 'expiration_id');
+        return $this->belongsTo(Expiration::class, 'expiration_id');
     }
 
     public function product(): BelongsTo

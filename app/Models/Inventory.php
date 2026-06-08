@@ -46,6 +46,6 @@ class Inventory extends Model
 
     public function expirations(): HasMany
     {
-        return $this->hasMany(ProductExpiration::class);
+        return $this->hasMany(Expiration::class);
     }
 }

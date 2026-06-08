@@ -12,7 +12,7 @@ use App\Services\PurchaseReturnService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PurchaseReturnController extends Controller
+class ReturnController extends Controller
 {
     public function __construct(private readonly PurchaseReturnService $purchaseReturnService) {}
 

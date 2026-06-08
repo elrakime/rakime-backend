@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\ProductExpiration;
-use App\Models\ProductExpirationItem;
+use App\Models\Expiration;
+use App\Models\ExpirationItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class ProductExpirationService
+class ExpirationService
 {
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(ProductExpiration::class, $request)
+        return QueryBuilder::for(Expiration::class, $request)
             ->with(['user', 'inventory', 'items.product', 'items.stock', 'items.batch'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
@@ -36,9 +36,9 @@ class ProductExpirationService
             ->appends($request->query());
     }
 
-    public function create(array $data): ProductExpiration
+    public function create(array $data): Expiration
     {
-        $expiration = ProductExpiration::create([
+        $expiration = Expiration::create([
             'user_id'      => $data['user_id'],
             'inventory_id' => $data['inventory_id'],
             'reference'    => $data['reference'],
@@ -48,7 +48,7 @@ class ProductExpirationService
 
         if (!empty($data['items'])) {
             foreach ($data['items'] as $item) {
-                ProductExpirationItem::create([
+                ExpirationItem::create([
                     'expiration_id' => $expiration->id,
                     'product_id'    => $item['product_id'],
                     'stock_id'      => $item['stock_id'],
@@ -62,12 +62,12 @@ class ProductExpirationService
         return $expiration->load(['user', 'inventory', 'items.product', 'items.stock', 'items.batch']);
     }
 
-    public function show(ProductExpiration $expiration): ProductExpiration
+    public function show(Expiration $expiration): Expiration
     {
         return $expiration->loadMissing(['user', 'inventory', 'items.product', 'items.stock', 'items.batch']);
     }
 
-    public function update(ProductExpiration $expiration, array $data): ProductExpiration
+    public function update(Expiration $expiration, array $data): Expiration
     {
         $expiration->update(array_filter([
             'inventory_id' => $data['inventory_id'] ?? null,
@@ -79,7 +79,7 @@ class ProductExpirationService
         return $expiration->refresh()->loadMissing(['user', 'inventory', 'items.product', 'items.stock', 'items.batch']);
     }
 
-    public function delete(ProductExpiration $expiration): void
+    public function delete(Expiration $expiration): void
     {
         $expiration->items()->delete();
         $expiration->delete();

@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Web\ProductExpiration\StoreProductExpirationRequest;
-use App\Http\Requests\Web\ProductExpiration\UpdateProductExpirationRequest;
-use App\Http\Resources\Web\ProductExpirationResource;
-use App\Models\ProductExpiration;
-use App\Services\ProductExpirationService;
+use App\Http\Requests\Web\Expiration\StoreExpirationRequest;
+use App\Http\Requests\Web\Expiration\UpdateExpirationRequest;
+use App\Http\Resources\Web\ExpirationResource;
+use App\Models\Expiration;
+use App\Services\ExpirationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ProductExpirationController extends Controller
+class ExpirationController extends Controller
 {
-    public function __construct(private readonly ProductExpirationService $expirationService) {}
+    public function __construct(private readonly ExpirationService $expirationService) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -23,11 +23,11 @@ class ProductExpirationController extends Controller
         }
 
         return $this->successResponse(
-            ProductExpirationResource::collection($this->expirationService->list($request)),
+            ExpirationResource::collection($this->expirationService->list($request)),
         );
     }
 
-    public function store(StoreProductExpirationRequest $request): JsonResponse
+    public function store(StoreExpirationRequest $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;
@@ -38,21 +38,21 @@ class ProductExpirationController extends Controller
 
         $expiration = $this->expirationService->create($validated);
 
-        return $this->successResponse(new ProductExpirationResource($expiration), statusCode: 201);
+        return $this->successResponse(new ExpirationResource($expiration), statusCode: 201);
     }
 
-    public function show(ProductExpiration $expiration): JsonResponse
+    public function show(Expiration $expiration): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
             return $response;
         }
 
         return $this->successResponse(
-            new ProductExpirationResource($this->expirationService->show($expiration)),
+            new ExpirationResource($this->expirationService->show($expiration)),
         );
     }
 
-    public function update(UpdateProductExpirationRequest $request, ProductExpiration $expiration): JsonResponse
+    public function update(UpdateExpirationRequest $request, Expiration $expiration): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;
@@ -60,10 +60,10 @@ class ProductExpirationController extends Controller
 
         $expiration = $this->expirationService->update($expiration, $this->validateRequest($request));
 
-        return $this->successResponse(new ProductExpirationResource($expiration));
+        return $this->successResponse(new ExpirationResource($expiration));
     }
 
-    public function destroy(ProductExpiration $expiration): JsonResponse
+    public function destroy(Expiration $expiration): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;

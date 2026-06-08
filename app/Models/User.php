@@ -61,22 +61,22 @@ class User extends Authenticatable implements HasMedia
 
     public function restockOrders(): HasMany
     {
-        return $this->hasMany(RestockOrder::class);
+        return $this->hasMany(Restock::class);
     }
 
     public function cashPaymentsReceived(): HasMany
     {
-        return $this->hasMany(InstallmentCashPayment::class, 'received_by');
+        return $this->hasMany(InstallmentPayment::class, 'received_by');
     }
 
     public function installmentContracts(): HasMany
     {
-        return $this->hasMany(InstallmentContract::class);
+        return $this->hasMany(Contract::class);
     }
 
     public function productExpirations(): HasMany
     {
-        return $this->hasMany(ProductExpiration::class);
+        return $this->hasMany(Expiration::class);
     }
 
     public function treasuryMovements(): HasMany

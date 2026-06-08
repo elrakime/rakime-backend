@@ -88,12 +88,12 @@ class Stock extends Model
 
     public function installmentContractItems(): HasMany
     {
-        return $this->hasMany(InstallmentContractItem::class);
+        return $this->hasMany(ContractItem::class);
     }
 
     public function expirationItems(): HasMany
     {
-        return $this->hasMany(ProductExpirationItem::class);
+        return $this->hasMany(ExpirationItem::class);
     }
 
     public function movements(): HasMany

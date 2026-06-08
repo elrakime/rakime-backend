@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\RestockOrderStatus;
+use App\Enums\RestockStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,11 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class RestockOrder extends Model
+class Restock extends Model
 {
     use LogsActivity;
-
-    
 
     protected $fillable = [
         'user_id',
@@ -30,7 +28,7 @@ class RestockOrder extends Model
     protected function casts(): array
     {
         return [
-            'status'       => RestockOrderStatus::class,
+            'status'       => RestockStatus::class,
             'created_at'   => 'datetime',
             'fulfilled_at' => 'datetime',
         ];
@@ -43,22 +41,22 @@ class RestockOrder extends Model
 
     public function scopeDraft(Builder $query): void
     {
-        $query->where('status', RestockOrderStatus::DRAFT);
+        $query->where('status', RestockStatus::DRAFT);
     }
 
     public function scopeSubmitted(Builder $query): void
     {
-        $query->where('status', RestockOrderStatus::SUBMITTED);
+        $query->where('status', RestockStatus::SUBMITTED);
     }
 
     public function scopeFulfilled(Builder $query): void
     {
-        $query->where('status', RestockOrderStatus::FULFILLED);
+        $query->where('status', RestockStatus::FULFILLED);
     }
 
     public function scopeCancelled(Builder $query): void
     {
-        $query->where('status', RestockOrderStatus::CANCELLED);
+        $query->where('status', RestockStatus::CANCELLED);
     }
 
     public function user(): BelongsTo
@@ -73,7 +71,7 @@ class RestockOrder extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(RestockOrderItem::class);
+        return $this->hasMany(RestockItem::class);
     }
 
     public function inventoryMovements(): HasMany

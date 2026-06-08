@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\InstallmentCashPayment;
+use App\Models\InstallmentPayment;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchasePayment;
 use App\Models\PurchaseReturn;
-use App\Models\RestockOrder;
+use App\Models\Restock;
 use App\Models\Sale;
 use App\Models\Transfer;
 use App\Models\TransferItem;
@@ -26,13 +26,13 @@ class AppServiceProvider extends ServiceProvider
             'transfer_item'  => TransferItem::class,
 
             // reference_type in treasury_movements
-            'installment_cash_payments' => InstallmentCashPayment::class,
+            'installment_payments'      => InstallmentPayment::class,
             'purchase_payments'         => PurchasePayment::class,
-            'purchase_returns'          => PurchaseReturn::class,
+            'returns'                   => PurchaseReturn::class,
             'transfers'                 => Transfer::class,
             'sales'                     => Sale::class,
             'purchases'                 => Purchase::class,
-            'restock_orders'            => RestockOrder::class,
+            'restocks'                  => Restock::class,
         ]);
     }
 }

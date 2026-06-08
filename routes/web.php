@@ -1,25 +1,27 @@
 <?php
 
+use App\Http\Controllers\Api\BatchController;
+use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\Auth\AuthController;
 use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
+use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ColorController;
-use App\Http\Controllers\Web\ProductExpirationController;
-use App\Http\Controllers\Web\ProductController;
-use App\Http\Controllers\Web\CategoryController;
-use App\Http\Controllers\Web\TypeController;
-use App\Http\Controllers\Web\WilayaController;
+use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\PermissionController;
+use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
-use App\Http\Controllers\Web\PurchaseReturnController;
+use App\Http\Controllers\Web\ReturnController;
+use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\TreasuryController;
-use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\TypeController;
 use App\Http\Controllers\Web\UserController;
-use App\Http\Controllers\Web\StockController;
+use App\Http\Controllers\Web\WilayaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -61,10 +63,10 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
-    Route::apiResource('purchases.returns', PurchaseReturnController::class)->except(['update']);
+    Route::apiResource('purchases.returns', ReturnController::class)->except(['update']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
 
-    Route::apiResource('stocks.prices', \App\Http\Controllers\Api\PriceController::class);
-    Route::apiResource('stocks.batches', \App\Http\Controllers\Api\BatchController::class);
-    Route::apiResource('product-expirations', ProductExpirationController::class);
+    Route::apiResource('stocks.prices', PriceController::class);
+    Route::apiResource('stocks.batches', BatchController::class);
+    Route::apiResource('expirations', ExpirationController::class);
 });

@@ -60,16 +60,16 @@ class Installment extends Model
 
     public function contract(): BelongsTo
     {
-        return $this->belongsTo(InstallmentContract::class, 'contract_id');
+        return $this->belongsTo(Contract::class, 'contract_id');
     }
 
     public function cashPayment(): HasOne
     {
-        return $this->hasOne(InstallmentCashPayment::class);
+        return $this->hasOne(InstallmentPayment::class);
     }
 
     public function draws(): HasMany
     {
-        return $this->hasMany(InstallmentDraw::class);
+        return $this->hasMany(Draw::class);
     }
 }

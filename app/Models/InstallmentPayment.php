@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InstallmentCashPayment extends Model
+class InstallmentPayment extends Model
 {
 
     protected $fillable = [

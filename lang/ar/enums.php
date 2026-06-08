@@ -37,7 +37,7 @@ return [
         'BANK' => 'بنك',
     ],
 
-    'restock_order_status' => [
+    'restock_status' => [
         'DRAFT'     => 'مسودة',
         'SUBMITTED' => 'مقدمة',
         'FULFILLED' => 'منجزة',

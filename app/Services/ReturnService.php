@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Enums\InventoryMovementType;
 use App\Models\InventoryMovement;
 use App\Models\PurchaseReturn;
-use App\Models\PurchaseReturnItem;
+use App\Models\ReturnItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +48,7 @@ class PurchaseReturnService
             ]);
 
             foreach ($data['items'] as $item) {
-                $returnItem = PurchaseReturnItem::create([
+                $returnItem = ReturnItem::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'purchase_item_id'   => $item['purchase_item_id'],
                     'quantity'           => $item['quantity'],

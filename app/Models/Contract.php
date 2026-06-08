@@ -12,11 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class InstallmentContract extends Model
+class Contract extends Model
 {
     use LogsActivity;
-
-    
 
     protected $fillable = [
         'user_id',
@@ -110,7 +108,7 @@ class InstallmentContract extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(InstallmentContractItem::class, 'contract_id');
+        return $this->hasMany(ContractItem::class, 'contract_id');
     }
 
     public function installments(): HasMany
@@ -120,6 +118,6 @@ class InstallmentContract extends Model
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(InstallmentSubscription::class, 'contract_id');
+        return $this->hasMany(Subscription::class, 'contract_id');
     }
 }

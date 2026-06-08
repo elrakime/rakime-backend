@@ -31,7 +31,7 @@ class PurchaseReturn extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(PurchaseReturnItem::class);
+        return $this->hasMany(ReturnItem::class);
     }
 
     public function inventoryMovements(): HasMany

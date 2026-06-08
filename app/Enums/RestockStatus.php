@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum RestockOrderStatus: string
+enum RestockStatus: string
 {
     case DRAFT     = 'DRAFT';
     case SUBMITTED = 'SUBMITTED';
@@ -34,7 +34,7 @@ enum RestockOrderStatus: string
 
     public function get_name(): string
     {
-        return __('enums.restock_order_status.' . $this->value);
+        return __('enums.restock_status.' . $this->value);
     }
 
     public function get_color(): string

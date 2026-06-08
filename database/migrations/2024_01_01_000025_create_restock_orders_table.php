@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\RestockOrderStatus;
+use App\Enums\RestockStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('branch_id')->constrained();
             $table->string('reference');
-            $table->enum('status', RestockOrderStatus::keys())->default(RestockOrderStatus::default()->value);
+            $table->enum('status', RestockStatus::keys())->default(RestockStatus::default()->value);
             $table->string('note')->nullable();
             $table->timestamp('fulfilled_at')->nullable();
             $table->timestamps();
