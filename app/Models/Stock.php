@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PriceType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
@@ -48,6 +50,35 @@ class Stock extends Model
     public function prices(): HasMany
     {
         return $this->hasMany(Price::class);
+    }
+
+    public function cashPrice(): HasOne
+    {
+        return $this->hasOne(Price::class)->where('type', PriceType::CASH)->latest();
+    }
+
+    public function installmentPrice(): HasOne
+    {
+        return $this->hasOne(Price::class)->where('type', PriceType::INSTALLMENT)->latest();
+    }
+
+    public function wholesalePrice(): HasOne
+    {
+        return $this->hasOne(Price::class)->where('type', PriceType::WHOLESALE)->latest();
+    }
+
+    public function currentQuantity(): HasOne
+    {
+        return $this->hasOne(Batch::class)
+            ->selectRaw('stock_id, sum(current_quantity) as total_current_quantity')
+            ->groupBy('stock_id');
+    }
+
+    public function initialQuantity(): HasOne
+    {
+        return $this->hasOne(Batch::class)
+            ->selectRaw('stock_id, sum(initial_quantity) as total_initial_quantity')
+            ->groupBy('stock_id');
     }
 
     public function saleItems(): HasMany

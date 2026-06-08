@@ -55,7 +55,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('treasuries', TreasuryController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('purchases', PurchaseController::class);
-    Route::apiResource('stocks', StockController::class);
+    Route::apiResource('stocks', StockController::class)->except(['update']);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);

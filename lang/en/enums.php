@@ -80,4 +80,10 @@ return [
         'FAILED'    => 'Failed',
     ],
 
+    'price_type' => [
+        'cash'        => 'Cash',
+        'installment' => 'Installment',
+        'wholesale'   => 'Wholesale',
+    ],
+
 ];

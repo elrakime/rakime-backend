@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Web;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Stock\StoreStockRequest;
-use App\Http\Requests\Web\Stock\UpdateStockRequest;
 use App\Http\Resources\Web\StockResource;
 use App\Models\Stock;
 use App\Services\StockService;
@@ -43,17 +42,6 @@ class StockController extends Controller
         }
 
         return $this->successResponse(new StockResource($this->stockService->show($stock)));
-    }
-
-    public function update(UpdateStockRequest $request, Stock $stock): JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
-            return $response;
-        }
-
-        $stock = $this->stockService->update($stock, $this->validateRequest($request), $request);
-
-        return $this->successResponse(new StockResource($stock));
     }
 
     public function destroy(Stock $stock): JsonResponse

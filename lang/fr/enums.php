@@ -80,4 +80,10 @@ return [
         'FAILED'    => 'Échoué',
     ],
 
+    'price_type' => [
+        'cash'        => 'Comptant',
+        'installment' => 'Tranche',
+        'wholesale'   => 'Gros',
+    ],
+
 ];

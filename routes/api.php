@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\BatchController;
+use App\Http\Controllers\Api\PriceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -12,4 +14,9 @@ Route::prefix('auth')->group(function () {
         Route::put('update-profile', [AuthController::class, 'updateProfile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('prices', PriceController::class);
+    Route::apiResource('batches', BatchController::class);
 });

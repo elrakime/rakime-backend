@@ -80,4 +80,10 @@ return [
         'FAILED'    => 'فاشل',
     ],
 
+    'price_type' => [
+        'cash'        => 'نقداً',
+        'installment' => 'التقسيط',
+        'wholesale'   => 'الجملة',
+    ],
+
 ];

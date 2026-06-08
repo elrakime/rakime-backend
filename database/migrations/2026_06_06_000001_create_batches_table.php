@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('batches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('source_id');
-            $table->string('source_type');
+            $table->unsignedBigInteger('source_id')->nullable();
+            $table->string('source_type')->nullable();
             $table->unsignedInteger('purchase_price');
             $table->unsignedInteger('initial_quantity');
             $table->unsignedInteger('current_quantity');

@@ -15,7 +15,12 @@ class StockService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Stock::class, $request)
-            ->with(['inventory', 'product', 'batches', 'prices'])
+            ->with([
+                'inventory', 'product',
+                'batches', 'prices',
+                'cashPrice', 'installmentPrice', 'wholesalePrice',
+                'currentQuantity', 'initialQuantity',
+            ])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('product_id'),
@@ -36,16 +41,16 @@ class StockService
 
     public function create(array $data, Request $request): Stock
     {
-        $stock = Stock::create([
+        $stock = Stock::firstOrCreate([
             'inventory_id' => $data['inventory_id'],
             'product_id'   => $data['product_id'],
         ]);
 
-        if (isset($data['purchase_price']) || isset($data['selling_price']) || isset($data['installment_price'])) {
+        if (isset($data['purchase_price']) || isset($data['cash_price']) || isset($data['installment_price'])) {
             $prices = [];
 
-            if (isset($data['selling_price'])) {
-                $prices[] = new Price(['type' => 'selling', 'amount' => $data['selling_price']]);
+            if (isset($data['cash_price'])) {
+                $prices[] = new Price(['type' => 'cash', 'amount' => $data['cash_price']]);
             }
             if (isset($data['installment_price'])) {
                 $prices[] = new Price(['type' => 'installment', 'amount' => $data['installment_price']]);
@@ -70,22 +75,20 @@ class StockService
             ]);
         }
 
-        return $stock->load(['inventory', 'product', 'batches', 'prices']);
+        return $stock->load([
+            'inventory', 'product', 'batches', 'prices',
+            'cashPrice', 'installmentPrice', 'wholesalePrice',
+            'currentQuantity', 'initialQuantity',
+        ]);
     }
 
     public function show(Stock $stock): Stock
     {
-        return $stock->loadMissing(['inventory', 'product', 'batches', 'prices']);
-    }
-
-    public function update(Stock $stock, array $data, Request $request): Stock
-    {
-        $stock->update(array_filter([
-            'inventory_id' => $data['inventory_id'] ?? null,
-            'product_id'   => $data['product_id'] ?? null,
-        ], fn ($v) => $v !== null));
-
-        return $stock->refresh()->loadMissing(['inventory', 'product', 'batches', 'prices']);
+        return $stock->loadMissing([
+            'inventory', 'product', 'batches', 'prices',
+            'cashPrice', 'installmentPrice', 'wholesalePrice',
+            'currentQuantity', 'initialQuantity',
+        ]);
     }
 
     public function delete(Stock $stock): void
