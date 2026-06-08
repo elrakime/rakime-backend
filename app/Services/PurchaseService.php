@@ -150,7 +150,7 @@ class PurchaseService
             foreach ($purchase->items as $item) {
                 $pricing = $pricingByProduct->get($item->product_id, []);
 
-                $stock = Stock::create([
+                $stock = Stock::firstOrCreate([
                     'inventory_id' => $inventoryId,
                     'product_id'   => $item->product_id,
                 ]);
@@ -164,14 +164,15 @@ class PurchaseService
                     'purchased_at'     => $purchase->purchased_at,
                 ]);
 
-                $prices = [];
-                if (isset($pricing['selling_price'])) {
-                    $prices[] = new \App\Models\Price(['type' => 'selling', 'amount' => $pricing['selling_price']]);
+                $prices = collect();
+                foreach ($pricing['selling_prices'] ?? [] as $amount) {
+                    $prices->push(new \App\Models\Price(['type' => 'selling', 'amount' => $amount]));
                 }
-                if (isset($pricing['installment_price'])) {
-                    $prices[] = new \App\Models\Price(['type' => 'installment', 'amount' => $pricing['installment_price']]);
+                foreach ($pricing['installment_prices'] ?? [] as $amount) {
+                    $prices->push(new \App\Models\Price(['type' => 'installment', 'amount' => $amount]));
                 }
-                if (!empty($prices)) {
+
+                if ($prices->isNotEmpty()) {
                     $stock->prices()->saveMany($prices);
                 }
 
