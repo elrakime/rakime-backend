@@ -16,7 +16,7 @@ class RestockOrder extends Model
 {
     use LogsActivity;
 
-    const UPDATED_AT = null;
+    
 
     protected $fillable = [
         'user_id',

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InstallmentSubscription extends Model
 {
-    const UPDATED_AT = null;
+    
 
     protected $fillable = [
         'contract_id',

@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ColorController;
+use App\Http\Controllers\Web\ProductExpirationController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\TypeController;
@@ -63,4 +64,5 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
 
     Route::apiResource('stocks.prices', \App\Http\Controllers\Api\PriceController::class);
     Route::apiResource('stocks.batches', \App\Http\Controllers\Api\BatchController::class);
+    Route::apiResource('product-expirations', ProductExpirationController::class);
 });

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class TreasuryMovement extends Model
 {
-    const UPDATED_AT = null;
+    
 
     protected $fillable = [
         'treasury_id',

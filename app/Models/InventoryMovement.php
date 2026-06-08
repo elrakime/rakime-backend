@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InventoryMovement extends Model
 {
-    const UPDATED_AT = null;
+    
 
     protected $fillable = [
         'stock_id',
