@@ -81,9 +81,9 @@ return [
     ],
 
     'price_type' => [
-        'selling'     => 'البيع',
-        'installment' => 'التقسيط',
-        'wholesale'   => 'الجملة',
+        'SELLING'     => 'البيع',
+        'INSTALLMENT' => 'التقسيط',
+        'WHOLESALE'   => 'الجملة',
     ],
 
 ];

@@ -81,9 +81,9 @@ return [
     ],
 
     'price_type' => [
-        'selling'     => 'Vente',
-        'installment' => 'Tranche',
-        'wholesale'   => 'Gros',
+        'SELLING'     => 'Vente',
+        'INSTALLMENT' => 'Tranche',
+        'WHOLESALE'   => 'Gros',
     ],
 
 ];

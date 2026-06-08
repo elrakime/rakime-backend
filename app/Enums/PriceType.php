@@ -6,9 +6,9 @@ namespace App\Enums;
 
 enum PriceType: string
 {
-    case SELLING      = 'selling';
-    case INSTALLMENT  = 'installment';
-    case WHOLESALE    = 'wholesale';
+    case SELLING      = 'SELLING';
+    case INSTALLMENT  = 'INSTALLMENT';
+    case WHOLESALE    = 'WHOLESALE';
 
     public static function keys(): array
     {
