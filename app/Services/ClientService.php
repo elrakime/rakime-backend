@@ -16,21 +16,24 @@ class ClientService
         return QueryBuilder::for(Client::class, $request)
             ->with(['branch', 'wilaya'])
             ->allowedFilters(
-                AllowedFilter::partial('name'),
+                AllowedFilter::partial('firstname'),
+                AllowedFilter::partial('lastname'),
                 AllowedFilter::partial('phone'),
                 AllowedFilter::partial('nin'),
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('wilaya_id'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
-                        $q->where('name', 'like', "%{$value}%")
+                        $q->where('firstname', 'like', "%{$value}%")
+                          ->orWhere('lastname', 'like', "%{$value}%")
                           ->orWhere('phone', 'like', "%{$value}%")
                           ->orWhere('nin', 'like', "%{$value}%");
                     });
                 }),
             )
             ->allowedSorts(
-                AllowedSort::field('name'),
+                AllowedSort::field('firstname'),
+                AllowedSort::field('lastname'),
                 AllowedSort::field('phone'),
                 AllowedSort::field('created_at'),
             )

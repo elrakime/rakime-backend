@@ -11,7 +11,8 @@ class StoreClientRequest extends FormRequest
         return [
             'branch_id'  => ['required', 'integer', 'exists:branches,id'],
             'wilaya_id'  => ['required', 'integer', 'exists:wilayas,id'],
-            'name'       => ['required', 'string', 'max:255'],
+            'firstname'  => ['required', 'string', 'max:255'],
+            'lastname'   => ['required', 'string', 'max:255'],
             'phone'      => ['required', 'string', 'max:20', 'unique:clients,phone'],
             'birthdate'  => ['nullable', 'date'],
             'address'    => ['nullable', 'string', 'max:500'],

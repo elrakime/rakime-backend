@@ -14,7 +14,8 @@ class UpdateClientRequest extends FormRequest
         return [
             'branch_id'  => ['sometimes', 'required', 'integer', 'exists:branches,id'],
             'wilaya_id'  => ['sometimes', 'required', 'integer', 'exists:wilayas,id'],
-            'name'       => ['sometimes', 'required', 'string', 'max:255'],
+            'firstname'  => ['sometimes', 'required', 'string', 'max:255'],
+            'lastname'   => ['sometimes', 'required', 'string', 'max:255'],
             'phone'      => ['sometimes', 'required', 'string', 'max:20', Rule::unique('clients', 'phone')->ignore($id)],
             'birthdate'  => ['sometimes', 'nullable', 'date'],
             'address'    => ['sometimes', 'nullable', 'string', 'max:500'],
