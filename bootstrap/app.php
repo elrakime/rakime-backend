@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->preventRequestForgery(except: ['v1/*']);
+        $middleware->validateCsrfTokens(except: ['v1/*']);
         $middleware->appendToGroup('api', SetLocaleFromHeader::class);
         $middleware->statefulApi();
         $middleware->alias([
