@@ -46,20 +46,20 @@ class StockService
             'product_id'   => $data['product_id'],
         ]);
 
-        if (isset($data['purchase_price']) || isset($data['selling_price']) || isset($data['installment_price'])) {
-            $prices = [];
+        if (isset($data['selling_prices']) || isset($data['installment_prices']) || isset($data['wholesale_prices']) || isset($data['purchase_price'])) {
+            $prices = collect();
 
-            if (isset($data['selling_price'])) {
-                $prices[] = new Price(['type' => 'selling', 'amount' => $data['selling_price']]);
+            foreach ($data['selling_prices'] ?? [] as $amount) {
+                $prices->push(new Price(['type' => 'selling', 'amount' => $amount]));
             }
-            if (isset($data['installment_price'])) {
-                $prices[] = new Price(['type' => 'installment', 'amount' => $data['installment_price']]);
+            foreach ($data['installment_prices'] ?? [] as $amount) {
+                $prices->push(new Price(['type' => 'installment', 'amount' => $amount]));
             }
-            if (isset($data['wholesale_price'])) {
-                $prices[] = new Price(['type' => 'wholesale', 'amount' => $data['wholesale_price']]);
+            foreach ($data['wholesale_prices'] ?? [] as $amount) {
+                $prices->push(new Price(['type' => 'wholesale', 'amount' => $amount]));
             }
 
-            if (!empty($prices)) {
+            if ($prices->isNotEmpty()) {
                 $stock->prices()->saveMany($prices);
             }
         }
