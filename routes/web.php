@@ -69,4 +69,5 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);
     Route::apiResource('expirations', ExpirationController::class);
+    Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
 });

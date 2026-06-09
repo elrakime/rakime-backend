@@ -14,7 +14,6 @@ class ExpirationItem extends Model
 
     protected $fillable = [
         'expiration_id',
-        'product_id',
         'stock_id',
         'batch_id',
         'quantity',
@@ -31,11 +30,6 @@ class ExpirationItem extends Model
     public function expiration(): BelongsTo
     {
         return $this->belongsTo(Expiration::class, 'expiration_id');
-    }
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
     }
 
     public function stock(): BelongsTo

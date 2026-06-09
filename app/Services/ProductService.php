@@ -75,8 +75,7 @@ class ProductService
 
         if ($request->hasFile('image')) {
             $product->clearMediaCollection('image');
-            $media = $product->addMediaFromRequest('image')->toMediaCollection('image');
-            $product->update(['image' => $media->getUrl()]);
+            $product->addMediaFromRequest('image')->toMediaCollection('image');
         }
 
         return $product->refresh()->loadMissing(['type', 'color', 'brand']);

@@ -33,12 +33,17 @@ class ExpirationController extends Controller
             return $response;
         }
 
-        $validated = $this->validateRequest($request);
-        $validated['user_id'] = $request->user()->id;
+        try {
+            $validated = $this->validateRequest($request);
+            $validated['user_id'] = $request->user()->id;
 
-        $expiration = $this->expirationService->create($validated);
+            $expiration = $this->expirationService->create($validated);
 
-        return $this->successResponse(new ExpirationResource($expiration), statusCode: 201);
+            return $this->successResponse(new ExpirationResource($expiration), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message:$e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+
     }
 
     public function show(Expiration $expiration): JsonResponse
@@ -72,5 +77,16 @@ class ExpirationController extends Controller
         $this->expirationService->delete($expiration);
 
         return $this->successResponse(message: __('app.deleted'));
+    }
+
+    public function approve(Expiration $expiration): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+            return $response;
+        }
+
+        $expiration = $this->expirationService->approve($expiration);
+
+        return $this->successResponse(new ExpirationResource($expiration));
     }
 }
