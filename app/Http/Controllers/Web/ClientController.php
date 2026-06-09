@@ -31,9 +31,13 @@ class ClientController extends Controller
             return $response;
         }
 
-        $client = $this->clientService->create($this->validateRequest($request));
+        try {
+            $client = $this->clientService->create($this->validateRequest($request));
 
-        return $this->successResponse(new ClientResource($client), statusCode: 201);
+            return $this->successResponse(new ClientResource($client), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Client $client): JsonResponse
@@ -42,7 +46,11 @@ class ClientController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new ClientResource($this->clientService->show($client)));
+        try {
+            return $this->successResponse(new ClientResource($this->clientService->show($client)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateClientRequest $request, Client $client): JsonResponse
@@ -51,9 +59,13 @@ class ClientController extends Controller
             return $response;
         }
 
-        $client = $this->clientService->update($client, $this->validateRequest($request));
+        try {
+            $client = $this->clientService->update($client, $this->validateRequest($request));
 
-        return $this->successResponse(new ClientResource($client));
+            return $this->successResponse(new ClientResource($client));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Client $client): JsonResponse
@@ -62,8 +74,12 @@ class ClientController extends Controller
             return $response;
         }
 
-        $this->clientService->delete($client);
+        try {
+            $this->clientService->delete($client);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

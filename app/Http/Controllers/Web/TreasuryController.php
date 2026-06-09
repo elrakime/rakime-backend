@@ -31,9 +31,13 @@ class TreasuryController extends Controller
             return $response;
         }
 
-        $treasury = $this->treasuryService->create($this->validateRequest($request));
+        try {
+            $treasury = $this->treasuryService->create($this->validateRequest($request));
 
-        return $this->successResponse(new TreasuryResource($treasury), statusCode: 201);
+            return $this->successResponse(new TreasuryResource($treasury), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Treasury $treasury): JsonResponse
@@ -42,7 +46,11 @@ class TreasuryController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new TreasuryResource($this->treasuryService->show($treasury)));
+        try {
+            return $this->successResponse(new TreasuryResource($this->treasuryService->show($treasury)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateTreasuryRequest $request, Treasury $treasury): JsonResponse
@@ -51,9 +59,13 @@ class TreasuryController extends Controller
             return $response;
         }
 
-        $treasury = $this->treasuryService->update($treasury, $this->validateRequest($request));
+        try {
+            $treasury = $this->treasuryService->update($treasury, $this->validateRequest($request));
 
-        return $this->successResponse(new TreasuryResource($treasury));
+            return $this->successResponse(new TreasuryResource($treasury));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Treasury $treasury): JsonResponse
@@ -62,8 +74,12 @@ class TreasuryController extends Controller
             return $response;
         }
 
-        $this->treasuryService->delete($treasury);
+        try {
+            $this->treasuryService->delete($treasury);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

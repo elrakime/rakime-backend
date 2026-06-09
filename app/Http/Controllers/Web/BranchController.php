@@ -31,9 +31,13 @@ class BranchController extends Controller
             return $response;
         }
 
-        $branch = $this->branchService->create($this->validateRequest($request));
+        try {
+            $branch = $this->branchService->create($this->validateRequest($request));
 
-        return $this->successResponse(new BranchResource($branch), statusCode: 201);
+            return $this->successResponse(new BranchResource($branch), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Branch $branch): JsonResponse
@@ -42,7 +46,11 @@ class BranchController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new BranchResource($this->branchService->show($branch)));
+        try {
+            return $this->successResponse(new BranchResource($this->branchService->show($branch)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateBranchRequest $request, Branch $branch): JsonResponse
@@ -51,9 +59,13 @@ class BranchController extends Controller
             return $response;
         }
 
-        $branch = $this->branchService->update($branch, $this->validateRequest($request));
+        try {
+            $branch = $this->branchService->update($branch, $this->validateRequest($request));
 
-        return $this->successResponse(new BranchResource($branch));
+            return $this->successResponse(new BranchResource($branch));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Branch $branch): JsonResponse
@@ -62,8 +74,12 @@ class BranchController extends Controller
             return $response;
         }
 
-        $this->branchService->delete($branch);
+        try {
+            $this->branchService->delete($branch);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

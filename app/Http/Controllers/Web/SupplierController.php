@@ -31,9 +31,13 @@ class SupplierController extends Controller
             return $response;
         }
 
-        $supplier = $this->supplierService->create($this->validateRequest($request));
+        try {
+            $supplier = $this->supplierService->create($this->validateRequest($request));
 
-        return $this->successResponse(new SupplierResource($supplier), statusCode: 201);
+            return $this->successResponse(new SupplierResource($supplier), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Supplier $supplier): JsonResponse
@@ -42,7 +46,11 @@ class SupplierController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new SupplierResource($this->supplierService->show($supplier)));
+        try {
+            return $this->successResponse(new SupplierResource($this->supplierService->show($supplier)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse
@@ -51,9 +59,13 @@ class SupplierController extends Controller
             return $response;
         }
 
-        $supplier = $this->supplierService->update($supplier, $this->validateRequest($request));
+        try {
+            $supplier = $this->supplierService->update($supplier, $this->validateRequest($request));
 
-        return $this->successResponse(new SupplierResource($supplier));
+            return $this->successResponse(new SupplierResource($supplier));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Supplier $supplier): JsonResponse
@@ -62,8 +74,12 @@ class SupplierController extends Controller
             return $response;
         }
 
-        $this->supplierService->delete($supplier);
+        try {
+            $this->supplierService->delete($supplier);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

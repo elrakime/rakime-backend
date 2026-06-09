@@ -31,9 +31,13 @@ class ColorController extends Controller
             return $response;
         }
 
-        $color = $this->colorService->create($this->validateRequest($request));
+        try {
+            $color = $this->colorService->create($this->validateRequest($request));
 
-        return $this->successResponse(new ColorResource($color), statusCode: 201);
+            return $this->successResponse(new ColorResource($color), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Color $color): JsonResponse
@@ -42,7 +46,11 @@ class ColorController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new ColorResource($this->colorService->show($color)));
+        try {
+            return $this->successResponse(new ColorResource($this->colorService->show($color)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateColorRequest $request, Color $color): JsonResponse
@@ -51,9 +59,13 @@ class ColorController extends Controller
             return $response;
         }
 
-        $color = $this->colorService->update($color, $this->validateRequest($request));
+        try {
+            $color = $this->colorService->update($color, $this->validateRequest($request));
 
-        return $this->successResponse(new ColorResource($color));
+            return $this->successResponse(new ColorResource($color));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Color $color): JsonResponse
@@ -62,8 +74,12 @@ class ColorController extends Controller
             return $response;
         }
 
-        $this->colorService->delete($color);
+        try {
+            $this->colorService->delete($color);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

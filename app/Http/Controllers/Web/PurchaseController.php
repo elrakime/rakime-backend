@@ -34,9 +34,13 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $purchase = $this->purchaseService->create($this->validateRequest($request));
+        try {
+            $purchase = $this->purchaseService->create($this->validateRequest($request));
 
-        return $this->successResponse(new PurchaseResource($purchase), statusCode: 201);
+            return $this->successResponse(new PurchaseResource($purchase), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Purchase $purchase): JsonResponse
@@ -45,7 +49,11 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new PurchaseResource($this->purchaseService->show($purchase)));
+        try {
+            return $this->successResponse(new PurchaseResource($this->purchaseService->show($purchase)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdatePurchaseRequest $request, Purchase $purchase): JsonResponse
@@ -54,9 +62,13 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $purchase = $this->purchaseService->update($purchase, $this->validateRequest($request));
+        try {
+            $purchase = $this->purchaseService->update($purchase, $this->validateRequest($request));
 
-        return $this->successResponse(new PurchaseResource($purchase));
+            return $this->successResponse(new PurchaseResource($purchase));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Purchase $purchase): JsonResponse
@@ -65,9 +77,13 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $this->purchaseService->delete($purchase);
+        try {
+            $this->purchaseService->delete($purchase);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function receive(ReceivePurchaseRequest $request, Purchase $purchase): JsonResponse
@@ -76,9 +92,13 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $purchase = $this->purchaseService->receive($purchase, $this->validateRequest($request));
+        try {
+            $purchase = $this->purchaseService->receive($purchase, $this->validateRequest($request));
 
-        return $this->successResponse(new PurchaseResource($purchase));
+            return $this->successResponse(new PurchaseResource($purchase));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function payments(Purchase $purchase): JsonResponse
@@ -87,9 +107,13 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $payments = $this->purchaseService->listPayments($purchase);
+        try {
+            $payments = $this->purchaseService->listPayments($purchase);
 
-        return $this->successResponse(PurchasePaymentResource::collection($payments));
+            return $this->successResponse(PurchasePaymentResource::collection($payments));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function addPayment(StorePurchasePaymentRequest $request, Purchase $purchase): JsonResponse
@@ -98,8 +122,12 @@ class PurchaseController extends Controller
             return $response;
         }
 
-        $payment = $this->purchaseService->addPayment($purchase, $this->validateRequest($request));
+        try {
+            $payment = $this->purchaseService->addPayment($purchase, $this->validateRequest($request));
 
-        return $this->successResponse(new PurchasePaymentResource($payment), statusCode: 201);
+            return $this->successResponse(new PurchasePaymentResource($payment), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

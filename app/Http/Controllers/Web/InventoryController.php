@@ -31,9 +31,13 @@ class InventoryController extends Controller
             return $response;
         }
 
-        $inventory = $this->inventoryService->create($this->validateRequest($request));
+        try {
+            $inventory = $this->inventoryService->create($this->validateRequest($request));
 
-        return $this->successResponse(new InventoryResource($inventory), statusCode: 201);
+            return $this->successResponse(new InventoryResource($inventory), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Inventory $inventory): JsonResponse
@@ -42,7 +46,11 @@ class InventoryController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new InventoryResource($this->inventoryService->show($inventory)));
+        try {
+            return $this->successResponse(new InventoryResource($this->inventoryService->show($inventory)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateInventoryRequest $request, Inventory $inventory): JsonResponse
@@ -51,9 +59,13 @@ class InventoryController extends Controller
             return $response;
         }
 
-        $inventory = $this->inventoryService->update($inventory, $this->validateRequest($request));
+        try {
+            $inventory = $this->inventoryService->update($inventory, $this->validateRequest($request));
 
-        return $this->successResponse(new InventoryResource($inventory));
+            return $this->successResponse(new InventoryResource($inventory));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Inventory $inventory): JsonResponse
@@ -62,8 +74,12 @@ class InventoryController extends Controller
             return $response;
         }
 
-        $this->inventoryService->delete($inventory);
+        try {
+            $this->inventoryService->delete($inventory);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

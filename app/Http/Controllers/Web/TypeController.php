@@ -31,9 +31,13 @@ class TypeController extends Controller
             return $response;
         }
 
-        $type = $this->typeService->create($this->validateRequest($request));
+        try {
+            $type = $this->typeService->create($this->validateRequest($request));
 
-        return $this->successResponse(new TypeResource($type), statusCode: 201);
+            return $this->successResponse(new TypeResource($type), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Type $type): JsonResponse
@@ -42,7 +46,11 @@ class TypeController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new TypeResource($this->typeService->show($type)));
+        try {
+            return $this->successResponse(new TypeResource($this->typeService->show($type)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateTypeRequest $request, Type $type): JsonResponse
@@ -51,9 +59,13 @@ class TypeController extends Controller
             return $response;
         }
 
-        $type = $this->typeService->update($type, $this->validateRequest($request));
+        try {
+            $type = $this->typeService->update($type, $this->validateRequest($request));
 
-        return $this->successResponse(new TypeResource($type));
+            return $this->successResponse(new TypeResource($type));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Type $type): JsonResponse
@@ -62,8 +74,12 @@ class TypeController extends Controller
             return $response;
         }
 
-        $this->typeService->delete($type);
+        try {
+            $this->typeService->delete($type);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

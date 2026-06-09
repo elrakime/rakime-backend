@@ -31,9 +31,13 @@ class WilayaController extends Controller
             return $response;
         }
 
-        $wilaya = $this->wilayaService->create($this->validateRequest($request));
+        try {
+            $wilaya = $this->wilayaService->create($this->validateRequest($request));
 
-        return $this->successResponse(new WilayaResource($wilaya), statusCode: 201);
+            return $this->successResponse(new WilayaResource($wilaya), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Wilaya $wilaya): JsonResponse
@@ -42,7 +46,11 @@ class WilayaController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new WilayaResource($this->wilayaService->show($wilaya)));
+        try {
+            return $this->successResponse(new WilayaResource($this->wilayaService->show($wilaya)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateWilayaRequest $request, Wilaya $wilaya): JsonResponse
@@ -51,9 +59,13 @@ class WilayaController extends Controller
             return $response;
         }
 
-        $wilaya = $this->wilayaService->update($wilaya, $this->validateRequest($request));
+        try {
+            $wilaya = $this->wilayaService->update($wilaya, $this->validateRequest($request));
 
-        return $this->successResponse(new WilayaResource($wilaya));
+            return $this->successResponse(new WilayaResource($wilaya));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Wilaya $wilaya): JsonResponse
@@ -62,8 +74,12 @@ class WilayaController extends Controller
             return $response;
         }
 
-        $this->wilayaService->delete($wilaya);
+        try {
+            $this->wilayaService->delete($wilaya);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

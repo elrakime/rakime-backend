@@ -31,9 +31,13 @@ class AccountController extends Controller
             return $response;
         }
 
-        $account = $this->accountService->create($this->validateRequest($request));
+        try {
+            $account = $this->accountService->create($this->validateRequest($request));
 
-        return $this->successResponse(new AccountResource($account), statusCode: 201);
+            return $this->successResponse(new AccountResource($account), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Account $account): JsonResponse
@@ -42,7 +46,11 @@ class AccountController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new AccountResource($this->accountService->show($account)));
+        try {
+            return $this->successResponse(new AccountResource($this->accountService->show($account)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateAccountRequest $request, Account $account): JsonResponse
@@ -51,9 +59,13 @@ class AccountController extends Controller
             return $response;
         }
 
-        $account = $this->accountService->update($account, $this->validateRequest($request));
+        try {
+            $account = $this->accountService->update($account, $this->validateRequest($request));
 
-        return $this->successResponse(new AccountResource($account));
+            return $this->successResponse(new AccountResource($account));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Account $account): JsonResponse
@@ -62,8 +74,12 @@ class AccountController extends Controller
             return $response;
         }
 
-        $this->accountService->delete($account);
+        try {
+            $this->accountService->delete($account);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

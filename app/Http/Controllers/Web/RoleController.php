@@ -30,9 +30,13 @@ class RoleController extends Controller
             return $response;
         }
 
-        $role = $this->roleService->create($this->validateRequest($request));
+        try {
+            $role = $this->roleService->create($this->validateRequest($request));
 
-        return $this->successResponse(new RoleResource($role), statusCode: 201);
+            return $this->successResponse(new RoleResource($role), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Role $role): JsonResponse
@@ -41,7 +45,11 @@ class RoleController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new RoleResource($this->roleService->show($role)));
+        try {
+            return $this->successResponse(new RoleResource($this->roleService->show($role)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
@@ -50,9 +58,13 @@ class RoleController extends Controller
             return $response;
         }
 
-        $role = $this->roleService->update($role, $this->validateRequest($request));
+        try {
+            $role = $this->roleService->update($role, $this->validateRequest($request));
 
-        return $this->successResponse(new RoleResource($role));
+            return $this->successResponse(new RoleResource($role));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Role $role): JsonResponse
@@ -61,8 +73,12 @@ class RoleController extends Controller
             return $response;
         }
 
-        $this->roleService->delete($role);
+        try {
+            $this->roleService->delete($role);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

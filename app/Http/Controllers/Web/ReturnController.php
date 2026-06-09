@@ -33,9 +33,13 @@ class ReturnController extends Controller
             return $response;
         }
 
-        $purchaseReturn = $this->purchaseReturnService->create($this->validateRequest($request));
+        try {
+            $purchaseReturn = $this->purchaseReturnService->create($this->validateRequest($request));
 
-        return $this->successResponse(new PurchaseReturnResource($purchaseReturn), statusCode: 201);
+            return $this->successResponse(new PurchaseReturnResource($purchaseReturn), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(PurchaseReturn $purchaseReturn): JsonResponse
@@ -44,9 +48,13 @@ class ReturnController extends Controller
             return $response;
         }
 
-        return $this->successResponse(
-            new PurchaseReturnResource($this->purchaseReturnService->show($purchaseReturn)),
-        );
+        try {
+            return $this->successResponse(
+                new PurchaseReturnResource($this->purchaseReturnService->show($purchaseReturn)),
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(PurchaseReturn $purchaseReturn): JsonResponse
@@ -55,8 +63,12 @@ class ReturnController extends Controller
             return $response;
         }
 
-        $this->purchaseReturnService->delete($purchaseReturn);
+        try {
+            $this->purchaseReturnService->delete($purchaseReturn);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

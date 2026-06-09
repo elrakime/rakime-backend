@@ -30,9 +30,13 @@ class StockController extends Controller
             return $response;
         }
 
-        $stock = $this->stockService->create($this->validateRequest($request), $request);
+        try {
+            $stock = $this->stockService->create($this->validateRequest($request), $request);
 
-        return $this->successResponse(new StockResource($stock), statusCode: 201);
+            return $this->successResponse(new StockResource($stock), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Stock $stock): JsonResponse
@@ -41,7 +45,11 @@ class StockController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new StockResource($this->stockService->show($stock)));
+        try {
+            return $this->successResponse(new StockResource($this->stockService->show($stock)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Stock $stock): JsonResponse
@@ -50,8 +58,12 @@ class StockController extends Controller
             return $response;
         }
 
-        $this->stockService->delete($stock);
+        try {
+            $this->stockService->delete($stock);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

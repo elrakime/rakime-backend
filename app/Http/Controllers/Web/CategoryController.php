@@ -31,9 +31,13 @@ class CategoryController extends Controller
             return $response;
         }
 
-        $category = $this->categoryService->create($this->validateRequest($request), $request);
+        try {
+            $category = $this->categoryService->create($this->validateRequest($request), $request);
 
-        return $this->successResponse(new CategoryResource($category), statusCode: 201);
+            return $this->successResponse(new CategoryResource($category), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Category $category): JsonResponse
@@ -42,7 +46,11 @@ class CategoryController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new CategoryResource($this->categoryService->show($category)));
+        try {
+            return $this->successResponse(new CategoryResource($this->categoryService->show($category)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
@@ -51,9 +59,13 @@ class CategoryController extends Controller
             return $response;
         }
 
-        $category = $this->categoryService->update($category, $this->validateRequest($request), $request);
+        try {
+            $category = $this->categoryService->update($category, $this->validateRequest($request), $request);
 
-        return $this->successResponse(new CategoryResource($category));
+            return $this->successResponse(new CategoryResource($category));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Category $category): JsonResponse
@@ -62,8 +74,12 @@ class CategoryController extends Controller
             return $response;
         }
 
-        $this->categoryService->delete($category);
+        try {
+            $this->categoryService->delete($category);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

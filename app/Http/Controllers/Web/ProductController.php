@@ -31,9 +31,13 @@ class ProductController extends Controller
             return $response;
         }
 
-        $product = $this->productService->create($this->validateRequest($request), $request);
+        try {
+            $product = $this->productService->create($this->validateRequest($request), $request);
 
-        return $this->successResponse(new ProductResource($product), statusCode: 201);
+            return $this->successResponse(new ProductResource($product), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Product $product): JsonResponse
@@ -42,7 +46,11 @@ class ProductController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new ProductResource($this->productService->show($product)));
+        try {
+            return $this->successResponse(new ProductResource($this->productService->show($product)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateProductRequest $request, Product $product): JsonResponse
@@ -51,9 +59,13 @@ class ProductController extends Controller
             return $response;
         }
 
-        $product = $this->productService->update($product, $this->validateRequest($request), $request);
+        try {
+            $product = $this->productService->update($product, $this->validateRequest($request), $request);
 
-        return $this->successResponse(new ProductResource($product));
+            return $this->successResponse(new ProductResource($product));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Product $product): JsonResponse
@@ -62,8 +74,12 @@ class ProductController extends Controller
             return $response;
         }
 
-        $this->productService->delete($product);
+        try {
+            $this->productService->delete($product);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

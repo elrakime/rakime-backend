@@ -31,9 +31,13 @@ class BrandController extends Controller
             return $response;
         }
 
-        $brand = $this->brandService->create($this->validateRequest($request), $request);
+        try {
+            $brand = $this->brandService->create($this->validateRequest($request), $request);
 
-        return $this->successResponse(new BrandResource($brand), statusCode: 201);
+            return $this->successResponse(new BrandResource($brand), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(Brand $brand): JsonResponse
@@ -42,7 +46,11 @@ class BrandController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new BrandResource($this->brandService->show($brand)));
+        try {
+            return $this->successResponse(new BrandResource($this->brandService->show($brand)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateBrandRequest $request, Brand $brand): JsonResponse
@@ -51,9 +59,13 @@ class BrandController extends Controller
             return $response;
         }
 
-        $brand = $this->brandService->update($brand, $this->validateRequest($request), $request);
+        try {
+            $brand = $this->brandService->update($brand, $this->validateRequest($request), $request);
 
-        return $this->successResponse(new BrandResource($brand));
+            return $this->successResponse(new BrandResource($brand));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Brand $brand): JsonResponse
@@ -62,8 +74,12 @@ class BrandController extends Controller
             return $response;
         }
 
-        $this->brandService->delete($brand);
+        try {
+            $this->brandService->delete($brand);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

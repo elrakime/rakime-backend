@@ -52,9 +52,13 @@ class ExpirationController extends Controller
             return $response;
         }
 
-        return $this->successResponse(
-            new ExpirationResource($this->expirationService->show($expiration)),
-        );
+        try {
+            return $this->successResponse(
+                new ExpirationResource($this->expirationService->show($expiration)),
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateExpirationRequest $request, Expiration $expiration): JsonResponse
@@ -63,9 +67,13 @@ class ExpirationController extends Controller
             return $response;
         }
 
-        $expiration = $this->expirationService->update($expiration, $this->validateRequest($request));
+        try {
+            $expiration = $this->expirationService->update($expiration, $this->validateRequest($request));
 
-        return $this->successResponse(new ExpirationResource($expiration));
+            return $this->successResponse(new ExpirationResource($expiration));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(Expiration $expiration): JsonResponse
@@ -74,9 +82,13 @@ class ExpirationController extends Controller
             return $response;
         }
 
-        $this->expirationService->delete($expiration);
+        try {
+            $this->expirationService->delete($expiration);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function approve(Expiration $expiration): JsonResponse
@@ -85,8 +97,12 @@ class ExpirationController extends Controller
             return $response;
         }
 
-        $expiration = $this->expirationService->approve($expiration);
+        try {
+            $expiration = $this->expirationService->approve($expiration);
 
-        return $this->successResponse(new ExpirationResource($expiration));
+            return $this->successResponse(new ExpirationResource($expiration));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }

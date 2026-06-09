@@ -31,9 +31,13 @@ class UserController extends Controller
             return $response;
         }
 
-        $user = $this->userService->create($this->validateRequest($request));
+        try {
+            $user = $this->userService->create($this->validateRequest($request));
 
-        return $this->successResponse(new UserResource($user));
+            return $this->successResponse(new UserResource($user));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function show(User $user): JsonResponse
@@ -42,7 +46,11 @@ class UserController extends Controller
             return $response;
         }
 
-        return $this->successResponse(new UserResource($this->userService->show($user)));
+        try {
+            return $this->successResponse(new UserResource($this->userService->show($user)));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
@@ -51,9 +59,13 @@ class UserController extends Controller
             return $response;
         }
 
-        $user = $this->userService->update($user, $this->validateRequest($request));
+        try {
+            $user = $this->userService->update($user, $this->validateRequest($request));
 
-        return $this->successResponse(new UserResource($user));
+            return $this->successResponse(new UserResource($user));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 
     public function destroy(User $user): JsonResponse
@@ -62,8 +74,12 @@ class UserController extends Controller
             return $response;
         }
 
-        $this->userService->delete($user);
+        try {
+            $this->userService->delete($user);
 
-        return $this->successResponse(message: __('app.deleted'));
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
     }
 }
