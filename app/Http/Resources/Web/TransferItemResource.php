@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Web;
 
+use App\Http\Resources\Web\StockResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,10 +13,10 @@ class TransferItemResource extends JsonResource
         return [
             'id'          => $this->id,
             'transfer_id' => $this->transfer_id,
-            'product_id'  => $this->product_id,
+            'stock_id'    => $this->stock_id,
             'quantity'    => $this->quantity,
 
-            'product' => new ProductResource($this->whenLoaded('product')),
+            'stock'   => new StockResource($this->whenLoaded('stock')),
         ];
     }
 }

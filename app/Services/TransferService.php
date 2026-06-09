@@ -19,7 +19,7 @@ class TransferService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Transfer::class, $request)
-            ->with(['fromInventory', 'toInventory', 'items.product'])
+            ->with(['fromInventory', 'toInventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('from_inventory_id'),
                 AllowedFilter::exact('to_inventory_id'),
@@ -52,18 +52,18 @@ class TransferService
             foreach ($data['items'] as $item) {
                 TransferItem::create([
                     'transfer_id' => $transfer->id,
-                    'product_id'  => $item['product_id'],
+                    'stock_id'    => $item['stock_id'],
                     'quantity'    => $item['quantity'],
                 ]);
             }
 
-            return $transfer->load(['fromInventory', 'toInventory', 'items.product']);
+            return $transfer->load(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
     public function show(Transfer $transfer): Transfer
     {
-        return $transfer->loadMissing(['fromInventory', 'toInventory', 'items.product']);
+        return $transfer->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
     }
 
     public function update(Transfer $transfer, array $data): Transfer
@@ -86,13 +86,13 @@ class TransferService
                 foreach ($data['items'] as $item) {
                     TransferItem::create([
                         'transfer_id' => $transfer->id,
-                        'product_id'  => $item['product_id'],
+                        'stock_id'    => $item['stock_id'],
                         'quantity'    => $item['quantity'],
                     ]);
                 }
             }
 
-            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.product']);
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
@@ -106,11 +106,9 @@ class TransferService
             $transfer->update(['received_at' => now()]);
 
             foreach ($transfer->items as $transferItem) {
-                // Decrement stock in the source inventory
-                $fromStock = Stock::where('inventory_id', $transfer->from_inventory_id)
-                    ->where('product_id', $transferItem->product_id)
-                    ->first();
+                $fromStock = $transferItem->stock;
 
+                // Decrement stock in the source inventory
                 if ($fromStock) {
                     $fromBatch = $fromStock->batches()
                         ->where('current_quantity', '>', 0)
@@ -125,7 +123,7 @@ class TransferService
                         'stock_id'      => $fromStock->id,
                         'batch_id'      => $fromBatch?->id,
                         'inventory_id'  => $transfer->from_inventory_id,
-                        'product_id'    => $transferItem->product_id,
+                        'product_id'    => $transferItem->stock->product_id,
                         'moveable_id'   => $transfer->id,
                         'movement_type' => InventoryMovementType::TRANSFER_OUT,
                         'quantity'      => $transferItem->quantity,
@@ -135,7 +133,7 @@ class TransferService
                 // Increment stock in the destination inventory
                 $toStock = Stock::firstOrCreate([
                     'inventory_id' => $transfer->to_inventory_id,
-                    'product_id'   => $transferItem->product_id,
+                    'product_id'   => $transferItem->stock->product_id,
                 ]);
 
                 $toBatch = $toStock->batches()->create([
@@ -151,7 +149,7 @@ class TransferService
                     'stock_id'      => $toStock->id,
                     'batch_id'      => $toBatch->id,
                     'inventory_id'  => $transfer->to_inventory_id,
-                    'product_id'    => $transferItem->product_id,
+                    'product_id'    => $transferItem->stock->product_id,
                     'moveable_id'   => $transfer->id,
                     'movement_type' => InventoryMovementType::TRANSFER_IN,
                     'quantity'      => $transferItem->quantity,

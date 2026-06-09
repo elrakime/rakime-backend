@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Models\Batch;
 use App\Models\InventoryMovement;
+use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
 use App\Models\ReturnItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -40,6 +42,8 @@ class ReturnService
 
     public function create(array $data): PurchaseReturn
     {
+        $this->validateItemsBelongToPurchase($data['purchase_id'], $data['items']);
+
         return DB::transaction(function () use ($data) {
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $data['purchase_id'],
@@ -60,6 +64,40 @@ class ReturnService
         });
     }
 
+    public function update(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
+    {
+        if ($purchaseReturn->approved_at) {
+            throw new \Exception(__('returns.cannot_update_approved'), 422);
+        }
+
+        if (isset($data['items'])) {
+            $purchaseReturn->load('purchase');
+            $this->validateItemsBelongToPurchase($purchaseReturn->purchase_id, $data['items']);
+        }
+
+        return DB::transaction(function () use ($purchaseReturn, $data) {
+            $purchaseReturn->update([
+                'reference'   => $data['reference'] ?? $purchaseReturn->reference,
+                'returned_at' => $data['returned_at'] ?? $purchaseReturn->returned_at,
+            ]);
+
+            if (isset($data['items'])) {
+                $purchaseReturn->items()->delete();
+
+                foreach ($data['items'] as $item) {
+                    ReturnItem::create([
+                        'purchase_return_id' => $purchaseReturn->id,
+                        'purchase_item_id'   => $item['purchase_item_id'],
+                        'quantity'           => $item['quantity'],
+                        'reason'             => $item['reason'] ?? null,
+                    ]);
+                }
+            }
+
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
+        });
+    }
+
     public function show(PurchaseReturn $purchaseReturn): PurchaseReturn
     {
         return $purchaseReturn->loadMissing(['purchase', 'items.purchaseItem.product']);
@@ -76,24 +114,18 @@ class ReturnService
 
             foreach ($purchaseReturn->items as $returnItem) {
                 $purchaseItem = $returnItem->purchaseItem;
-                $stock = $purchaseItem->stock;
 
-                if ($stock) {
-                    // Decrement the batch quantity
-                    /** @var \App\Models\Batch|null $batch */
-                    $batch = $stock->batches()
-                        ->where('source_id', $purchaseItem->id)
-                        ->where('source_type', 'purchase_item')
-                        ->first();
+                $batch = Batch::where('source_id', $purchaseItem->id)
+                    ->where('source_type', 'purchase_items')
+                    ->first();
 
-                    if ($batch) {
-                        $batch->decrement('current_quantity', $returnItem->quantity);
-                    }
+                if ($batch) {
+                    $batch->decrement('current_quantity', $returnItem->quantity);
 
                     InventoryMovement::create([
-                        'stock_id'      => $stock->id,
-                        'batch_id'      => $batch?->id,
-                        'inventory_id'  => $stock->inventory_id,
+                        'stock_id'      => $batch->stock_id,
+                        'batch_id'      => $batch->id,
+                        'inventory_id'  => $batch->stock->inventory_id,
                         'product_id'    => $purchaseItem->product_id,
                         'moveable_id'   => $purchaseReturn->id,
                         'movement_type' => InventoryMovementType::RETURN,
@@ -116,5 +148,18 @@ class ReturnService
             $purchaseReturn->items()->delete();
             $purchaseReturn->delete();
         });
+    }
+
+    private function validateItemsBelongToPurchase(int $purchaseId, array $items): void
+    {
+        $itemIds = collect($items)->pluck('purchase_item_id')->unique()->toArray();
+
+        $validCount = PurchaseItem::whereIn('id', $itemIds)
+            ->where('purchase_id', $purchaseId)
+            ->count();
+
+        if ($validCount !== count($itemIds)) {
+            throw new \Exception(__('returns.invalid_purchase_items'), 422);
+        }
     }
 }

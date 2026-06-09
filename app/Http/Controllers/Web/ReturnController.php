@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Web\Purchase\StorePurchaseReturnRequest;
-use App\Http\Resources\Web\PurchaseReturnResource;
-use App\Models\Purchase;
+use App\Http\Requests\Web\Return\StoreReturnRequest;
+use App\Http\Requests\Web\Return\UpdateReturnRequest;
+use App\Http\Resources\Web\ReturnResource;
 use App\Models\PurchaseReturn;
 use App\Services\ReturnService;
 use Illuminate\Http\JsonResponse;
@@ -23,11 +23,11 @@ class ReturnController extends Controller
         }
 
         return $this->successResponse(
-            PurchaseReturnResource::collection($this->purchaseReturnService->list($request)),
+            ReturnResource::collection($this->purchaseReturnService->list($request)),
         );
     }
 
-    public function store(StorePurchaseReturnRequest $request): JsonResponse
+    public function store(StoreReturnRequest $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
             return $response;
@@ -36,7 +36,7 @@ class ReturnController extends Controller
         try {
             $purchaseReturn = $this->purchaseReturnService->create($this->validateRequest($request));
 
-            return $this->successResponse(new PurchaseReturnResource($purchaseReturn), statusCode: 201);
+            return $this->successResponse(new ReturnResource($purchaseReturn), statusCode: 201);
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
@@ -50,8 +50,23 @@ class ReturnController extends Controller
 
         try {
             return $this->successResponse(
-                new PurchaseReturnResource($this->purchaseReturnService->show($purchaseReturn)),
+                new ReturnResource($this->purchaseReturnService->show($purchaseReturn)),
             );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
+    public function update(UpdateReturnRequest $request, PurchaseReturn $purchaseReturn): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+            return $response;
+        }
+
+        try {
+            $purchaseReturn = $this->purchaseReturnService->update($purchaseReturn, $this->validateRequest($request));
+
+            return $this->successResponse(new ReturnResource($purchaseReturn));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
@@ -81,7 +96,7 @@ class ReturnController extends Controller
         try {
             $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn);
 
-            return $this->successResponse(new PurchaseReturnResource($purchaseReturn));
+            return $this->successResponse(new ReturnResource($purchaseReturn));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }

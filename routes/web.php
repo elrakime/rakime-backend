@@ -66,12 +66,12 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
-    Route::apiResource('purchases.returns', ReturnController::class)->except(['update']);
-    Route::post('purchases.returns/{purchase_return}/approve', [ReturnController::class, 'approve']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);
     Route::apiResource('expirations', ExpirationController::class);
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
+    Route::apiResource('returns', ReturnController::class)->parameters(['returns' => 'purchase_return']);
+    Route::post('returns/{purchase_return}/approve', [ReturnController::class, 'approve']);
 });

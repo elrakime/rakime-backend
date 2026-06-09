@@ -6,14 +6,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class TransferItem extends Model
 {
 
     protected $fillable = [
         'transfer_id',
-        'product_id',
+        'stock_id',
         'quantity',
     ];
 
@@ -29,13 +28,8 @@ class TransferItem extends Model
         return $this->belongsTo(Transfer::class);
     }
 
-    public function product(): BelongsTo
+    public function stock(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
-    }
-
-    public function stock(): MorphOne
-    {
-        return $this->morphOne(Stock::class, 'source', 'source_type', 'source_id');
+        return $this->belongsTo(Stock::class);
     }
 }
