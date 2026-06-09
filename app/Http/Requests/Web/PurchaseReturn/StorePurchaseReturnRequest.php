@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\Return;
+namespace App\Http\Requests\Web\PurchaseReturn;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreReturnRequest extends FormRequest
+class StorePurchaseReturnRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,6 @@ class StoreReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'purchase_id'                  => ['required', 'exists:purchases,id'],
             'reference'                    => ['nullable', 'string', 'max:255'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'returned_at'                  => ['nullable', 'date'],

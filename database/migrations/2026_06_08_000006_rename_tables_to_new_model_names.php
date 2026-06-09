@@ -12,7 +12,6 @@ return new class extends Migration
         Schema::rename('restock_orders', 'restocks');
         Schema::rename('restock_order_items', 'restock_items');
         Schema::rename('installment_cash_payments', 'installment_payments');
-        Schema::rename('purchase_return_items', 'return_items');
         Schema::rename('installment_contracts', 'contracts');
         Schema::rename('installment_contract_items', 'contract_items');
         Schema::rename('installment_draws', 'draws');
@@ -25,7 +24,6 @@ return new class extends Migration
         Schema::rename('draws', 'installment_draws');
         Schema::rename('contract_items', 'installment_contract_items');
         Schema::rename('contracts', 'installment_contracts');
-        Schema::rename('return_items', 'purchase_return_items');
         Schema::rename('installment_payments', 'installment_cash_payments');
         Schema::rename('restock_items', 'restock_order_items');
         Schema::rename('restocks', 'restock_orders');

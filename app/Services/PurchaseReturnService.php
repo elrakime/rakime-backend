@@ -5,9 +5,10 @@ namespace App\Services;
 use App\Enums\InventoryMovementType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
+use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
-use App\Models\ReturnItem;
+use App\Models\PurchaseReturnItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,12 +18,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseReturnService
 {
-    public function list(Request $request): LengthAwarePaginator
+    public function list(Request $request, Purchase $purchase): LengthAwarePaginator
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
+            ->where('purchase_id', $purchase->id)
             ->with(['purchase', 'items.purchaseItem.product'])
             ->allowedFilters(
-                AllowedFilter::exact('purchase_id'),
                 AllowedFilter::partial('reference'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
@@ -40,20 +41,20 @@ class PurchaseReturnService
             ->appends($request->query());
     }
 
-    public function create(array $data): PurchaseReturn
+    public function create(Purchase $purchase, array $data): PurchaseReturn
     {
-        $this->validateItemsBelongToPurchase($data['purchase_id'], $data['items']);
+        $this->validateItemsBelongToPurchase($purchase->id, $data['items']);
 
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($purchase, $data) {
             $purchaseReturn = PurchaseReturn::create([
-                'purchase_id' => $data['purchase_id'],
+                'purchase_id' => $purchase->id,
                 'reference'   => $data['reference'] ?? null,
                 'note'        => $data['note'] ?? null,
                 'returned_at' => $data['returned_at'] ?? now(),
             ]);
 
             foreach ($data['items'] as $item) {
-                ReturnItem::create([
+                PurchaseReturnItem::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'purchase_item_id'   => $item['purchase_item_id'],
                     'quantity'           => $item['quantity'],
@@ -68,7 +69,7 @@ class PurchaseReturnService
     public function update(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
     {
         if ($purchaseReturn->approved_at) {
-            throw new \Exception(__('returns.cannot_update_approved'), 422);
+            throw new \Exception(__('purchase_returns.cannot_update_approved'), 422);
         }
 
         if (isset($data['items'])) {
@@ -87,7 +88,7 @@ class PurchaseReturnService
                 $purchaseReturn->items()->delete();
 
                 foreach ($data['items'] as $item) {
-                    ReturnItem::create([
+                    PurchaseReturnItem::create([
                         'purchase_return_id' => $purchaseReturn->id,
                         'purchase_item_id'   => $item['purchase_item_id'],
                         'quantity'           => $item['quantity'],
@@ -143,7 +144,7 @@ class PurchaseReturnService
     public function delete(PurchaseReturn $purchaseReturn): void
     {
         if ($purchaseReturn->approved_at) {
-            throw new \Exception(__('returns.cannot_delete_approved'), 422);
+            throw new \Exception(__('purchase_returns.cannot_delete_approved'), 422);
         }
 
         DB::transaction(function () use ($purchaseReturn) {
@@ -161,7 +162,7 @@ class PurchaseReturnService
             ->count();
 
         if ($validCount !== count($itemIds)) {
-            throw new \Exception(__('returns.invalid_purchase_items'), 422);
+            throw new \Exception(__('purchase_returns.invalid_purchase_items'), 422);
         }
     }
 }

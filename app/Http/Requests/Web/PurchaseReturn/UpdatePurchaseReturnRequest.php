@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\Return;
+namespace App\Http\Requests\Web\PurchaseReturn;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateReturnRequest extends FormRequest
+class UpdatePurchaseReturnRequest extends FormRequest
 {
     public function authorize(): bool
     {

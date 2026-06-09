@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReturnItem extends Model
+class PurchaseReturnItem extends Model
 {
 
     protected $fillable = [

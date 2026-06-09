@@ -14,7 +14,7 @@ use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
-use App\Http\Controllers\Web\ReturnController;
+use App\Http\Controllers\Web\PurchaseReturnController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
@@ -64,14 +64,16 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('transfers/{transfer}/receive', [TransferController::class, 'receive']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
-    Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
-    Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
+    //Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
+    //Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
+    Route::apiResource('purchase.payments', PurchaseController::class)->only(['index', 'store']);
+    Route::apiResource('purchases.returns', PurchaseReturnController::class)->parameters(['returns' => 'purchase_return']);
+    Route::post('purchases/{purchase}/returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);
     Route::apiResource('expirations', ExpirationController::class);
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
-    Route::apiResource('returns', ReturnController::class)->parameters(['returns' => 'purchase_return']);
-    Route::post('returns/{purchase_return}/approve', [ReturnController::class, 'approve']);
+    
 });

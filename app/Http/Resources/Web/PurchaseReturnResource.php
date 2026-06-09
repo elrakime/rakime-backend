@@ -5,7 +5,7 @@ namespace App\Http\Resources\Web;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReturnResource extends JsonResource
+class PurchaseReturnResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -18,10 +18,10 @@ class ReturnResource extends JsonResource
             'created_at'  => $this->created_at,
 
             'purchase' => $this->whenLoaded('purchase', fn () => [
-                'id'      => $this->purchase->id,
+                'id'        => $this->purchase->id,
                 'reference' => $this->purchase->reference,
             ]),
-            'items' => ReturnItemResource::collection($this->whenLoaded('items')),
+            'items' => PurchaseReturnItemResource::collection($this->whenLoaded('items')),
         ];
     }
 }
