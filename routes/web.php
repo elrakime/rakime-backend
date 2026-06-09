@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\InventoryController;
+use App\Http\Controllers\Web\InventoryMovementController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
@@ -59,6 +60,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('inventories', InventoryController::class);
+    Route::get('inventory-movements', [InventoryMovementController::class, 'index']);
     Route::apiResource('treasuries', TreasuryController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('transfers', TransferController::class);
