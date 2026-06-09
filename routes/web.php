@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
 use App\Http\Controllers\Web\PurchaseReturnController;
+use App\Http\Controllers\Web\RestockController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
@@ -70,6 +71,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('purchase.payments', PurchaseController::class)->only(['index', 'store']);
     Route::apiResource('purchases.returns', PurchaseReturnController::class)->parameters(['returns' => 'purchase_return']);
     Route::post('purchases/{purchase}/returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
+
+    Route::apiResource('restocks', RestockController::class);
+    Route::post('restocks/{restock}/submit', [RestockController::class, 'submit']);
+    Route::post('restocks/{restock}/cancel', [RestockController::class, 'cancel']);
+    Route::post('restocks/{restock}/fulfill', [RestockController::class, 'fulfill']);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);

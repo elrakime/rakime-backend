@@ -98,10 +98,12 @@ enum Permission: string
     case CREATE_TRANSFERS  = 'transfers.create';
     case APPROVE_TRANSFERS = 'transfers.approve';
 
-    // Restock Orders
-    case VIEW_RESTOCK_ORDERS    = 'restock_orders.view';
-    case CREATE_RESTOCK_ORDERS  = 'restock_orders.create';
-    case APPROVE_RESTOCK_ORDERS = 'restock_orders.approve';
+    // Restocks
+    case VIEW_RESTOCKS    = 'restocks.view';
+    case CREATE_RESTOCKS  = 'restocks.create';
+    case UPDATE_RESTOCKS  = 'restocks.update';
+    case DELETE_RESTOCKS  = 'restocks.delete';
+    case APPROVE_RESTOCKS = 'restocks.approve';
 
     // Treasury
     case VIEW_TREASURY   = 'treasury.view';
