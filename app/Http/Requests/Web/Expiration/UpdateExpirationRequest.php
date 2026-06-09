@@ -15,7 +15,6 @@ class UpdateExpirationRequest extends FormRequest
     {
         return [
             'inventory_id'              => ['sometimes', 'integer', 'exists:inventories,id'],
-            'reference'                 => ['sometimes', 'string', 'max:255'],
             'note'                      => ['nullable', 'string'],
             'reported_at'               => ['nullable', 'date'],
             'items'                     => ['nullable', 'array'],

@@ -14,7 +14,6 @@ class UpdatePurchaseReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reference'                    => ['nullable', 'string', 'max:255'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'returned_at'                  => ['nullable', 'date'],
             'items'                        => ['nullable', 'array', 'min:1'],

@@ -15,7 +15,6 @@ class UpdatePurchaseRequest extends FormRequest
     {
         return [
             'supplier_id'          => ['sometimes', 'required', 'integer', 'exists:suppliers,id'],
-            'reference'            => ['sometimes', 'nullable', 'string', 'max:100'],
             'note'                 => ['sometimes', 'nullable', 'string'],
             'purchased_at'         => ['sometimes', 'required', 'date'],
             'items'                => ['sometimes', 'required', 'array', 'min:1'],

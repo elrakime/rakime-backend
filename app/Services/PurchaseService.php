@@ -55,7 +55,7 @@ class PurchaseService
 
             $purchase = Purchase::create([
                 'supplier_id'  => $data['supplier_id'],
-                'reference'    => $data['reference'] ?? null,
+                'reference'    => $this->generateReference('PUR'),
                 'status'       => PurchaseStatus::DRAFT,
                 'total_amount' => $totalAmount,
                 'paid_amount'  => 0,
@@ -89,7 +89,6 @@ class PurchaseService
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update(array_filter([
                 'supplier_id'  => $data['supplier_id'] ?? null,
-                'reference'    => $data['reference'] ?? null,
                 'note'         => $data['note'] ?? null,
                 'purchased_at' => $data['purchased_at'] ?? null,
             ], fn ($v) => $v !== null));
@@ -234,5 +233,10 @@ class PurchaseService
 
             return $payment;
         });
+    }
+
+    private function generateReference(string $prefix): string
+    {
+        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
     }
 }

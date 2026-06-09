@@ -48,7 +48,7 @@ class PurchaseReturnService
         return DB::transaction(function () use ($purchase, $data) {
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $purchase->id,
-                'reference'   => $data['reference'] ?? null,
+                'reference'   => $this->generateReference('RET'),
                 'note'        => $data['note'] ?? null,
                 'returned_at' => $data['returned_at'] ?? now(),
             ]);
@@ -79,7 +79,6 @@ class PurchaseReturnService
 
         return DB::transaction(function () use ($purchaseReturn, $data) {
             $purchaseReturn->update([
-                'reference'   => $data['reference'] ?? $purchaseReturn->reference,
                 'note'        => $data['note'] ?? $purchaseReturn->note,
                 'returned_at' => $data['returned_at'] ?? $purchaseReturn->returned_at,
             ]);
@@ -164,5 +163,10 @@ class PurchaseReturnService
         if ($validCount !== count($itemIds)) {
             throw new \Exception(__('purchase_returns.invalid_purchase_items'), 422);
         }
+    }
+
+    private function generateReference(string $prefix): string
+    {
+        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
     }
 }

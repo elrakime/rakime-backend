@@ -15,7 +15,6 @@ class StoreRestockRequest extends FormRequest
     {
         return [
             'branch_id'                    => ['required', 'integer', 'exists:branches,id'],
-            'reference'                    => ['nullable', 'string', 'max:255'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'items'                        => ['required', 'array', 'min:1'],
             'items.*.product_id'           => ['required', 'integer', 'exists:products,id'],

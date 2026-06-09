@@ -15,7 +15,6 @@ class StoreExpirationRequest extends FormRequest
     {
         return [
             'inventory_id'              => ['required', 'integer', 'exists:inventories,id'],
-            'reference'                 => ['required', 'string', 'max:255'],
             'note'                      => ['nullable', 'string'],
             'reported_at'               => ['nullable', 'date'],
             'items'                     => ['required', 'array', 'min:1'],
