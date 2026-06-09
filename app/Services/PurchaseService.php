@@ -83,9 +83,7 @@ class PurchaseService
     public function update(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw ValidationException::withMessages([
-                'status' => [__('purchases.not_draft')],
-            ]);
+            throw new \Exception(__('purchases.not_draft'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {

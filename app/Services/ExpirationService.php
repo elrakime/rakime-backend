@@ -99,14 +99,58 @@ class ExpirationService
 
     public function update(Expiration $expiration, array $data): Expiration
     {
-        $expiration->update(array_filter([
-            'inventory_id' => $data['inventory_id'] ?? null,
-            'reference'    => $data['reference'] ?? null,
-            'note'         => $data['note'] ?? null,
-            'reported_at'  => $data['reported_at'] ?? null,
-        ], fn ($v) => $v !== null));
+        if ($expiration->approved_at) {
+            throw new \Exception(__('expirations.cannot_update_approved'), 422);
+        }
 
-        return $expiration->refresh()->loadMissing(['user', 'inventory', 'items.stock', 'items.batch']);
+        return DB::transaction(function () use ($expiration, $data) {
+            $expiration->update(array_filter([
+                'inventory_id' => $data['inventory_id'] ?? null,
+                'reference'    => $data['reference'] ?? null,
+                'note'         => $data['note'] ?? null,
+                'reported_at'  => $data['reported_at'] ?? null,
+            ], fn ($v) => $v !== null));
+
+            if (array_key_exists('items', $data)) {
+                $expiration->items()->delete();
+
+                foreach ($data['items'] as $item) {
+                    $batchId = $item['batch_id'] ?? null;
+
+                    if ($batchId) {
+                        $batchExists = \App\Models\Batch::where('id', $batchId)
+                            ->where('stock_id', $item['stock_id'])
+                            ->exists();
+
+                        if (!$batchExists) {
+                            throw new \Exception(
+                                __('The batch :batch does not belong to stock :stock.', [
+                                    'batch' => $batchId,
+                                    'stock' => $item['stock_id'],
+                                ]), 422
+                            );
+                        }
+                    } else {
+                        $oldestBatch = \App\Models\Batch::where('stock_id', $item['stock_id'])
+                            ->where('current_quantity', '>', 0)
+                            ->orderBy('purchased_at')
+                            ->first();
+
+                        $batchId = $oldestBatch?->id;
+                    }
+
+                    ExpirationItem::create([
+                        'expiration_id' => $expiration->id,
+                        'stock_id'      => $item['stock_id'],
+                        'batch_id'      => $batchId,
+                        'quantity'      => $item['quantity'],
+                        'reason'        => $item['reason'] ?? null,
+                    ]);
+                }
+            }
+
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock', 'items.batch']);
+        });
     }
 
     public function approve(Expiration $expiration): Expiration
