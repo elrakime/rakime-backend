@@ -13,6 +13,7 @@ class ReturnResource extends JsonResource
             'id'          => $this->id,
             'purchase_id' => $this->purchase_id,
             'reference'   => $this->reference,
+            'note'        => $this->note,
             'returned_at' => $this->returned_at,
             'created_at'  => $this->created_at,
 

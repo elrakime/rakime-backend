@@ -14,6 +14,7 @@ class PurchaseReturn extends Model
     protected $fillable = [
         'purchase_id',
         'reference',
+        'note',
         'returned_at',
         'approved_at',
     ];

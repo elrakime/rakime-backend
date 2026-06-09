@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PriceType;
 use App\Models\Price;
 use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -50,13 +51,13 @@ class StockService
             $prices = collect();
 
             foreach ($data['selling_prices'] ?? [] as $amount) {
-                $prices->push(new Price(['type' => 'selling', 'amount' => $amount]));
+                $prices->push(new Price(['type' => PriceType::SELLING, 'amount' => $amount]));
             }
             foreach ($data['installment_prices'] ?? [] as $amount) {
-                $prices->push(new Price(['type' => 'installment', 'amount' => $amount]));
+                $prices->push(new Price(['type' => PriceType::INSTALLMENT, 'amount' => $amount]));
             }
             foreach ($data['wholesale_prices'] ?? [] as $amount) {
-                $prices->push(new Price(['type' => 'wholesale', 'amount' => $amount]));
+                $prices->push(new Price(['type' => PriceType::WHOLESALE, 'amount' => $amount]));
             }
 
             if ($prices->isNotEmpty()) {

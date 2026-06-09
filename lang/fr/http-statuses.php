@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 return [
-    '0'            => 'Erreur inconnue',
     '100'          => 'Continuer',
     '101'          => 'Protocoles de commutation',
     '102'          => 'En traitement',

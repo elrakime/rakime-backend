@@ -48,6 +48,7 @@ class ReturnService
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $data['purchase_id'],
                 'reference'   => $data['reference'] ?? null,
+                'note'        => $data['note'] ?? null,
                 'returned_at' => $data['returned_at'] ?? now(),
             ]);
 
@@ -78,6 +79,7 @@ class ReturnService
         return DB::transaction(function () use ($purchaseReturn, $data) {
             $purchaseReturn->update([
                 'reference'   => $data['reference'] ?? $purchaseReturn->reference,
+                'note'        => $data['note'] ?? $purchaseReturn->note,
                 'returned_at' => $data['returned_at'] ?? $purchaseReturn->returned_at,
             ]);
 

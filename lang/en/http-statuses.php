@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 return [
-    '0'            => 'Unknown Error',
     '100'          => 'Continue',
     '101'          => 'Switching Protocols',
     '102'          => 'Processing',

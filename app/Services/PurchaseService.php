@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\PriceType;
 use App\Enums\PurchaseStatus;
 use App\Enums\TreasuryMovementType;
 use App\Models\InventoryMovement;
@@ -15,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -118,9 +118,7 @@ class PurchaseService
     public function delete(Purchase $purchase): void
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw ValidationException::withMessages([
-                'status' => [__('purchases.not_draft')],
-            ]);
+            throw new \Exception(__('purchases.not_draft'), 422);
         }
 
         $purchase->delete();
@@ -129,9 +127,7 @@ class PurchaseService
     public function receive(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw ValidationException::withMessages([
-                'status' => [__('purchases.not_draft')],
-            ]);
+            throw new \Exception(__('purchases.not_draft'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {
@@ -164,10 +160,10 @@ class PurchaseService
 
                 $prices = collect();
                 foreach ($pricing['selling_prices'] ?? [] as $amount) {
-                    $prices->push(new \App\Models\Price(['type' => 'selling', 'amount' => $amount]));
+                    $prices->push(new \App\Models\Price(['type' => PriceType::SELLING, 'amount' => $amount]));
                 }
                 foreach ($pricing['installment_prices'] ?? [] as $amount) {
-                    $prices->push(new \App\Models\Price(['type' => 'installment', 'amount' => $amount]));
+                    $prices->push(new \App\Models\Price(['type' => PriceType::INSTALLMENT, 'amount' => $amount]));
                 }
 
                 if ($prices->isNotEmpty()) {
@@ -197,17 +193,13 @@ class PurchaseService
     public function addPayment(Purchase $purchase, array $data): PurchasePayment
     {
         if ($purchase->status === PurchaseStatus::DRAFT) {
-            throw ValidationException::withMessages([
-                'status' => [__('purchases.must_be_received')],
-            ]);
+            throw new \Exception(__('purchases.must_be_received'), 422);
         }
 
         $remaining = $purchase->total_amount - $purchase->paid_amount;
 
         if ($data['amount'] > $remaining) {
-            throw ValidationException::withMessages([
-                'amount' => [__('purchases.amount_exceeds_remaining')],
-            ]);
+            throw new \Exception(__('purchases.amount_exceeds_remaining'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {

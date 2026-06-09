@@ -4,14 +4,13 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
     /**
      * Validate credentials and return the user with roles, permissions, and branches.
      *
-     * @throws ValidationException
+     * @throws \Exception
      */
     public function getUser(array $credentials): User
     {
@@ -19,15 +18,11 @@ class AuthService
         $user = User::where('email', $credentials['email'])->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => [__('auth.failed')],
-            ]);
+            throw new \Exception(__('auth.failed'), 422);
         }
 
         if (! $user->is_active) {
-            throw ValidationException::withMessages([
-                'email' => [__('auth.inactive')],
-            ]);
+            throw new \Exception(__('auth.inactive'), 422);
         }
 
         return $user->loadMissing(['roles', 'permissions', 'branches']);
@@ -46,14 +41,12 @@ class AuthService
     /**
      * Change the user's password after verifying the current one.
      *
-     * @throws ValidationException
+     * @throws \Exception
      */
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
     {
         if (! Hash::check($currentPassword, $user->password)) {
-            throw ValidationException::withMessages([
-                'current_password' => [__('auth.password')],
-            ]);
+            throw new \Exception(__('auth.password'), 422);
         }
 
         $user->update(['password' => $newPassword]);

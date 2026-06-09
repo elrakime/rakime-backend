@@ -156,7 +156,7 @@ class TransferService
                 ]);
             }
 
-            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.product']);
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
