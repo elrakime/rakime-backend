@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\ReturnController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
+use App\Http\Controllers\Web\TransferController;
 use App\Http\Controllers\Web\TreasuryController;
 use App\Http\Controllers\Web\TypeController;
 use App\Http\Controllers\Web\UserController;
@@ -59,11 +60,14 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('inventories', InventoryController::class);
     Route::apiResource('treasuries', TreasuryController::class);
     Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('transfers', TransferController::class);
+    Route::post('transfers/{transfer}/receive', [TransferController::class, 'receive']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::get('purchases/{purchase}/payments', [PurchaseController::class, 'payments']);
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment']);
     Route::apiResource('purchases.returns', ReturnController::class)->except(['update']);
+    Route::post('purchases.returns/{purchase_return}/approve', [ReturnController::class, 'approve']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
 
     Route::apiResource('stocks.prices', PriceController::class);

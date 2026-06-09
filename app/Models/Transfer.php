@@ -20,13 +20,25 @@ class Transfer extends Model
         'to_inventory_id',
         'note',
         'transferred_at',
+        'received_at',
     ];
 
     protected function casts(): array
     {
         return [
             'transferred_at' => 'datetime',
+            'received_at'    => 'datetime',
         ];
+    }
+
+    public function scopeReceived($query): void
+    {
+        $query->whereNotNull('received_at');
+    }
+
+    public function scopePending($query): void
+    {
+        $query->whereNull('received_at');
     }
 
     public function getActivitylogOptions(): LogOptions

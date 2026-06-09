@@ -8,13 +8,13 @@ use App\Http\Requests\Web\Purchase\StorePurchaseReturnRequest;
 use App\Http\Resources\Web\PurchaseReturnResource;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
-use App\Services\PurchaseReturnService;
+use App\Services\ReturnService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ReturnController extends Controller
 {
-    public function __construct(private readonly PurchaseReturnService $purchaseReturnService) {}
+    public function __construct(private readonly ReturnService $purchaseReturnService) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -67,6 +67,21 @@ class ReturnController extends Controller
             $this->purchaseReturnService->delete($purchaseReturn);
 
             return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
+    public function approve(PurchaseReturn $purchaseReturn): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+            return $response;
+        }
+
+        try {
+            $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn);
+
+            return $this->successResponse(new PurchaseReturnResource($purchaseReturn));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }

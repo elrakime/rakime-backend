@@ -13,7 +13,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class PurchaseReturnService
+class ReturnService
 {
     public function list(Request $request): LengthAwarePaginator
     {
@@ -48,14 +48,33 @@ class PurchaseReturnService
             ]);
 
             foreach ($data['items'] as $item) {
-                $returnItem = ReturnItem::create([
+                ReturnItem::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'purchase_item_id'   => $item['purchase_item_id'],
                     'quantity'           => $item['quantity'],
                     'reason'             => $item['reason'] ?? null,
                 ]);
+            }
 
-                // Find the stock and batch linked to this purchase item
+            return $purchaseReturn->load(['purchase', 'items.purchaseItem.product']);
+        });
+    }
+
+    public function show(PurchaseReturn $purchaseReturn): PurchaseReturn
+    {
+        return $purchaseReturn->loadMissing(['purchase', 'items.purchaseItem.product']);
+    }
+
+    public function approve(PurchaseReturn $purchaseReturn): PurchaseReturn
+    {
+        if ($purchaseReturn->approved_at) {
+            return $purchaseReturn;
+        }
+
+        return DB::transaction(function () use ($purchaseReturn) {
+            $purchaseReturn->update(['approved_at' => now()]);
+
+            foreach ($purchaseReturn->items as $returnItem) {
                 $purchaseItem = $returnItem->purchaseItem;
                 $stock = $purchaseItem->stock;
 
@@ -68,7 +87,7 @@ class PurchaseReturnService
                         ->first();
 
                     if ($batch) {
-                        $batch->decrement('current_quantity', $item['quantity']);
+                        $batch->decrement('current_quantity', $returnItem->quantity);
                     }
 
                     InventoryMovement::create([
@@ -78,25 +97,23 @@ class PurchaseReturnService
                         'product_id'    => $purchaseItem->product_id,
                         'moveable_id'   => $purchaseReturn->id,
                         'movement_type' => InventoryMovementType::RETURN,
-                        'quantity'      => $item['quantity'],
+                        'quantity'      => $returnItem->quantity,
                     ]);
                 }
             }
 
-            return $purchaseReturn->load(['purchase', 'items.purchaseItem.product']);
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
         });
-    }
-
-    public function show(PurchaseReturn $purchaseReturn): PurchaseReturn
-    {
-        return $purchaseReturn->loadMissing(['purchase', 'items.purchaseItem.product']);
     }
 
     public function delete(PurchaseReturn $purchaseReturn): void
     {
+        if ($purchaseReturn->approved_at) {
+            throw new \Exception(__('returns.cannot_delete_approved'), 422);
+        }
+
         DB::transaction(function () use ($purchaseReturn) {
             $purchaseReturn->items()->delete();
-            $purchaseReturn->inventoryMovements()->delete();
             $purchaseReturn->delete();
         });
     }
