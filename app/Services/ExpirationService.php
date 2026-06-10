@@ -18,7 +18,7 @@ class ExpirationService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Expiration::class, $request)
-            ->with(['user', 'inventory', 'items.stock', 'items.batch'])
+            ->with(['user', 'inventory', 'items.stock.product', 'items.batch'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('user_id'),
@@ -88,13 +88,13 @@ class ExpirationService
                 }
             }
 
-            return $expiration->load(['user', 'inventory', 'items.stock', 'items.batch']);
+            return $expiration->load(['user', 'inventory', 'items.stock.product', 'items.batch']);
         });
     }
 
     public function show(Expiration $expiration): Expiration
     {
-        return $expiration->loadMissing(['user', 'inventory', 'items.stock', 'items.batch']);
+        return $expiration->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
     }
 
     public function update(Expiration $expiration, array $data): Expiration
@@ -148,7 +148,7 @@ class ExpirationService
                 }
             }
 
-            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock', 'items.batch']);
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
         });
     }
 
@@ -179,7 +179,7 @@ class ExpirationService
                 ]);
             }
 
-            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock', 'items.batch']);
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
         });
     }
 

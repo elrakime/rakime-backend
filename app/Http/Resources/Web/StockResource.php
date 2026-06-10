@@ -30,8 +30,8 @@ class StockResource extends JsonResource
 
             'inventory' => new InventoryResource($this->whenLoaded('inventory')),
             'product'   => new ProductResource($this->whenLoaded('product')),
-            'batches'   => \App\Http\Resources\Web\BatchResource::collection($this->whenLoaded('batches')),
-            'prices'    => \App\Http\Resources\Web\PriceResource::collection($this->whenLoaded('prices')),
+            'batches'   => BatchResource::collection($this->whenLoaded('batches')),
+            'prices'    => PriceResource::collection($this->whenLoaded('prices')),
         ];
     }
 }
