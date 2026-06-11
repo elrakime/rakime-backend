@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\InventoryMovementController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
+use App\Http\Controllers\Web\PurchasePaymentController;
 use App\Http\Controllers\Web\PurchaseReturnController;
 use App\Http\Controllers\Web\RestockController;
 use App\Http\Controllers\Web\RoleController;
@@ -68,7 +69,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('purchases', PurchaseController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
-    Route::apiResource('purchase.payments', PurchaseController::class)->only(['index', 'store']);
+    Route::apiResource('purchases.payments', PurchasePaymentController::class)->parameters(['payments' => 'purchase_payment'])->only(['index', 'store']);
     Route::apiResource('purchases.returns', PurchaseReturnController::class)->parameters(['returns' => 'purchase_return']);
     Route::post('purchases/{purchase}/returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
 

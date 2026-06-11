@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Web;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Purchase\ReceivePurchaseRequest;
-use App\Http\Requests\Web\Purchase\StorePurchasePaymentRequest;
 use App\Http\Requests\Web\Purchase\StorePurchaseRequest;
 use App\Http\Requests\Web\Purchase\UpdatePurchaseRequest;
-use App\Http\Resources\Web\PurchasePaymentResource;
 use App\Http\Resources\Web\PurchaseResource;
 use App\Models\Purchase;
 use App\Services\PurchaseService;
@@ -96,36 +94,6 @@ class PurchaseController extends Controller
             $purchase = $this->purchaseService->receive($purchase, $this->validateRequest($request));
 
             return $this->successResponse(new PurchaseResource($purchase));
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
-        }
-    }
-
-    public function payments(Purchase $purchase): JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
-            return $response;
-        }
-
-        try {
-            $payments = $this->purchaseService->listPayments($purchase);
-
-            return $this->successResponse(PurchasePaymentResource::collection($payments));
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
-        }
-    }
-
-    public function addPayment(StorePurchasePaymentRequest $request, Purchase $purchase): JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
-            return $response;
-        }
-
-        try {
-            $payment = $this->purchaseService->addPayment($purchase, $this->validateRequest($request));
-
-            return $this->successResponse(new PurchasePaymentResource($payment), statusCode: 201);
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
