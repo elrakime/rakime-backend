@@ -11,7 +11,7 @@ class RestockItem extends Model
 {
 
     protected $fillable = [
-        'restock_order_id',
+        'restock_id',
         'product_id',
         'requested_quantity',
         'fulfilled_quantity',
@@ -27,7 +27,7 @@ class RestockItem extends Model
 
     public function restockOrder(): BelongsTo
     {
-        return $this->belongsTo(Restock::class, 'restock_order_id');
+        return $this->belongsTo(Restock::class, 'restock_id');
     }
 
     public function product(): BelongsTo

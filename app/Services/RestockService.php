@@ -57,7 +57,7 @@ class RestockService
 
             foreach ($data['items'] as $item) {
                 RestockItem::create([
-                    'restock_order_id'   => $restock->id,
+                    'restock_id'   => $restock->id,
                     'product_id'         => $item['product_id'],
                     'requested_quantity' => $item['requested_quantity'],
                     'fulfilled_quantity' => 0,
@@ -90,7 +90,7 @@ class RestockService
 
                 foreach ($data['items'] as $item) {
                     RestockItem::create([
-                        'restock_order_id'   => $restock->id,
+                        'restock_id'   => $restock->id,
                         'product_id'         => $item['product_id'],
                         'requested_quantity' => $item['requested_quantity'],
                         'fulfilled_quantity' => 0,

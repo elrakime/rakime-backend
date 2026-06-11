@@ -11,7 +11,7 @@ class RestockItemResource extends JsonResource
     {
         return [
             'id'                 => $this->id,
-            'restock_order_id'   => $this->restock_order_id,
+            'restock_id'   => $this->restock_id,
             'product_id'         => $this->product_id,
             'requested_quantity' => $this->requested_quantity,
             'fulfilled_quantity' => $this->fulfilled_quantity,
