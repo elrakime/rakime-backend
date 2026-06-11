@@ -9,9 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('installment_subscriptions', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contract_id')->constrained('installment_contracts');
+            $table->foreignId('contract_id')->constrained('contracts');
             $table->string('reference')->unique();
             $table->unsignedSmallInteger('subscription_number');
             $table->unsignedInteger('amount');
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('installment_subscriptions');
+        Schema::dropIfExists('subscriptions');
     }
 };

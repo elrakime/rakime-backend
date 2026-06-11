@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('restock_order_items', function (Blueprint $table) {
+        Schema::create('restock_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('restock_order_id')->constrained();
+            $table->foreignId('restock_id')->constrained('restocks');
             $table->foreignId('product_id')->constrained();
             $table->unsignedInteger('requested_quantity');
             $table->unsignedInteger('fulfilled_quantity')->nullable()->default(0);
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('restock_order_items');
+        Schema::dropIfExists('restock_items');
     }
 };

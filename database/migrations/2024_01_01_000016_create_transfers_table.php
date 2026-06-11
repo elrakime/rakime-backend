@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('from_inventory_id')->constrained('inventories');
             $table->foreignId('to_inventory_id')->constrained('inventories');
-            $table->string('note');
+            $table->string('note')->nullable();
             $table->timestamp('transferred_at');
+            $table->timestamp('received_at')->nullable();
             $table->timestamps();
         });
     }

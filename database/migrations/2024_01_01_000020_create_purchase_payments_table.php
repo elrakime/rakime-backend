@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\PriceType;
+use App\Enums\PurchasePaymentMethod;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,19 +9,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('prices', function (Blueprint $table) {
+        Schema::create('purchase_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', PriceType::values());
+            $table->foreignId('purchase_id')->constrained();
             $table->unsignedInteger('amount');
+            $table->string('payment_method', 50);
+            $table->timestamp('paid_at');
             $table->timestamps();
-
-            $table->unique(['stock_id', 'type']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('prices');
+        Schema::dropIfExists('purchase_payments');
     }
 };

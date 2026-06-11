@@ -8,18 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('purchase_return_items', function (Blueprint $table) {
+        Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_return_id')->constrained();
+            $table->foreignId('inventory_id')->constrained();
             $table->foreignId('product_id')->constrained();
-            $table->unsignedInteger('quantity');
-            $table->string('reason');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('purchase_return_items');
+        Schema::dropIfExists('stocks');
     }
 };

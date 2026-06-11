@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('product_expirations', function (Blueprint $table) {
+        Schema::create('installment_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('inventory_id')->constrained();
-            $table->string('reference');
+            $table->foreignId('installment_id')->unique()->constrained();
+            $table->unsignedInteger('amount');
+            $table->foreignId('received_by')->constrained('users');
+            $table->timestamp('paid_at');
             $table->string('note')->nullable();
-            $table->timestamp('reported_at');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('product_expirations');
+        Schema::dropIfExists('installment_payments');
     }
 };

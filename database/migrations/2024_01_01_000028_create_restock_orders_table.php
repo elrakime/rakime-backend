@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\PurchaseStatus;
+use App\Enums\RestockStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,23 +9,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sales', function (Blueprint $table) {
+        Schema::create('restocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('branch_id')->constrained();
-            $table->foreignId('client_id')->constrained();
             $table->string('reference');
-            $table->enum('status', PurchaseStatus::keys())->default(PurchaseStatus::default()->value);
-            $table->unsignedInteger('total_amount');
-            $table->unsignedInteger('paid_amount')->default(0);
-            $table->string('note');
-            $table->timestamp('sold_at');
+            $table->enum('status', RestockStatus::keys())->default(RestockStatus::default()->value);
+            $table->string('note')->nullable();
+            $table->timestamp('fulfilled_at')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('restocks');
     }
 };

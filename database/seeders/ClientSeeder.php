@@ -20,7 +20,8 @@ class ClientSeeder extends Seeder
 
         $clients = [
             [
-                'name'        => 'Ahmed Benali',
+                'firstname'   => 'Ahmed',
+                'lastname'    => 'Benali',
                 'phone'       => '0555123456',
                 'nin'         => '198501612345678',
                 'ccp_number'  => '1234567890',
@@ -33,7 +34,8 @@ class ClientSeeder extends Seeder
                 'eccp'        => null,
             ],
             [
-                'name'        => 'Fatima Zahra Boualem',
+                'firstname'   => 'Fatima Zahra',
+                'lastname'    => 'Boualem',
                 'phone'       => '0661234567',
                 'nin'         => '199002161234567',
                 'ccp_number'  => '9876543210',
@@ -46,7 +48,8 @@ class ClientSeeder extends Seeder
                 'eccp'        => null,
             ],
             [
-                'name'        => 'Mohamed Amine Karimi',
+                'firstname'   => 'Mohamed Amine',
+                'lastname'    => 'Karimi',
                 'phone'       => '0771234567',
                 'nin'         => '198801634567890',
                 'ccp_number'  => '1122334455',

@@ -9,9 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('installment_draws', function (Blueprint $table) {
+        Schema::create('draws', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subscription_id')->constrained('installment_subscriptions');
+            $table->foreignId('subscription_id')->constrained('subscriptions');
             $table->foreignId('installment_id')->constrained();
             $table->unsignedSmallInteger('month_number');
             $table->unsignedInteger('amount');
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('installment_draws');
+        Schema::dropIfExists('draws');
     }
 };

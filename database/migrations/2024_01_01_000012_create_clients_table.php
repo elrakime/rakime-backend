@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('wilaya_id')->constrained();
-            $table->string('name');
+            $table->string('firstname');
+            $table->string('lastname');
             $table->string('phone')->unique();
             $table->date('birthdate')->nullable();
             $table->string('address')->nullable();

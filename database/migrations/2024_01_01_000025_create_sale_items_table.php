@@ -8,19 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('product_expiration_items', function (Blueprint $table) {
+        Schema::create('sale_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('expiration_id')->constrained('product_expirations');
+            $table->foreignId('sale_id')->constrained();
             $table->foreignId('product_id')->constrained();
             $table->foreignId('stock_id')->constrained();
+            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('price_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedInteger('unit_price');
             $table->unsignedInteger('quantity');
-            $table->string('reason')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('product_expiration_items');
+        Schema::dropIfExists('sale_items');
     }
 };

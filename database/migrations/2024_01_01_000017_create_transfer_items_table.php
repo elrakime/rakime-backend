@@ -8,20 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('installment_contract_items', function (Blueprint $table) {
+        Schema::create('transfer_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contract_id')->constrained('installment_contracts');
-            $table->foreignId('product_id')->constrained();
+            $table->foreignId('transfer_id')->constrained();
             $table->foreignId('stock_id')->constrained();
             $table->unsignedInteger('quantity');
-            $table->unsignedInteger('unit_price_snapshot');
-            $table->unsignedInteger('installment_price_snapshot');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('installment_contract_items');
+        Schema::dropIfExists('transfer_items');
     }
 };

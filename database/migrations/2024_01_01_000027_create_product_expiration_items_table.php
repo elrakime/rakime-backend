@@ -8,18 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sale_items', function (Blueprint $table) {
+        Schema::create('expiration_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sale_id')->constrained();
-            $table->foreignId('product_id')->constrained();
+            $table->foreignId('expiration_id')->constrained('expirations');
             $table->foreignId('stock_id')->constrained();
+            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('quantity');
+            $table->string('reason')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('sale_items');
+        Schema::dropIfExists('expiration_items');
     }
 };
