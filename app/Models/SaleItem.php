@@ -14,17 +14,15 @@ class SaleItem extends Model
         'sale_id',
         'product_id',
         'stock_id',
-        'batch_id',
-        'price_id',
         'quantity',
-        'unit_price',
+        'price',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity'   => 'integer',
-            'unit_price' => 'integer',
+            'quantity' => 'integer',
+            'price'    => 'integer',
         ];
     }
 
@@ -41,15 +39,5 @@ class SaleItem extends Model
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
-    }
-
-    public function batch(): BelongsTo
-    {
-        return $this->belongsTo(Batch::class);
-    }
-
-    public function price(): BelongsTo
-    {
-        return $this->belongsTo(Price::class);
     }
 }
