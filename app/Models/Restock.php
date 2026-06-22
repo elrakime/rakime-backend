@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -23,6 +24,8 @@ class Restock extends Model
         'status',
         'note',
         'fulfilled_at',
+        'fulfilled_with_id',
+        'fulfilled_with_type',
     ];
 
     protected function casts(): array
@@ -72,6 +75,11 @@ class Restock extends Model
     public function items(): HasMany
     {
         return $this->hasMany(RestockItem::class);
+    }
+
+    public function fulfilledWith(): MorphTo
+    {
+        return $this->morphTo('fulfilled_with');
     }
 
     public function inventoryMovements(): HasMany

@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -59,6 +60,11 @@ class Transfer extends Model
     public function items(): HasMany
     {
         return $this->hasMany(TransferItem::class);
+    }
+
+    public function restocks(): MorphMany
+    {
+        return $this->morphMany(Restock::class, 'fulfilled_with');
     }
 
     public function inventoryMovements(): HasMany

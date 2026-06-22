@@ -23,7 +23,7 @@ class RestockService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Restock::class, $request)
-            ->with(['user', 'branch', 'items.product'])
+            ->with(['user', 'branch', 'items.product', 'fulfilledWith'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('status'),
@@ -70,7 +70,7 @@ class RestockService
 
     public function show(Restock $restock): Restock
     {
-        return $restock->loadMissing(['user', 'branch', 'items.product']);
+        return $restock->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
     }
 
     public function update(Restock $restock, array $data): Restock
@@ -145,7 +145,7 @@ class RestockService
         $type = $data['type'];
 
         return DB::transaction(function () use ($restock, $data, $type) {
-            match ($type) {
+            $fulfilledWith = match ($type) {
                 'purchase' => $this->fulfillViaPurchase($restock, $data),
                 'transfer' => $this->fulfillViaTransfer($restock, $data),
                 'none'     => $this->fulfillNoAction($restock),
@@ -153,15 +153,17 @@ class RestockService
             };
 
             $restock->update([
-                'status'       => RestockStatus::FULFILLED,
-                'fulfilled_at' => now(),
+                'status'             => RestockStatus::FULFILLED,
+                'fulfilled_at'       => now(),
+                'fulfilled_with_id'  => $fulfilledWith?->id,
+                'fulfilled_with_type' => $fulfilledWith ? get_class($fulfilledWith) : null,
             ]);
 
-            return $restock->fresh()->loadMissing(['user', 'branch', 'items.product']);
+            return $restock->fresh()->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
         });
     }
 
-    private function fulfillViaPurchase(Restock $restock, array $data): void
+    private function fulfillViaPurchase(Restock $restock, array $data): Purchase
     {
         $restock->loadMissing('branch');
 
@@ -236,9 +238,11 @@ class RestockService
                 'fulfilled_quantity' => $quantity,
             ]);
         }
+
+        return $purchase;
     }
 
-    private function fulfillViaTransfer(Restock $restock, array $data): void
+    private function fulfillViaTransfer(Restock $restock, array $data): Transfer
     {
         $restock->loadMissing('branch');
 
@@ -338,15 +342,19 @@ class RestockService
                 'fulfilled_quantity' => $quantity,
             ]);
         }
+
+        return $transfer;
     }
 
-    private function fulfillNoAction(Restock $restock): void
+    private function fulfillNoAction(Restock $restock): ?Purchase
     {
         foreach ($restock->items as $restockItem) {
             $restockItem->update([
                 'fulfilled_quantity' => 0,
             ]);
         }
+
+        return null;
     }
 
     private function generateReference(string $prefix): string
