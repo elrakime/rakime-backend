@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
 use App\Models\InventoryMovement;
@@ -18,7 +19,7 @@ class ExpirationService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Expiration::class, $request)
-            ->with(['user', 'inventory', 'items.stock.product', 'items.batch'])
+            ->with(['user', 'inventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('user_id'),
@@ -52,49 +53,22 @@ class ExpirationService
 
             if (!empty($data['items'])) {
                 foreach ($data['items'] as $item) {
-                    $batchId = $item['batch_id'] ?? null;
-
-                    // If batch_id is provided, ensure it belongs to the given stock
-                    if ($batchId) {
-                        $batchExists = \App\Models\Batch::where('id', $batchId)
-                            ->where('stock_id', $item['stock_id'])
-                            ->exists();
-
-                        if (!$batchExists) {
-                            throw new \Exception(
-                                __('The batch :batch does not belong to stock :stock.', [
-                                    'batch' => $batchId,
-                                    'stock' => $item['stock_id'],
-                                ]), 422
-                            );
-                        }
-                    } else {
-                        // Select the oldest batch with available quantity for this stock
-                        $oldestBatch = \App\Models\Batch::where('stock_id', $item['stock_id'])
-                            ->where('current_quantity', '>', 0)
-                            ->orderBy('purchased_at')
-                            ->first();
-
-                        $batchId = $oldestBatch?->id;
-                    }
-
                     ExpirationItem::create([
                         'expiration_id' => $expiration->id,
                         'stock_id'      => $item['stock_id'],
-                        'batch_id'      => $batchId,
                         'quantity'      => $item['quantity'],
                         'reason'        => $item['reason'] ?? null,
                     ]);
                 }
             }
 
-            return $expiration->load(['user', 'inventory', 'items.stock.product', 'items.batch']);
+            return $expiration->load(['user', 'inventory', 'items.stock.product']);
         });
     }
 
     public function show(Expiration $expiration): Expiration
     {
-        return $expiration->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
+        return $expiration->loadMissing(['user', 'inventory', 'items.stock.product']);
     }
 
     public function update(Expiration $expiration, array $data): Expiration
@@ -114,41 +88,16 @@ class ExpirationService
                 $expiration->items()->delete();
 
                 foreach ($data['items'] as $item) {
-                    $batchId = $item['batch_id'] ?? null;
-
-                    if ($batchId) {
-                        $batchExists = \App\Models\Batch::where('id', $batchId)
-                            ->where('stock_id', $item['stock_id'])
-                            ->exists();
-
-                        if (!$batchExists) {
-                            throw new \Exception(
-                                __('The batch :batch does not belong to stock :stock.', [
-                                    'batch' => $batchId,
-                                    'stock' => $item['stock_id'],
-                                ]), 422
-                            );
-                        }
-                    } else {
-                        $oldestBatch = \App\Models\Batch::where('stock_id', $item['stock_id'])
-                            ->where('current_quantity', '>', 0)
-                            ->orderBy('purchased_at')
-                            ->first();
-
-                        $batchId = $oldestBatch?->id;
-                    }
-
                     ExpirationItem::create([
                         'expiration_id' => $expiration->id,
                         'stock_id'      => $item['stock_id'],
-                        'batch_id'      => $batchId,
                         'quantity'      => $item['quantity'],
                         'reason'        => $item['reason'] ?? null,
                     ]);
                 }
             }
 
-            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });
     }
 
@@ -158,28 +107,41 @@ class ExpirationService
             return $expiration;
         }
 
+        $expiration->loadMissing(['items.stock.product']);
+
         return DB::transaction(function () use ($expiration) {
             $expiration->update(['approved_at' => now()]);
 
             foreach ($expiration->items as $item) {
-                // Decrement batch quantity
-                if ($item->batch) {
-                    $item->batch->decrement('current_quantity', $item->quantity);
-                }
+                $remaining = $item->quantity;
 
-                // Create inventory movement
-                InventoryMovement::create([
-                    'stock_id'      => $item->stock_id,
-                    'batch_id'      => $item->batch_id,
-                    'inventory_id'  => $expiration->inventory_id,
-                    'product_id'    => $item->stock->product_id,
-                    'moveable_id'   => $expiration->id,
-                    'movement_type' => InventoryMovementType::EXPIRED,
-                    'quantity'      => $item->quantity,
-                ]);
+                $batches = Batch::where('stock_id', $item->stock_id)
+                    ->where('current_quantity', '>', 0)
+                    ->orderBy('purchased_at')
+                    ->get();
+
+                foreach ($batches as $batch) {
+                    $deduct = min($remaining, $batch->current_quantity);
+                    $batch->decrement('current_quantity', $deduct);
+
+                    InventoryMovement::create([
+                        'stock_id'      => $item->stock_id,
+                        'batch_id'      => $batch->id,
+                        'inventory_id'  => $expiration->inventory_id,
+                        'product_id'    => $item->stock->product_id,
+                        'moveable_id'   => $expiration->id,
+                        'movement_type' => InventoryMovementType::EXPIRED,
+                        'quantity'      => $deduct,
+                    ]);
+
+                    $remaining -= $deduct;
+                    if ($remaining <= 0) {
+                        break;
+                    }
+                }
             }
 
-            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product', 'items.batch']);
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });
     }
 

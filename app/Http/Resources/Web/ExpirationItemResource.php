@@ -13,12 +13,10 @@ class ExpirationItemResource extends JsonResource
             'id'            => $this->id,
             'expiration_id' => $this->expiration_id,
             'stock_id'      => $this->stock_id,
-            'batch_id'      => $this->batch_id,
             'quantity'      => $this->quantity,
             'reason'        => $this->reason,
 
             'stock'   => new StockResource($this->whenLoaded('stock')),
-            'batch'   => new BatchResource($this->whenLoaded('batch')),
         ];
     }
 }

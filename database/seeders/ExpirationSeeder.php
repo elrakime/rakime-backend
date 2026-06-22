@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
 use App\Models\Inventory;
@@ -16,14 +15,9 @@ class ExpirationSeeder extends Seeder
     {
         $user      = User::where('email', 'admin@example.com')->first();
         $inventory = Inventory::where('name', 'Main Warehouse')->first();
-        $stock     = Stock::with('batches')->first();
+        $stock     = Stock::first();
 
         if (! $user || ! $inventory || ! $stock) {
-            return;
-        }
-
-        $batch = $stock->batches->first();
-        if (! $batch) {
             return;
         }
 
@@ -39,7 +33,6 @@ class ExpirationSeeder extends Seeder
         ExpirationItem::create([
             'expiration_id' => $expiration->id,
             'stock_id'      => $stock->id,
-            'batch_id'      => $batch->id,
             'quantity'      => 1,
             'reason'        => 'Passed expiration date',
         ]);

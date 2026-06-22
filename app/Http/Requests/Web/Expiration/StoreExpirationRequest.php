@@ -19,7 +19,6 @@ class StoreExpirationRequest extends FormRequest
             'reported_at'               => ['nullable', 'date'],
             'items'                     => ['required', 'array', 'min:1'],
             'items.*.stock_id'          => ['required', 'integer', 'exists:stocks,id'],
-            'items.*.batch_id'          => ['nullable', 'integer', 'exists:batches,id'],
             'items.*.quantity'          => ['required', 'integer', 'min:1'],
             'items.*.reason'            => ['nullable', 'string'],
         ];

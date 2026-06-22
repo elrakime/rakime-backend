@@ -19,7 +19,6 @@ class UpdateExpirationRequest extends FormRequest
             'reported_at'               => ['nullable', 'date'],
             'items'                     => ['nullable', 'array'],
             'items.*.stock_id'          => ['required_with:items', 'integer', 'exists:stocks,id'],
-            'items.*.batch_id'          => ['nullable', 'integer', 'exists:batches,id'],
             'items.*.quantity'          => ['required_with:items', 'integer', 'min:1'],
             'items.*.reason'            => ['nullable', 'string'],
         ];
