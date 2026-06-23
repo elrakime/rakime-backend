@@ -15,6 +15,7 @@ class PurchaseReturnResource extends JsonResource
             'reference'   => $this->reference,
             'note'        => $this->note,
             'returned_at' => $this->returned_at,
+            'approved_at' => $this->approved_at,
             'created_at'  => $this->created_at,
 
             'purchase' => $this->whenLoaded('purchase', fn () => [
