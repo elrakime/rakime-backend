@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Treasury;
+use App\Traits\ScopesByUserBranches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
