@@ -27,12 +27,18 @@ class TreasuryController extends Controller
 
     public function store(StoreTreasuryRequest $request): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_TREASURY->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $treasury = $this->treasuryService->create($this->validateRequest($request));
+            $treasury = $this->treasuryService->create($data);
 
             return $this->successResponse(new TreasuryResource($treasury), statusCode: 201);
         } catch (\Exception $e) {
@@ -42,6 +48,10 @@ class TreasuryController extends Controller
 
     public function show(Treasury $treasury): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($treasury)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_TREASURY->value)) {
             return $response;
         }
@@ -55,12 +65,18 @@ class TreasuryController extends Controller
 
     public function update(UpdateTreasuryRequest $request, Treasury $treasury): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($treasury)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_TREASURY->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $treasury = $this->treasuryService->update($treasury, $this->validateRequest($request));
+            $treasury = $this->treasuryService->update($treasury, $data);
 
             return $this->successResponse(new TreasuryResource($treasury));
         } catch (\Exception $e) {
@@ -70,6 +86,10 @@ class TreasuryController extends Controller
 
     public function destroy(Treasury $treasury): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($treasury)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_TREASURY->value)) {
             return $response;
         }

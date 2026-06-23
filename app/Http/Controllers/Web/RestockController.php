@@ -30,12 +30,18 @@ class RestockController extends Controller
 
     public function store(StoreRestockRequest $request): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::CREATE_RESTOCKS->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $restock = $this->restockService->create($this->validateRequest($request));
+            $restock = $this->restockService->create($data);
 
             return $this->successResponse(new RestockResource($restock), statusCode: 201);
         } catch (\Exception $e) {
@@ -45,6 +51,10 @@ class RestockController extends Controller
 
     public function show(Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_RESTOCKS->value)) {
             return $response;
         }
@@ -60,12 +70,18 @@ class RestockController extends Controller
 
     public function update(UpdateRestockRequest $request, Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_RESTOCKS->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $restock = $this->restockService->update($restock, $this->validateRequest($request));
+            $restock = $this->restockService->update($restock, $data);
 
             return $this->successResponse(new RestockResource($restock));
         } catch (\Exception $e) {
@@ -75,6 +91,10 @@ class RestockController extends Controller
 
     public function destroy(Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_RESTOCKS->value)) {
             return $response;
         }
@@ -90,6 +110,10 @@ class RestockController extends Controller
 
     public function submit(Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::APPROVE_RESTOCKS->value)) {
             return $response;
         }
@@ -105,6 +129,10 @@ class RestockController extends Controller
 
     public function cancel(Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::APPROVE_RESTOCKS->value)) {
             return $response;
         }
@@ -120,12 +148,18 @@ class RestockController extends Controller
 
     public function fulfill(FulfillRestockRequest $request, Restock $restock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($restock)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::APPROVE_RESTOCKS->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $restock = $this->restockService->fulfill($restock, $this->validateRequest($request));
+            $restock = $this->restockService->fulfill($restock, $data);
 
             return $this->successResponse(new RestockResource($restock));
         } catch (\Exception $e) {

@@ -29,12 +29,18 @@ class SaleController extends Controller
 
     public function store(StoreSaleRequest $request): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::CREATE_SALES->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $sale = $this->saleService->create($this->validateRequest($request));
+            $sale = $this->saleService->create($data);
 
             return $this->successResponse(new SaleResource($sale), statusCode: 201);
         } catch (\Exception $e) {
@@ -44,6 +50,10 @@ class SaleController extends Controller
 
     public function show(Sale $sale): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($sale)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_SALES->value)) {
             return $response;
         }
@@ -59,12 +69,18 @@ class SaleController extends Controller
 
     public function update(UpdateSaleRequest $request, Sale $sale): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($sale)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_SALES->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $sale = $this->saleService->update($sale, $this->validateRequest($request));
+            $sale = $this->saleService->update($sale, $data);
 
             return $this->successResponse(new SaleResource($sale));
         } catch (\Exception $e) {
@@ -74,6 +90,10 @@ class SaleController extends Controller
 
     public function destroy(Sale $sale): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($sale)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_SALES->value)) {
             return $response;
         }

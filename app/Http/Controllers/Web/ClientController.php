@@ -27,12 +27,18 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::CREATE_CLIENTS->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $client = $this->clientService->create($this->validateRequest($request));
+            $client = $this->clientService->create($data);
 
             return $this->successResponse(new ClientResource($client), statusCode: 201);
         } catch (\Exception $e) {
@@ -42,6 +48,10 @@ class ClientController extends Controller
 
     public function show(Client $client): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($client)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_CLIENTS->value)) {
             return $response;
         }
@@ -55,12 +65,18 @@ class ClientController extends Controller
 
     public function update(UpdateClientRequest $request, Client $client): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($client)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_CLIENTS->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $client = $this->clientService->update($client, $this->validateRequest($request));
+            $client = $this->clientService->update($client, $data);
 
             return $this->successResponse(new ClientResource($client));
         } catch (\Exception $e) {
@@ -70,6 +86,10 @@ class ClientController extends Controller
 
     public function destroy(Client $client): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($client)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_CLIENTS->value)) {
             return $response;
         }

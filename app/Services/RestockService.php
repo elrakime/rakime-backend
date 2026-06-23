@@ -11,6 +11,7 @@ use App\Models\Restock;
 use App\Models\RestockItem;
 use App\Models\Stock;
 use App\Models\Transfer;
+use App\Traits\ScopesByUserBranches;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,9 +21,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class RestockService
 {
+    use ScopesByUserBranches;
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Restock::class, $request)
+        $query = Restock::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with(['user', 'branch', 'items.product', 'fulfilledWith'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),

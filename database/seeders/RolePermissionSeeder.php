@@ -22,9 +22,31 @@ class RolePermissionSeeder extends Seeder
 
         // Define which permissions each role has
         $matrix = [
-            Role::ADMIN->value    => Permission::cases(), // all permissions
-            Role::MANAGER->value  => [],
-            Role::EMPLOYEE->value => [],
+            Role::ADMIN->value    => Permission::cases(), // All permissions, all branches
+
+            // Manager: all permissions, scoped to their branches
+            Role::MANAGER->value  => Permission::cases(),
+
+            // Employee: limited permissions, scoped to their branches
+            Role::EMPLOYEE->value => [
+                Permission::VIEW_CLIENTS,
+                Permission::CREATE_CLIENTS,
+                Permission::VIEW_INVENTORY,
+                Permission::VIEW_SALES,
+                Permission::CREATE_SALES,
+                Permission::VIEW_RESTOCKS,
+                Permission::CREATE_RESTOCKS,
+                Permission::VIEW_TREASURY,
+                Permission::VIEW_PRODUCTS,
+                Permission::VIEW_SUPPLIERS,
+                Permission::VIEW_PURCHASES,
+                Permission::VIEW_TRANSFERS,
+                Permission::VIEW_CATEGORIES,
+                Permission::VIEW_BRANDS,
+                Permission::VIEW_COLORS,
+                Permission::VIEW_TYPES,
+                Permission::VIEW_REPORTS,
+            ],
         ];
 
         foreach ($matrix as $roleName => $permissions) {

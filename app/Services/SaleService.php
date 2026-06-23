@@ -19,9 +19,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class SaleService
 {
+    use ScopesByUserBranches;
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Sale::class, $request)
+        $query = Sale::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with(['user', 'branch', 'client', 'items.product', 'items.stock'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),

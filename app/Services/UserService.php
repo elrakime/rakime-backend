@@ -45,6 +45,16 @@ class UserService
         $roles    = $data['roles'] ?? [];
         $branches = $data['branches'] ?? [];
 
+        // Admin should not be linked to specific branches
+        if (in_array(\App\Enums\Role::ADMIN->value, $roles)) {
+            $branches = [];
+        }
+
+        // Non-admin users must be linked to at least one branch
+        if (! in_array(\App\Enums\Role::ADMIN->value, $roles) && empty($branches)) {
+            throw new \InvalidArgumentException('Non-admin users must be assigned to at least one branch.', 422);
+        }
+
         $user = User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
@@ -73,6 +83,19 @@ class UserService
     {
         $roles    = $data['roles'] ?? null;
         $branches = $data['branches'] ?? null;
+
+        // Determine effective roles for branch validation
+        $effectiveRoles = $roles ?? $user->roles->pluck('name')->toArray();
+
+        // Admin should not be linked to specific branches
+        if (in_array(\App\Enums\Role::ADMIN->value, $effectiveRoles)) {
+            $branches = [];
+        }
+
+        // Non-admin users must be linked to at least one branch
+        if (! in_array(\App\Enums\Role::ADMIN->value, $effectiveRoles) && is_array($branches) && empty($branches)) {
+            throw new \InvalidArgumentException('Non-admin users must be assigned to at least one branch.', 422);
+        }
 
         $user->update(array_filter([
             'name'      => $data['name'] ?? null,

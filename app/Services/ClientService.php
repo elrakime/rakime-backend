@@ -11,9 +11,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ClientService
 {
+    use ScopesByUserBranches;
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Client::class, $request)
+        $query = Client::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with(['branch', 'wilaya'])
             ->allowedFilters(
                 AllowedFilter::partial('firstname'),

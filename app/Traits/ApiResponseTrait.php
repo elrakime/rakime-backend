@@ -104,4 +104,53 @@ trait ApiResponseTrait
             return $this->errorResponse(__('app.unauthorized'), 403);
         }
     }
+
+    /**
+     * Ensure the authenticated user has access to the given branch.
+     * Admins bypass branch checks. Managers and Employees are limited to their assigned branches.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|int|null  $target  Model with branch_id or raw branch ID
+     * @param  string  $branchField  The field name holding the branch ID on the model
+     * @return JsonResponse|void
+     */
+    protected function authorizeBranchAccess($target, string $branchField = 'branch_id')
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return $this->errorResponse(__('app.unauthorized'), 403);
+        }
+
+        // Admins have access to all branches
+        if ($user->hasRole(\App\Enums\Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchId = $target instanceof \Illuminate\Database\Eloquent\Model
+            ? $target->{$branchField}
+            : $target;
+
+        if ($branchId === null) {
+            return;
+        }
+
+        if (! $user->branches()->where('branch_id', $branchId)->exists()) {
+            return $this->errorResponse(__('app.unauthorized'), 403);
+        }
+    }
+
+    /**
+     * Get the branch IDs the authenticated user is allowed to access.
+     * Returns null for admins (meaning all branches).
+     */
+    protected function getUserBranchIds(): ?array
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(\App\Enums\Role::ADMIN->value)) {
+            return null;
+        }
+
+        return $user->branches()->pluck('branch_id')->toArray();
+    }
 }

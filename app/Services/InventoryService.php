@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Inventory;
+use App\Traits\ScopesByUserBranches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -11,9 +12,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class InventoryService
 {
+    use ScopesByUserBranches;
     public function list(Request $request): Collection
     {
-        return QueryBuilder::for(Inventory::class, $request)
+        $query = Inventory::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with('branch')
             ->allowedFilters(
                 AllowedFilter::partial('name'),

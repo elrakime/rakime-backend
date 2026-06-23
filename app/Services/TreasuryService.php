@@ -11,9 +11,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class TreasuryService
 {
+    use ScopesByUserBranches;
     public function list(Request $request): Collection
     {
-        return QueryBuilder::for(Treasury::class, $request)
+        $query = Treasury::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with('branch')
             ->allowedFilters(
                 AllowedFilter::partial('name'),

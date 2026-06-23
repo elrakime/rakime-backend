@@ -27,12 +27,18 @@ class InventoryController extends Controller
 
     public function store(StoreInventoryRequest $request): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $inventory = $this->inventoryService->create($this->validateRequest($request));
+            $inventory = $this->inventoryService->create($data);
 
             return $this->successResponse(new InventoryResource($inventory), statusCode: 201);
         } catch (\Exception $e) {
@@ -42,6 +48,10 @@ class InventoryController extends Controller
 
     public function show(Inventory $inventory): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
             return $response;
         }
@@ -55,12 +65,18 @@ class InventoryController extends Controller
 
     public function update(UpdateInventoryRequest $request, Inventory $inventory): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;
         }
 
+        $data = $this->validateRequest($request);
+
         try {
-            $inventory = $this->inventoryService->update($inventory, $this->validateRequest($request));
+            $inventory = $this->inventoryService->update($inventory, $data);
 
             return $this->successResponse(new InventoryResource($inventory));
         } catch (\Exception $e) {
@@ -70,6 +86,10 @@ class InventoryController extends Controller
 
     public function destroy(Inventory $inventory): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
             return $response;
         }
