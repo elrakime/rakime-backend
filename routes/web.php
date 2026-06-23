@@ -19,6 +19,7 @@ use App\Http\Controllers\Web\PurchasePaymentController;
 use App\Http\Controllers\Web\PurchaseReturnController;
 use App\Http\Controllers\Web\RestockController;
 use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\SaleController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\TransferController;
@@ -77,6 +78,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('restocks/{restock}/submit', [RestockController::class, 'submit']);
     Route::post('restocks/{restock}/cancel', [RestockController::class, 'cancel']);
     Route::post('restocks/{restock}/fulfill', [RestockController::class, 'fulfill']);
+
+    Route::apiResource('sales', SaleController::class);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);

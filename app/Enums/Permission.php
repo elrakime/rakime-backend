@@ -92,6 +92,8 @@ enum Permission: string
     // Sales
     case VIEW_SALES   = 'sales.view';
     case CREATE_SALES = 'sales.create';
+    case UPDATE_SALES = 'sales.update';
+    case DELETE_SALES = 'sales.delete';
 
     // Transfers
     case VIEW_TRANSFERS    = 'transfers.view';

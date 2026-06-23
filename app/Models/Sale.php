@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\PurchaseStatus;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,15 +14,12 @@ class Sale extends Model
 {
     use LogsActivity;
 
-
     protected $fillable = [
         'user_id',
         'branch_id',
         'client_id',
         'reference',
-        'status',
         'total_amount',
-        'paid_amount',
         'note',
         'sold_at',
     ];
@@ -32,9 +27,7 @@ class Sale extends Model
     protected function casts(): array
     {
         return [
-            'status'       => PurchaseStatus::class,
             'total_amount' => 'integer',
-            'paid_amount'  => 'integer',
             'sold_at'      => 'datetime',
         ];
     }
@@ -42,21 +35,6 @@ class Sale extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();
-    }
-
-    public function scopeDraft(Builder $query): void
-    {
-        $query->where('status', PurchaseStatus::DRAFT);
-    }
-
-    public function scopePaid(Builder $query): void
-    {
-        $query->where('status', PurchaseStatus::PAID);
-    }
-
-    public function scopePartiallyPaid(Builder $query): void
-    {
-        $query->where('status', PurchaseStatus::PARTIALLY_PAID);
     }
 
     public function user(): BelongsTo
