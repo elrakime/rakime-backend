@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Models\Batch;
+use App\Models\Inventory;
 use App\Models\InventoryMovement;
+use App\Models\Price;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +48,10 @@ class SaleService
     public function create(array $data): Sale
     {
         return DB::transaction(function () use ($data) {
-            $totalAmount = collect($data['items'])->sum(fn ($item) => $item['quantity'] * $item['price']);
+            $inventory = $this->getBranchInventory($data['branch_id']);
+            $resolvedItems = $this->resolveItems($inventory->id, $data['items']);
+
+            $totalAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
 
             $sale = Sale::create([
                 'user_id'      => $data['user_id'] ?? auth()->id(),
@@ -54,10 +60,10 @@ class SaleService
                 'reference'    => $this->generateReference('SL'),
                 'total_amount' => $totalAmount,
                 'note'         => $data['note'] ?? null,
-                'sold_at'      => now(),
+                'sold_at'      => $data['sold_at'] ?? now(),
             ]);
 
-            foreach ($data['items'] as $item) {
+            foreach ($resolvedItems as $item) {
                 SaleItem::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $item['product_id'],
@@ -132,6 +138,77 @@ class SaleService
                 }
             }
         }
+    }
+
+    private function getBranchInventory(int $branchId): Inventory
+    {
+        $inventory = Inventory::where('branch_id', $branchId)->first();
+
+        if (!$inventory) {
+            throw new \Exception(__('sales.no_inventory_for_branch'), 422);
+        }
+
+        return $inventory;
+    }
+
+    /**
+     * Validates that each stock belongs to the branch inventory and has sufficient quantity,
+     * then resolves product_id and price.
+     *
+     * If price_id is provided, uses that specific price; otherwise falls back to the
+     * stock's latest selling price.
+     *
+     * @return array[] items enriched with product_id and price
+     */
+    private function resolveItems(int $inventoryId, array $items): array
+    {
+        $stockIds = array_column($items, 'stock_id');
+        $priceIds = array_filter(array_column($items, 'price_id'));
+
+        $stocks = Stock::where('inventory_id', $inventoryId)
+            ->whereIn('id', $stockIds)
+            ->withSum('batches as total_current', 'current_quantity')
+            ->with('sellingPrice')
+            ->get()
+            ->keyBy('id');
+
+        $prices = [];
+        if (!empty($priceIds)) {
+            $prices = Price::whereIn('id', $priceIds)->get()->keyBy('id');
+        }
+
+        $resolved = [];
+
+        foreach ($items as $item) {
+            $stockId = $item['stock_id'];
+
+            if (!isset($stocks[$stockId])) {
+                throw new \Exception(
+                    __('sales.stock_not_in_branch_inventory', ['stock' => $stockId]), 422
+                );
+            }
+
+            $stock = $stocks[$stockId];
+
+            if (($stock->total_current ?? 0) < $item['quantity']) {
+                throw new \Exception(
+                    __('sales.insufficient_stock', ['stock' => $stockId, 'available' => $stock->total_current ?? 0]), 422
+                );
+            }
+
+            $price = isset($item['price_id'])
+                ? $prices[$item['price_id']]->amount ?? 0
+                : $stock->sellingPrice?->amount ?? 0;
+
+            $resolved[] = [
+                'stock_id'   => $stockId,
+                'product_id' => $stock->product_id,
+                'quantity'   => $item['quantity'],
+                'price'      => $price,
+            ];
+        }
+
+        return $resolved;
     }
 
     private function generateReference(string $prefix): string

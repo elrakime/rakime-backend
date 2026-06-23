@@ -17,11 +17,11 @@ class StoreSaleRequest extends FormRequest
             'branch_id'       => ['required', 'integer', 'exists:branches,id'],
             'client_id'       => ['nullable', 'integer', 'exists:clients,id'],
             'note'            => ['nullable', 'string'],
-            'items'           => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
-            'items.*.stock_id'   => ['required', 'integer', 'exists:stocks,id'],
-            'items.*.quantity'   => ['required', 'integer', 'min:1'],
-            'items.*.price'      => ['required', 'integer', 'min:0'],
+            'sold_at'         => ['nullable', 'date'],
+            'items'                 => ['required', 'array', 'min:1'],
+            'items.*.stock_id'      => ['required', 'integer', 'exists:stocks,id'],
+            'items.*.quantity'      => ['required', 'integer', 'min:1'],
+            'items.*.price_id'      => ['nullable', 'integer', 'exists:prices,id'],
         ];
     }
 }

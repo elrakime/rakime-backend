@@ -6,8 +6,8 @@ namespace App\Enums;
 
 enum PurchasePaymentMethod: string
 {
-    case CASH = 'CASH';
-    case BANK = 'BANK';
+    case CASH = 'cash';
+    case BANK = 'bank';
 
     public static function keys(): array
     {

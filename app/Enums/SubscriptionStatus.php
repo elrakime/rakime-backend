@@ -6,9 +6,9 @@ namespace App\Enums;
 
 enum SubscriptionStatus: string
 {
-    case ACTIVE    = 'ACTIVE';
-    case CANCELLED = 'CANCELLED';
-    case COMPLETED = 'COMPLETED';
+    case ACTIVE    = 'active';
+    case CANCELLED = 'cancelled';
+    case COMPLETED = 'completed';
 
     public static function keys(): array
     {

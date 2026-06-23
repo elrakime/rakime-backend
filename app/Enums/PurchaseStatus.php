@@ -6,10 +6,10 @@ namespace App\Enums;
 
 enum PurchaseStatus: string
 {
-    case DRAFT         = 'DRAFT';
-    case RECEIVED      = 'RECEIVED';
-    case PAID          = 'PAID';
-    case PARTIALLY_PAID = 'PARTIALLY_PAID';
+    case DRAFT         = 'draft';
+    case RECEIVED      = 'received';
+    case PAID          = 'paid';
+    case PARTIALLY_PAID = 'partially_paid';
 
     public static function keys(): array
     {

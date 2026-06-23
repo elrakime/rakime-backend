@@ -6,9 +6,9 @@ namespace App\Enums;
 
 enum InstallmentStatus: string
 {
-    case PENDING = 'PENDING';
-    case PAID    = 'PAID';
-    case OVERDUE = 'OVERDUE';
+    case PENDING = 'pending';
+    case PAID    = 'paid';
+    case OVERDUE = 'overdue';
 
     public static function keys(): array
     {

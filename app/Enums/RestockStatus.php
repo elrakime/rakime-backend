@@ -6,10 +6,10 @@ namespace App\Enums;
 
 enum RestockStatus: string
 {
-    case DRAFT     = 'DRAFT';
-    case SUBMITTED = 'SUBMITTED';
-    case FULFILLED = 'FULFILLED';
-    case CANCELLED = 'CANCELLED';
+    case DRAFT     = 'draft';
+    case SUBMITTED = 'submitted';
+    case FULFILLED = 'fulfilled';
+    case CANCELLED = 'cancelled';
 
     public static function keys(): array
     {

@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', PriceType::values());
+            $table->enum('type', PriceType::keys());
             $table->unsignedInteger('amount');
             $table->timestamps();
         });

@@ -6,13 +6,13 @@ namespace App\Enums;
 
 enum InventoryMovementType: string
 {
-    case RECEIVE          = 'RECEIVE';
-    case RETURN           = 'RETURN';
-    case TRANSFER_IN      = 'TRANSFER_IN';
-    case TRANSFER_OUT     = 'TRANSFER_OUT';
-    case SALE             = 'SALE';
-    case EXPIRED          = 'EXPIRED';
-    case RESTOCK_RECEIVED = 'RESTOCK_RECEIVED';
+    case RECEIVE          = 'receive';
+    case RETURN           = 'return';
+    case TRANSFER_IN      = 'transfer_in';
+    case TRANSFER_OUT     = 'transfer_out';
+    case SALE             = 'sale';
+    case EXPIRED          = 'expired';
+    case RESTOCK_RECEIVED = 'restock_received';
 
     public static function keys(): array
     {

@@ -6,10 +6,10 @@ namespace App\Enums;
 
 enum DrawStatus: string
 {
-    case PENDING   = 'PENDING';
-    case RECEIVED  = 'RECEIVED';
-    case CANCELLED = 'CANCELLED';
-    case FAILED    = 'FAILED';
+    case PENDING   = 'pending';
+    case RECEIVED  = 'received';
+    case CANCELLED = 'cancelled';
+    case FAILED    = 'failed';
 
     public static function keys(): array
     {

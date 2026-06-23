@@ -6,15 +6,15 @@ namespace App\Enums;
 
 enum ContractStatus: string
 {
-    case DRAFT     = 'DRAFT';
-    case PENDING   = 'PENDING';
-    case APPROVED  = 'APPROVED';
-    case REJECTED  = 'REJECTED';
-    case CONFIRMED = 'CONFIRMED';
-    case ACTIVE    = 'ACTIVE';
-    case COMPLETED = 'COMPLETED';
-    case CLOSED    = 'CLOSED';
-    case CANCELLED = 'CANCELLED';
+    case DRAFT     = 'draft';
+    case PENDING   = 'pending';
+    case APPROVED  = 'approved';
+    case REJECTED  = 'rejected';
+    case CONFIRMED = 'confirmed';
+    case ACTIVE    = 'active';
+    case COMPLETED = 'completed';
+    case CLOSED    = 'closed';
+    case CANCELLED = 'cancelled';
 
     public static function keys(): array
     {

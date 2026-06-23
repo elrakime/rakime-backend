@@ -6,14 +6,14 @@ namespace App\Enums;
 
 enum TreasuryMovementType: string
 {
-    case DEPOSIT             = 'DEPOSIT';
-    case WITHDRAWAL          = 'WITHDRAWAL';
-    case TRANSFER_IN         = 'TRANSFER_IN';
-    case TRANSFER_OUT        = 'TRANSFER_OUT';
-    case INSTALLMENT_PAYMENT = 'INSTALLMENT_PAYMENT';
-    case PURCHASE_PAYMENT    = 'PURCHASE_PAYMENT';
-    case SALE_PAYMENT        = 'SALE_PAYMENT';
-    case ADJUSTMENT          = 'ADJUSTMENT';
+    case DEPOSIT             = 'deposit';
+    case WITHDRAWAL          = 'withdrawal';
+    case TRANSFER_IN         = 'transfer_in';
+    case TRANSFER_OUT        = 'transfer_out';
+    case INSTALLMENT_PAYMENT = 'installment_payment';
+    case PURCHASE_PAYMENT    = 'purchase_payment';
+    case SALE_PAYMENT        = 'sale_payment';
+    case ADJUSTMENT          = 'adjustment';
 
     public static function keys(): array
     {
