@@ -50,7 +50,7 @@ class SaleService
             $sale = Sale::create([
                 'user_id'      => $data['user_id'] ?? auth()->id(),
                 'branch_id'    => $data['branch_id'],
-                'client_id'    => $data['client_id'],
+                'client_id'    => $data['client_id'] ?? null,
                 'reference'    => $this->generateReference('SL'),
                 'total_amount' => $totalAmount,
                 'note'         => $data['note'] ?? null,

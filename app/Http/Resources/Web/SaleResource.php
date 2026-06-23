@@ -27,12 +27,12 @@ class SaleResource extends JsonResource
                 'id'   => $this->branch->id,
                 'name' => $this->branch->name,
             ]),
-            'client' => $this->whenLoaded('client', fn () => [
+            'client' => $this->whenLoaded('client', fn () => $this->client ? [
                 'id'        => $this->client->id,
                 'firstname' => $this->client->firstname,
                 'lastname'  => $this->client->lastname,
                 'phone'     => $this->client->phone,
-            ]),
+            ] : null),
             'items' => SaleItemResource::collection($this->whenLoaded('items')),
         ];
     }
