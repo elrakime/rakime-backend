@@ -89,6 +89,17 @@ enum Permission: string
     case DELETE_PURCHASES  = 'purchases.delete';
     case APPROVE_PURCHASES = 'purchases.approve';
 
+    // Purchase Payments (2 endpoints: index, store)
+    case VIEW_PURCHASE_PAYMENTS   = 'purchase_payments.view';
+    case CREATE_PURCHASE_PAYMENTS = 'purchase_payments.create';
+
+    // Purchase Returns (6 endpoints: index, store, show, update, destroy, approve)
+    case VIEW_PURCHASE_RETURNS    = 'purchase_returns.view';
+    case CREATE_PURCHASE_RETURNS  = 'purchase_returns.create';
+    case UPDATE_PURCHASE_RETURNS  = 'purchase_returns.update';
+    case DELETE_PURCHASE_RETURNS  = 'purchase_returns.delete';
+    case APPROVE_PURCHASE_RETURNS = 'purchase_returns.approve';
+
     // Sales
     case VIEW_SALES   = 'sales.view';
     case CREATE_SALES = 'sales.create';
@@ -110,15 +121,6 @@ enum Permission: string
     // Treasury
     case VIEW_TREASURY   = 'treasury.view';
     case MANAGE_TREASURY = 'treasury.manage';
-
-    // Installments
-    case VIEW_INSTALLMENTS   = 'installments.view';
-    case CREATE_INSTALLMENTS = 'installments.create';
-    case UPDATE_INSTALLMENTS = 'installments.update';
-    case DELETE_INSTALLMENTS = 'installments.delete';
-
-    // Reports
-    case VIEW_REPORTS = 'reports.view';
 
     // Roles
     case VIEW_ROLES   = 'roles.view';
@@ -162,11 +164,10 @@ enum Permission: string
             'categories', 'brands', 'products', 'suppliers' => 'blue',
             'clients'                         => 'teal',
             'inventory'                       => 'orange',
-            'purchases'                       => 'yellow',
+            'purchases', 'purchase_payments', 'purchase_returns' => 'yellow',
             'sales'                           => 'green',
-            'transfers', 'restock_orders'     => 'cyan',
+            'transfers', 'restocks'            => 'cyan',
             'treasury'                        => 'emerald',
-            'installments'                    => 'rose',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };
@@ -174,6 +175,6 @@ enum Permission: string
 
     public static function default(): self
     {
-        return self::VIEW_REPORTS;
+        return self::VIEW_PRODUCTS;
     }
 }

@@ -19,7 +19,7 @@ class PurchaseReturnController extends Controller
 
     public function index(Request $request, Purchase $purchase): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
@@ -32,7 +32,7 @@ class PurchaseReturnController extends Controller
 
     public function store(StorePurchaseReturnRequest $request, Purchase $purchase): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
@@ -56,7 +56,7 @@ class PurchaseReturnController extends Controller
 
     public function show(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
@@ -76,7 +76,7 @@ class PurchaseReturnController extends Controller
 
     public function update(UpdatePurchaseReturnRequest $request, Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
@@ -99,7 +99,7 @@ class PurchaseReturnController extends Controller
 
     public function destroy(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::DELETE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
@@ -117,7 +117,7 @@ class PurchaseReturnController extends Controller
 
     public function approve(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 

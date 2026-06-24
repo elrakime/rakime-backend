@@ -16,7 +16,7 @@ class PurchasePaymentController extends Controller
 
     public function index(Purchase $purchase): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASE_PAYMENTS->value)) {
             return $response;
         }
 
@@ -31,7 +31,7 @@ class PurchasePaymentController extends Controller
 
     public function store(StorePurchasePaymentRequest $request, Purchase $purchase): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_PURCHASE_PAYMENTS->value)) {
             return $response;
         }
 

@@ -40,12 +40,13 @@ class RolePermissionSeeder extends Seeder
                 Permission::VIEW_PRODUCTS,
                 Permission::VIEW_SUPPLIERS,
                 Permission::VIEW_PURCHASES,
+                Permission::VIEW_PURCHASE_PAYMENTS,
+                Permission::VIEW_PURCHASE_RETURNS,
                 Permission::VIEW_TRANSFERS,
                 Permission::VIEW_CATEGORIES,
                 Permission::VIEW_BRANDS,
                 Permission::VIEW_COLORS,
                 Permission::VIEW_TYPES,
-                Permission::VIEW_REPORTS,
             ],
         ];
 
