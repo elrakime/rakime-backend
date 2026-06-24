@@ -48,7 +48,6 @@ class PurchaseReturnService
         return DB::transaction(function () use ($purchase, $data) {
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $purchase->id,
-                'reference'   => $this->generateReference('RET'),
                 'note'        => $data['note'] ?? null,
                 'returned_at' => $data['returned_at'] ?? now(),
             ]);
@@ -165,8 +164,4 @@ class PurchaseReturnService
         }
     }
 
-    private function generateReference(string $prefix): string
-    {
-        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
-    }
 }

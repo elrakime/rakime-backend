@@ -86,4 +86,15 @@ class Restock extends Model
     {
         return $this->hasMany(InventoryMovement::class, 'moveable_id');
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $model) {
+            $model->reference = '';
+        });
+
+        static::created(function (self $model) {
+            $model->updateQuietly(['reference' => 'RSK-' . now()->format('Y') . '-' . str_pad((string) $model->id, 4, '0', STR_PAD_LEFT)]);
+        });
+    }
 }

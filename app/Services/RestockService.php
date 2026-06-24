@@ -56,7 +56,6 @@ class RestockService
             $restock = Restock::create([
                 'user_id'   => $data['user_id'] ?? auth()->id(),
                 'branch_id' => $data['branch_id'],
-                'reference' => $this->generateReference('RSK'),
                 'status'    => RestockStatus::DRAFT,
                 'note'      => $data['note'] ?? null,
             ]);
@@ -183,7 +182,6 @@ class RestockService
         // Create a new purchase from the supplier (prices default to 0 for restock fulfillment)
         $purchase = Purchase::create([
             'supplier_id'  => $data['supplier_id'],
-            'reference'    => $this->generateReference('PUR'),
             'status'       => \App\Enums\PurchaseStatus::RECEIVED,
             'total_amount' => 0,
             'paid_amount'  => 0,
@@ -363,8 +361,4 @@ class RestockService
         return null;
     }
 
-    private function generateReference(string $prefix): string
-    {
-        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
-    }
 }

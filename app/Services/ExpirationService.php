@@ -46,7 +46,6 @@ class ExpirationService
             $expiration = Expiration::create([
                 'user_id'      => $data['user_id'],
                 'inventory_id' => $data['inventory_id'],
-                'reference'    => $this->generateReference('EXP'),
                 'note'         => $data['note'] ?? null,
                 'reported_at'  => $data['reported_at'] ?? now(),
             ]);
@@ -151,8 +150,4 @@ class ExpirationService
         $expiration->delete();
     }
 
-    private function generateReference(string $prefix): string
-    {
-        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
-    }
 }

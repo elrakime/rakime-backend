@@ -63,7 +63,6 @@ class SaleService
                 'user_id'      => $data['user_id'] ?? auth()->id(),
                 'branch_id'    => $data['branch_id'],
                 'client_id'    => $data['client_id'] ?? null,
-                'reference'    => $this->generateReference('SL'),
                 'total_amount' => $totalAmount,
                 'note'         => $data['note'] ?? null,
                 'sold_at'      => $data['sold_at'] ?? now(),
@@ -217,8 +216,4 @@ class SaleService
         return $resolved;
     }
 
-    private function generateReference(string $prefix): string
-    {
-        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
-    }
 }

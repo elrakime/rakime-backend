@@ -51,7 +51,6 @@ class PurchaseService
 
             $purchase = Purchase::create([
                 'supplier_id'  => $data['supplier_id'],
-                'reference'    => $this->generateReference('PUR'),
                 'status'       => PurchaseStatus::DRAFT,
                 'total_amount' => $totalAmount,
                 'paid_amount'  => 0,
@@ -180,8 +179,4 @@ class PurchaseService
         });
     }
 
-    private function generateReference(string $prefix): string
-    {
-        return $prefix . '-' . now()->format('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
-    }
 }
