@@ -33,9 +33,16 @@ class AuthService
      */
     public function updateProfile(User $user, array $data): User
     {
+        if (isset($data['image'])) {
+            $user->clearMediaCollection('image');
+            $user->addMedia($data['image'])->toMediaCollection('image');
+        }
+
+        unset($data['image']);
+
         $user->update($data);
 
-        return $user->loadMissing(['roles', 'permissions', 'branches']);
+        return $user->loadMissing(['roles', 'permissions', 'branches', 'media']);
     }
 
     /**
