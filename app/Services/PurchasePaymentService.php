@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Enums\PurchaseStatus;
-use App\Enums\TreasuryMovementType;
+use App\Enums\WalletMovementType;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
-use App\Models\Treasury;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -47,11 +47,11 @@ class PurchasePaymentService
                 'status'      => $status,
             ]);
 
-            $treasury = Treasury::findOrFail($data['treasury_id']);
-            $treasury->decrement('balance', $data['amount']);
+            $wallet = Wallet::findOrFail($data['wallet_id']);
+            $wallet->decrement('balance', $data['amount']);
 
-            $treasury->movements()->create([
-                'movement_type'  => TreasuryMovementType::PURCHASE_PAYMENT,
+            $wallet->movements()->create([
+                'movement_type'  => WalletMovementType::PURCHASE_PAYMENT,
                 'amount'         => -$data['amount'],
                 'reference_type' => 'purchase_payments',
                 'reference_id'   => $payment->id,

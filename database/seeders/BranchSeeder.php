@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Inventory;
-use App\Models\Treasury;
+use App\Models\Wallet;
 use Illuminate\Database\Seeder;
 
 class BranchSeeder extends Seeder
@@ -17,13 +17,13 @@ class BranchSeeder extends Seeder
                 'name' => 'Main Branch',
                 'code' => 'M',
                 'inventory' => 'Main Warehouse',
-                'treasury'  => 'Main Treasury',
+                'wallet'     => 'Main Wallet',
             ],
             [
                 'name' => 'Second Branch',
                 'code' => 'S',
                 'inventory' => 'Second Branch Warehouse',
-                'treasury'  => 'Second Branch Treasury',
+                'wallet'     => 'Second Branch Wallet',
             ],
         ];
 
@@ -45,9 +45,9 @@ class BranchSeeder extends Seeder
                 ['branch_id' => $branch->id, 'name' => $data['inventory']],
             );
 
-            // Create treasury for the branch
-            Treasury::firstOrCreate(
-                ['branch_id' => $branch->id, 'name' => $data['treasury']],
+            // Create wallet for the branch
+            Wallet::firstOrCreate(
+                ['owner_type' => 'branch', 'owner_id' => $branch->id, 'name' => $data['wallet']],
                 ['balance' => 0]
             );
         }

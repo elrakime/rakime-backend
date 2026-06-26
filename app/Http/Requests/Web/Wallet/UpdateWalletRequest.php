@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\Treasury;
+namespace App\Http\Requests\Web\Wallet;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateTreasuryRequest extends FormRequest
+class UpdateWalletRequest extends FormRequest
 {
     public function authorize(): bool
     {

@@ -14,7 +14,7 @@ class StorePurchasePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'treasury_id'    => ['required', 'integer', 'exists:treasuries,id'],
+            'wallet_id'     => ['required', 'integer', 'exists:wallets,id'],
             'amount'         => ['required', 'integer', 'min:1'],
             'payment_method' => ['required', 'string'],
             'paid_at'        => ['required', 'date'],

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Branch;
 use App\Models\Inventory;
-use App\Models\Treasury;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -54,8 +54,8 @@ class BranchService
             ['name' => $branch->name],
         );
 
-        Treasury::firstOrCreate(
-            ['branch_id' => $branch->id],
+        Wallet::firstOrCreate(
+            ['owner_type' => 'branch', 'owner_id' => $branch->id],
             ['name' => $branch->name, 'balance' => 0],
         );
 
@@ -83,8 +83,8 @@ class BranchService
             ['name' => $branch->name],
         );
 
-        Treasury::firstOrCreate(
-            ['branch_id' => $branch->id],
+        Wallet::firstOrCreate(
+            ['owner_type' => 'branch', 'owner_id' => $branch->id],
             ['name' => $branch->name, 'balance' => 0],
         );
 

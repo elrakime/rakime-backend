@@ -14,7 +14,7 @@ return [
         'RESTOCK_RECEIVED'  => 'Restock Received',
     ],
 
-    'treasury_movement_type' => [
+    'wallet_movement_type' => [
         'DEPOSIT'             => 'Deposit',
         'WITHDRAWAL'          => 'Withdrawal',
         'TRANSFER_IN'         => 'Transfer In',

@@ -36,7 +36,7 @@ class RolePermissionSeeder extends Seeder
                 Permission::CREATE_SALES,
                 Permission::VIEW_RESTOCKS,
                 Permission::CREATE_RESTOCKS,
-                Permission::VIEW_TREASURY,
+                Permission::VIEW_WALLET,
                 Permission::VIEW_PRODUCTS,
                 Permission::VIEW_SUPPLIERS,
                 Permission::VIEW_PURCHASES,

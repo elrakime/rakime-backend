@@ -23,7 +23,7 @@ use App\Http\Controllers\Web\SaleController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\TransferController;
-use App\Http\Controllers\Web\TreasuryController;
+use App\Http\Controllers\Web\WalletController;
 use App\Http\Controllers\Web\TypeController;
 use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\WilayaController;
@@ -63,7 +63,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('products', ProductController::class);
     Route::apiResource('inventories', InventoryController::class);
     Route::get('inventory-movements', [InventoryMovementController::class, 'index']);
-    Route::apiResource('treasuries', TreasuryController::class);
+    Route::apiResource('wallets', WalletController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('transfers', TransferController::class);
     Route::post('transfers/{transfer}/receive', [TransferController::class, 'receive']);

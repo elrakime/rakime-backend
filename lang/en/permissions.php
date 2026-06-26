@@ -77,9 +77,9 @@ return [
     'create_restock_orders'  => 'Create Restock Orders',
     'approve_restock_orders' => 'Approve Restock Orders',
 
-    // Treasury
-    'view_treasury'   => 'View Treasury',
-    'manage_treasury' => 'Manage Treasury',
+    // Wallet
+    'view_wallet'   => 'View Wallet',
+    'manage_wallet' => 'Manage Wallet',
 
     // Installments
     'view_installments'   => 'View Installments',

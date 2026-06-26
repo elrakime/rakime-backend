@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
             'purchase_item'  => PurchaseItem::class,
             'transfer_item'  => TransferItem::class,
 
-            // reference_type in treasury_movements
+            // reference_type in wallet_movements
             'installment_payments'      => InstallmentPayment::class,
             'purchase_payments'         => PurchasePayment::class,
             'purchase_returns'          => PurchaseReturn::class,

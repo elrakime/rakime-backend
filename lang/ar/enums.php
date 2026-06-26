@@ -14,7 +14,7 @@ return [
         'RESTOCK_RECEIVED' => 'إعادة تخزين مستلمة',
     ],
 
-    'treasury_movement_type' => [
+    'wallet_movement_type' => [
         'DEPOSIT'             => 'إيداع',
         'WITHDRAWAL'          => 'سحب',
         'TRANSFER_IN'         => 'تحويل وارد',

@@ -89,8 +89,8 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany(Expiration::class);
     }
 
-    public function treasuryMovements(): HasMany
+    public function walletMovements(): HasMany
     {
-        return $this->hasMany(TreasuryMovement::class, 'performed_by');
+        return $this->hasMany(WalletMovement::class, 'performed_by');
     }
 }

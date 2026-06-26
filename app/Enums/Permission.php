@@ -118,9 +118,9 @@ enum Permission: string
     case DELETE_RESTOCKS  = 'restocks.delete';
     case APPROVE_RESTOCKS = 'restocks.approve';
 
-    // Treasury
-    case VIEW_TREASURY   = 'treasury.view';
-    case MANAGE_TREASURY = 'treasury.manage';
+    // Wallet
+    case VIEW_WALLET   = 'wallet.view';
+    case MANAGE_WALLET = 'wallet.manage';
 
     // Roles
     case VIEW_ROLES   = 'roles.view';
@@ -167,7 +167,7 @@ enum Permission: string
             'purchases', 'purchase_payments', 'purchase_returns' => 'yellow',
             'sales'                           => 'green',
             'transfers', 'restocks'            => 'cyan',
-            'treasury'                        => 'emerald',
+            'wallet'                          => 'emerald',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

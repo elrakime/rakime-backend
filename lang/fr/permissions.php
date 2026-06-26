@@ -77,9 +77,9 @@ return [
     'create_restock_orders'  => 'Créer des commandes de réapprovisionnement',
     'approve_restock_orders' => 'Approuver les commandes de réapprovisionnement',
 
-    // Trésorerie
-    'view_treasury'   => 'Voir la trésorerie',
-    'manage_treasury' => 'Gérer la trésorerie',
+    // Portefeuille
+    'view_wallet'   => 'Voir le portefeuille',
+    'manage_wallet' => 'Gérer le portefeuille',
 
     // Mensualités
     'view_installments'   => 'Voir les mensualités',

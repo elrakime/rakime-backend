@@ -37,9 +37,9 @@ class Branch extends Model
         return $this->hasMany(Inventory::class);
     }
 
-    public function treasuries(): HasMany
+    public function wallets(): HasMany
     {
-        return $this->hasMany(Treasury::class);
+        return $this->hasMany(Wallet::class, 'owner_id')->where('owner_type', 'branch');
     }
 
     public function restockOrders(): HasMany

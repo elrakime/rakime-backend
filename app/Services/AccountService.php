@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -37,7 +38,7 @@ class AccountService
 
     public function create(array $data): Account
     {
-        return Account::create([
+        $account = Account::create([
             'name'                => $data['name'],
             'ccp_number'          => $data['ccp_number'],
             'ccp_key'             => $data['ccp_key'],
@@ -45,6 +46,13 @@ class AccountService
             'min_withdraw_amount' => $data['min_withdraw_amount'],
             'max_withdraw_count'  => $data['max_withdraw_count'],
         ]);
+
+        Wallet::firstOrCreate(
+            ['owner_type' => 'account', 'owner_id' => $account->id],
+            ['name' => $account->name, 'balance' => 0],
+        );
+
+        return $account;
     }
 
     public function show(Account $account): Account

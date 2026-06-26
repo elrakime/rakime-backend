@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\TreasuryMovementType;
+use App\Enums\WalletMovementType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class TreasuryMovement extends Model
+class WalletMovement extends Model
 {
     
 
     protected $fillable = [
-        'treasury_id',
+        'wallet_id',
         'movement_type',
         'amount',
         'reference_type',
@@ -27,13 +27,13 @@ class TreasuryMovement extends Model
     protected function casts(): array
     {
         return [
-            'movement_type' => TreasuryMovementType::class,
+            'movement_type' => WalletMovementType::class,
             'amount'        => 'decimal:2',
-            'created_at'         => 'datetime',
+            'created_at'    => 'datetime',
         ];
     }
 
-    public function scopeOfType(Builder $query, TreasuryMovementType $type): void
+    public function scopeOfType(Builder $query, WalletMovementType $type): void
     {
         $query->where('movement_type', $type);
     }
@@ -48,9 +48,9 @@ class TreasuryMovement extends Model
         $query->where('amount', '<', 0);
     }
 
-    public function treasury(): BelongsTo
+    public function wallet(): BelongsTo
     {
-        return $this->belongsTo(Treasury::class);
+        return $this->belongsTo(Wallet::class);
     }
 
     public function performedBy(): BelongsTo

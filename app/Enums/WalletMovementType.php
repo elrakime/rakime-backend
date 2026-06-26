@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TreasuryMovementType: string
+enum WalletMovementType: string
 {
     case DEPOSIT             = 'deposit';
     case WITHDRAWAL          = 'withdrawal';
@@ -38,7 +38,7 @@ enum TreasuryMovementType: string
 
     public function get_name(): string
     {
-        return __('enums.treasury_movement_type.' . $this->value);
+        return __('enums.wallet_movement_type.' . $this->value);
     }
 
     public function get_color(): string

@@ -6,17 +6,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Treasury extends Model
+class Wallet extends Model
 {
     use LogsActivity;
 
 
-    protected $fillable = ['branch_id', 'name', 'balance'];
+    protected $fillable = ['owner_type', 'owner_id', 'name', 'balance'];
 
     protected function casts(): array
     {
@@ -32,16 +32,16 @@ class Treasury extends Model
 
     public function scopeCentral(Builder $query): void
     {
-        $query->whereNull('branch_id');
+        $query->whereNull('owner_id');
     }
 
-    public function branch(): BelongsTo
+    public function owner(): MorphTo
     {
-        return $this->belongsTo(Branch::class);
+        return $this->morphTo();
     }
 
     public function movements(): HasMany
     {
-        return $this->hasMany(TreasuryMovement::class);
+        return $this->hasMany(WalletMovement::class);
     }
 }

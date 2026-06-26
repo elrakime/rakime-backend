@@ -77,9 +77,9 @@ return [
     'create_restock_orders'  => 'إنشاء طلبات تزويد',
     'approve_restock_orders' => 'اعتماد طلبات التزويد',
 
-    // الخزينة
-    'view_treasury'   => 'عرض الخزينة',
-    'manage_treasury' => 'إدارة الخزينة',
+    // المحفظة
+    'view_wallet'   => 'عرض المحفظة',
+    'manage_wallet' => 'إدارة المحفظة',
 
     // الأقساط
     'view_installments'   => 'عرض الأقساط',

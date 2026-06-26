@@ -14,7 +14,7 @@ return [
         'RESTOCK_RECEIVED' => 'Réapprovisionnement reçu',
     ],
 
-    'treasury_movement_type' => [
+    'wallet_movement_type' => [
         'DEPOSIT'             => 'Dépôt',
         'WITHDRAWAL'          => 'Retrait',
         'TRANSFER_IN'         => 'Transfert entrant',

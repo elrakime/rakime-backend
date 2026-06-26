@@ -17,7 +17,7 @@ ENUM inventory_movement_type {
   RESTOCK_RECEIVED
 }
 
-ENUM treasury_movement_type {
+ENUM wallet_movement_type {
   DEPOSIT
   WITHDRAWAL
   TRANSFER_IN
@@ -161,20 +161,21 @@ Table inventory_movements {
 }
 
 // ============================================================
-// TREASURY
+// WALLET
 // ============================================================
 
-Table treasuries {
-  id        int     [pk]
-  branch_id int     [ref: > branches.id, null, note: "null = central/head treasury"]
-  name      varchar
-  balance   decimal [default: 0, note: "running balance, updated on each movement"]
+Table wallets {
+  id         int     [pk]
+  owner_type varchar [null, note: "polymorphic owner type (branch, account, etc.)"]
+  owner_id   int     [null, note: "polymorphic owner id"]
+  name       varchar
+  balance    decimal [default: 0, note: "running balance, updated on each movement"]
 }
 
-Table treasury_movements {
+Table wallet_movements {
   id                    int                    [pk]
-  treasury_id           int                    [ref: > treasuries.id]
-  movement_type         treasury_movement_type
+  wallet_id             int                    [ref: > wallets.id]
+  movement_type         wallet_movement_type
   amount                decimal                [note: "positive = inflow, negative = outflow"]
   reference_type        varchar                [null, note: "e.g. installment_cash_payments, purchase_payments, transfers"]
   reference_id          int                    [null, note: "FK to the source document"]
