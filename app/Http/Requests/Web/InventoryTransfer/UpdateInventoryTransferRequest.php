@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\Transfer;
+namespace App\Http\Requests\Web\InventoryTransfer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateTransferRequest extends FormRequest
+class UpdateInventoryTransferRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -27,7 +27,7 @@ class UpdateTransferRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $fromInventoryId = $this->input('from_inventory_id') ?? $this->route('transfer')?->from_inventory_id;
+            $fromInventoryId = $this->input('from_inventory_id') ?? $this->route('inventory_transfer')?->from_inventory_id;
             $items = $this->input('items', []);
 
             if (!$fromInventoryId || empty($items)) {

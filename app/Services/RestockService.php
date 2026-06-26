@@ -10,7 +10,7 @@ use App\Models\Purchase;
 use App\Models\Restock;
 use App\Models\RestockItem;
 use App\Models\Stock;
-use App\Models\Transfer;
+use App\Models\InventoryTransfer;
 use App\Traits\ScopesByUserBranches;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -246,7 +246,7 @@ class RestockService
         return $purchase;
     }
 
-    private function fulfillViaTransfer(Restock $restock, array $data): Transfer
+    private function fulfillViaTransfer(Restock $restock, array $data): InventoryTransfer
     {
         $restock->loadMissing('branch');
 
@@ -260,9 +260,10 @@ class RestockService
         $fromInventoryId = $data['from_inventory_id'];
 
         // Create a new transfer from the source inventory to the branch's inventory
-        $transfer = Transfer::create([
+        $transfer = InventoryTransfer::create([
             'from_inventory_id' => $fromInventoryId,
             'to_inventory_id'   => $toInventory->id,
+            'performed_by'      => auth()->id(),
             'note'              => $data['note'] ?? null,
             'transferred_at'    => now(),
             'received_at'       => now(),
@@ -313,7 +314,7 @@ class RestockService
             // Create batch for the received transfer item
             $toBatch = $toStock->batches()->create([
                 'source_id'        => $transferItem->id,
-                'source_type'      => 'transfer_items',
+                'source_type'      => 'inventory_transfer_item',
                 'purchase_price'   => 0,
                 'initial_quantity' => $quantity,
                 'current_quantity' => $quantity,

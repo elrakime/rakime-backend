@@ -7,11 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TransferItem extends Model
+class InventoryTransferItem extends Model
 {
 
     protected $fillable = [
-        'transfer_id',
+        'inventory_transfer_id',
         'stock_id',
         'quantity',
     ];
@@ -23,9 +23,9 @@ class TransferItem extends Model
         ];
     }
 
-    public function transfer(): BelongsTo
+    public function inventoryTransfer(): BelongsTo
     {
-        return $this->belongsTo(Transfer::class);
+        return $this->belongsTo(InventoryTransfer::class);
     }
 
     public function stock(): BelongsTo

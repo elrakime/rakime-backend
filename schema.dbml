@@ -154,7 +154,7 @@ Table inventory_movements {
   stock_id      int                     [ref: > stocks.id]
   inventory_id  int                     [ref: > inventories.id]
   product_id    int                     [ref: > products.id]
-  moveable_id   int                     [ref: > purchases.id, ref: > purchase_returns.id, ref: > transfers.id, ref: > sales.id, ref: > product_expirations.id, ref: > restock_orders.id]
+  moveable_id   int                     [ref: > purchases.id, ref: > purchase_returns.id, ref: > inventory_transfers.id, ref: > sales.id, ref: > product_expirations.id, ref: > restock_orders.id]
   movement_type inventory_movement_type
   quantity      int
   created_at    timestamp
@@ -177,7 +177,7 @@ Table wallet_movements {
   wallet_id             int                    [ref: > wallets.id]
   movement_type         wallet_movement_type
   amount                decimal                [note: "positive = inflow, negative = outflow"]
-  reference_type        varchar                [null, note: "e.g. installment_cash_payments, purchase_payments, transfers"]
+  reference_type        varchar                [null, note: "e.g. installment_cash_payments, purchase_payments, inventory_transfers"]
   reference_id          int                    [null, note: "FK to the source document"]
   note                  varchar                [null]
   performed_by_type     actor_type
@@ -243,19 +243,20 @@ Table suppliers {
 // TRANSFERS
 // ============================================================
 
-Table transfers {
+Table inventory_transfers {
   id                int       [pk]
   from_inventory_id int       [ref: > inventories.id]
   to_inventory_id   int       [ref: > inventories.id]
+  performed_by      int       [ref: > users.id, null]
   note              varchar
   transferred_at    timestamp
 }
 
-Table transfer_items {
-  id          int [pk]
-  transfer_id int [ref: > transfers.id]
-  product_id  int [ref: > products.id]
-  quantity    int
+Table inventory_transfer_items {
+  id                      int [pk]
+  inventory_transfer_id   int [ref: > inventory_transfers.id]
+  product_id              int [ref: > products.id]
+  quantity                int
 }
 
 // ============================================================
@@ -313,7 +314,7 @@ Table stocks {
   id                int       [pk]
   inventory_id      int       [ref: > inventories.id]
   product_id        int       [ref: > products.id]
-  source_id         int       [ref: > purchase_items.id, ref: > transfer_items.id]
+  source_id         int       [ref: > purchase_items.id, ref: > inventory_transfer_items.id]
   initial_quantity  int
   current_quantity  int
   purchase_price    int

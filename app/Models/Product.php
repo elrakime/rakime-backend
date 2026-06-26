@@ -85,7 +85,7 @@ class Product extends Model implements HasMedia
 
     public function transferItems(): HasMany
     {
-        return $this->hasMany(TransferItem::class);
+        return $this->hasMany(InventoryTransferItem::class);
     }
 
     public function restockOrderItems(): HasMany

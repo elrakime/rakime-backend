@@ -4,21 +4,22 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Models\InventoryMovement;
+use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferItem;
 use App\Models\Stock;
-use App\Models\Transfer;
-use App\Models\TransferItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class TransferService
+class InventoryTransferService
 {
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Transfer::class, $request)
+        return QueryBuilder::for(InventoryTransfer::class, $request)
             ->with(['fromInventory', 'toInventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('from_inventory_id'),
@@ -39,21 +40,22 @@ class TransferService
             ->appends($request->query());
     }
 
-    public function create(array $data): Transfer
+    public function create(array $data): InventoryTransfer
     {
         return DB::transaction(function () use ($data) {
-            $transfer = Transfer::create([
+            $transfer = InventoryTransfer::create([
                 'from_inventory_id' => $data['from_inventory_id'],
                 'to_inventory_id'   => $data['to_inventory_id'],
+                'performed_by'      => Auth::id(),
                 'note'              => $data['note'] ?? null,
                 'transferred_at'    => $data['transferred_at'] ?? now(),
             ]);
 
             foreach ($data['items'] as $item) {
-                TransferItem::create([
-                    'transfer_id' => $transfer->id,
-                    'stock_id'    => $item['stock_id'],
-                    'quantity'    => $item['quantity'],
+                InventoryTransferItem::create([
+                    'inventory_transfer_id' => $transfer->id,
+                    'stock_id'              => $item['stock_id'],
+                    'quantity'              => $item['quantity'],
                 ]);
             }
 
@@ -61,12 +63,12 @@ class TransferService
         });
     }
 
-    public function show(Transfer $transfer): Transfer
+    public function show(InventoryTransfer $transfer): InventoryTransfer
     {
         return $transfer->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
     }
 
-    public function update(Transfer $transfer, array $data): Transfer
+    public function update(InventoryTransfer $transfer, array $data): InventoryTransfer
     {
         if ($transfer->received_at) {
             throw new \Exception(__('transfers.cannot_update_received'), 422);
@@ -84,10 +86,10 @@ class TransferService
                 $transfer->items()->delete();
 
                 foreach ($data['items'] as $item) {
-                    TransferItem::create([
-                        'transfer_id' => $transfer->id,
-                        'stock_id'    => $item['stock_id'],
-                        'quantity'    => $item['quantity'],
+                    InventoryTransferItem::create([
+                        'inventory_transfer_id' => $transfer->id,
+                        'stock_id'              => $item['stock_id'],
+                        'quantity'              => $item['quantity'],
                     ]);
                 }
             }
@@ -96,7 +98,7 @@ class TransferService
         });
     }
 
-    public function receive(Transfer $transfer): Transfer
+    public function receive(InventoryTransfer $transfer): InventoryTransfer
     {
         if ($transfer->received_at) {
             return $transfer;
@@ -138,7 +140,7 @@ class TransferService
 
                 $toBatch = $toStock->batches()->create([
                     'source_id'        => $transferItem->id,
-                    'source_type'      => 'transfer_item',
+                    'source_type'      => 'inventory_transfer_item',
                     'purchase_price'   => 0,
                     'initial_quantity' => $transferItem->quantity,
                     'current_quantity' => $transferItem->quantity,
@@ -160,7 +162,7 @@ class TransferService
         });
     }
 
-    public function delete(Transfer $transfer): void
+    public function delete(InventoryTransfer $transfer): void
     {
         if ($transfer->received_at) {
             throw new \Exception(__('transfers.cannot_delete_received'), 422);

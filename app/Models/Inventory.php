@@ -36,12 +36,12 @@ class Inventory extends Model
 
     public function transfersOut(): HasMany
     {
-        return $this->hasMany(Transfer::class, 'from_inventory_id');
+        return $this->hasMany(InventoryTransfer::class, 'from_inventory_id');
     }
 
     public function transfersIn(): HasMany
     {
-        return $this->hasMany(Transfer::class, 'to_inventory_id');
+        return $this->hasMany(InventoryTransfer::class, 'to_inventory_id');
     }
 
     public function expirations(): HasMany

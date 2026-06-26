@@ -3,12 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Inventory;
+use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferItem;
 use App\Models\Stock;
-use App\Models\Transfer;
-use App\Models\TransferItem;
 use Illuminate\Database\Seeder;
 
-class TransferSeeder extends Seeder
+class InventoryTransferSeeder extends Seeder
 {
     public function run(): void
     {
@@ -16,11 +16,11 @@ class TransferSeeder extends Seeder
         $toInventory   = Inventory::where('name', 'Second Branch Warehouse')->first();
         $stock         = Stock::where('inventory_id', $fromInventory?->id)->first();
 
-        if (! $fromInventory || ! $toInventory || ! $stock) {
+        if (!$fromInventory || !$toInventory || !$stock) {
             return;
         }
 
-        $transfer = Transfer::create([
+        $transfer = InventoryTransfer::create([
             'from_inventory_id' => $fromInventory->id,
             'to_inventory_id'   => $toInventory->id,
             'note'              => 'Stock transfer to second branch',
@@ -34,10 +34,10 @@ class TransferSeeder extends Seeder
             'product_id'   => $stock->product_id,
         ]);
 
-        TransferItem::create([
-            'transfer_id' => $transfer->id,
-            'stock_id'    => $destStock->id,
-            'quantity'    => 2,
+        InventoryTransferItem::create([
+            'inventory_transfer_id' => $transfer->id,
+            'stock_id'              => $destStock->id,
+            'quantity'              => 2,
         ]);
     }
 }

@@ -9,8 +9,8 @@ use App\Models\PurchasePayment;
 use App\Models\PurchaseReturn;
 use App\Models\Restock;
 use App\Models\Sale;
-use App\Models\Transfer;
-use App\Models\TransferItem;
+use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferItem;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,13 +23,13 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             // source_type in stocks
             'purchase_item'  => PurchaseItem::class,
-            'transfer_item'  => TransferItem::class,
+            'inventory_transfer_item'  => InventoryTransferItem::class,
 
             // reference_type in wallet_movements
             'installment_payments'      => InstallmentPayment::class,
             'purchase_payments'         => PurchasePayment::class,
             'purchase_returns'          => PurchaseReturn::class,
-            'transfers'                 => Transfer::class,
+            'inventory_transfers'       => InventoryTransfer::class,
             'sales'                     => Sale::class,
             'purchases'                 => Purchase::class,
             'restocks'                  => Restock::class,

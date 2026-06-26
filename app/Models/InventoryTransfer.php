@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Transfer extends Model
+class InventoryTransfer extends Model
 {
     use LogsActivity;
 
@@ -19,6 +19,7 @@ class Transfer extends Model
     protected $fillable = [
         'from_inventory_id',
         'to_inventory_id',
+        'performed_by',
         'note',
         'transferred_at',
         'received_at',
@@ -57,9 +58,14 @@ class Transfer extends Model
         return $this->belongsTo(Inventory::class, 'to_inventory_id');
     }
 
+    public function performedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'performed_by');
+    }
+
     public function items(): HasMany
     {
-        return $this->hasMany(TransferItem::class);
+        return $this->hasMany(InventoryTransferItem::class);
     }
 
     public function restocks(): MorphMany

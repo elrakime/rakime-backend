@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Web\Transfer;
+namespace App\Http\Requests\Web\InventoryTransfer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTransferRequest extends FormRequest
+class StoreInventoryTransferRequest extends FormRequest
 {
     public function authorize(): bool
     {

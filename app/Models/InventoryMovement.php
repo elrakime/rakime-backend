@@ -86,7 +86,7 @@ class InventoryMovement extends Model
             InventoryMovementType::RECEIVE          => Purchase::find($this->moveable_id),
             InventoryMovementType::RETURN           => PurchaseReturn::find($this->moveable_id),
             InventoryMovementType::TRANSFER_IN,
-            InventoryMovementType::TRANSFER_OUT     => Transfer::find($this->moveable_id),
+            InventoryMovementType::TRANSFER_OUT     => InventoryTransfer::find($this->moveable_id),
             InventoryMovementType::SALE             => Sale::find($this->moveable_id),
             InventoryMovementType::EXPIRED          => Expiration::find($this->moveable_id),
             InventoryMovementType::RESTOCK_RECEIVED => Restock::find($this->moveable_id),
