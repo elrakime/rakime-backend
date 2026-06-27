@@ -68,6 +68,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('wallets', WalletController::class);
     Route::post('wallets/{wallet}/deposit', [WalletController::class, 'deposit']);
     Route::post('wallets/{wallet}/withdraw', [WalletController::class, 'withdraw']);
+    Route::post('wallets/{wallet}/expense', [WalletController::class, 'expense']);
     Route::apiResource('wallet-movements', WalletMovementController::class)->only(['index']);
     Route::apiResource('wallet-transfers', WalletTransferController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::apiResource('suppliers', SupplierController::class);

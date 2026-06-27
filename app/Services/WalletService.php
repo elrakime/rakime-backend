@@ -109,4 +109,25 @@ class WalletService
             return $wallet->refresh()->loadMissing('owner');
         });
     }
+
+    public function expense(Wallet $wallet, array $data): Wallet
+    {
+        return DB::transaction(function () use ($wallet, $data) {
+            if ($wallet->balance < $data['amount']) {
+                throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
+            }
+
+            $wallet->decrement('balance', $data['amount']);
+
+            WalletMovement::create([
+                'wallet_id'      => $wallet->id,
+                'movement_type'  => WalletMovementType::EXPENSE,
+                'amount'         => -$data['amount'],
+                'note'           => $data['note'] ?? null,
+                'performed_by'   => $data['performed_by'] ?? null,
+            ]);
+
+            return $wallet->refresh()->loadMissing('owner');
+        });
+    }
 }

@@ -10,6 +10,8 @@ enum WalletMovementType: string
     case WITHDRAWAL          = 'withdrawal';
     case TRANSFER_IN         = 'transfer_in';
     case TRANSFER_OUT        = 'transfer_out';
+    case EXPENSE             = 'expense';
+    case RETURN              = 'return';
     case INSTALLMENT_PAYMENT = 'installment_payment';
     case PURCHASE_PAYMENT    = 'purchase_payment';
     case SALE_PAYMENT        = 'sale_payment';
@@ -48,6 +50,8 @@ enum WalletMovementType: string
             self::WITHDRAWAL          => 'red',
             self::TRANSFER_IN         => 'blue',
             self::TRANSFER_OUT        => 'purple',
+            self::EXPENSE             => 'orange',
+            self::RETURN              => 'emerald',
             self::INSTALLMENT_PAYMENT => 'amber',
             self::PURCHASE_PAYMENT    => 'orange',
             self::SALE_PAYMENT        => 'emerald',

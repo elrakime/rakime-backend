@@ -123,4 +123,22 @@ class WalletController extends Controller
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }
     }
+
+    public function expense(StoreWalletMovementRequest $request, Wallet $wallet): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+            return $response;
+        }
+
+        $data = $this->validateRequest($request);
+        $data['performed_by'] = $request->user()?->id;
+
+        try {
+            $wallet = $this->walletService->expense($wallet, $data);
+
+            return $this->successResponse(new WalletResource($wallet));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
 }
