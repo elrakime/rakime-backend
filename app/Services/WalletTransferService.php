@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\WalletMovementType;
 use App\Models\Wallet;
+use App\Models\WalletMovement;
 use App\Models\WalletTransfer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -46,7 +48,29 @@ class WalletTransferService
             $fromWallet->decrement('balance', $data['amount']);
             Wallet::where('id', $data['to_wallet_id'])->increment('balance', $data['amount']);
 
-            return WalletTransfer::create($data);
+            $transfer = WalletTransfer::create($data);
+
+            WalletMovement::create([
+                'wallet_id'      => $transfer->from_wallet_id,
+                'movement_type'  => WalletMovementType::TRANSFER_OUT,
+                'amount'         => -$transfer->amount,
+                'reference_type' => WalletTransfer::class,
+                'reference_id'   => $transfer->id,
+                'note'           => $transfer->note,
+                'performed_by'   => $transfer->performed_by,
+            ]);
+
+            WalletMovement::create([
+                'wallet_id'      => $transfer->to_wallet_id,
+                'movement_type'  => WalletMovementType::TRANSFER_IN,
+                'amount'         => $transfer->amount,
+                'reference_type' => WalletTransfer::class,
+                'reference_id'   => $transfer->id,
+                'note'           => $transfer->note,
+                'performed_by'   => $transfer->performed_by,
+            ]);
+
+            return $transfer;
         });
     }
 
