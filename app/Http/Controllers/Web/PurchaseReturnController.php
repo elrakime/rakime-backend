@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\PurchaseReturn\ApprovePurchaseReturnRequest;
 use App\Http\Requests\Web\PurchaseReturn\StorePurchaseReturnRequest;
 use App\Http\Requests\Web\PurchaseReturn\UpdatePurchaseReturnRequest;
 use App\Http\Resources\Web\PurchaseReturnResource;
@@ -115,14 +116,16 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function approve(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function approve(ApprovePurchaseReturnRequest $request, Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
         try {
-            $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn);
+            $data = $this->validateRequest($request);
+
+            $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn, $data['wallet_id']);
 
             return $this->successResponse(
                 new PurchaseReturnResource($purchaseReturn)

@@ -3,14 +3,18 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\WalletMovementType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
+use App\Models\Wallet;
+use App\Models\WalletMovement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -104,17 +108,22 @@ class PurchaseReturnService
         return $purchaseReturn->loadMissing(['purchase', 'items.purchaseItem.product']);
     }
 
-    public function approve(PurchaseReturn $purchaseReturn): PurchaseReturn
+    public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
     {
         if ($purchaseReturn->approved_at) {
             return $purchaseReturn;
         }
 
-        return DB::transaction(function () use ($purchaseReturn) {
+        return DB::transaction(function () use ($purchaseReturn, $walletId) {
             $purchaseReturn->update(['approved_at' => now()]);
+
+            $purchaseReturn->load('items.purchaseItem');
+
+            $totalReturnAmount = 0;
 
             foreach ($purchaseReturn->items as $returnItem) {
                 $purchaseItem = $returnItem->purchaseItem;
+                $totalReturnAmount += $returnItem->quantity * $purchaseItem->price;
 
                 $batch = Batch::where('source_id', $purchaseItem->id)
                     ->where('source_type', 'purchase_items')
@@ -133,6 +142,21 @@ class PurchaseReturnService
                         'quantity'      => $returnItem->quantity,
                     ]);
                 }
+            }
+
+            if ($totalReturnAmount > 0) {
+                $wallet = Wallet::findOrFail($walletId);
+                $wallet->increment('balance', $totalReturnAmount);
+
+                WalletMovement::create([
+                    'wallet_id'     => $wallet->id,
+                    'movement_type' => WalletMovementType::PURCHASE_RETURN,
+                    'amount'        => $totalReturnAmount,
+                    'source_type'   => PurchaseReturn::class,
+                    'source_id'     => $purchaseReturn->id,
+                    'note'          => $purchaseReturn->note,
+                    'performed_by'  => Auth::id(),
+                ]);
             }
 
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
