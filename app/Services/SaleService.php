@@ -3,16 +3,21 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\WalletMovementType;
 use App\Models\Batch;
+use App\Models\Branch;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
 use App\Models\Price;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Stock;
+use App\Models\Wallet;
+use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -80,6 +85,8 @@ class SaleService
 
             $this->deductStock($sale);
 
+            $this->creditBranchWallet($data['branch_id'], $totalAmount, $sale);
+
             return $sale->load(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
     }
@@ -108,6 +115,29 @@ class SaleService
             $sale->inventoryMovements()->delete();
             $sale->delete();
         });
+    }
+
+    private function creditBranchWallet(int $branchId, int $amount, Sale $sale): void
+    {
+        $wallet = Wallet::where('owner_type', Branch::class)
+            ->where('owner_id', $branchId)
+            ->first();
+
+        if (!$wallet) {
+            return;
+        }
+
+        $wallet->increment('balance', $amount);
+
+        WalletMovement::create([
+            'wallet_id'     => $wallet->id,
+            'movement_type' => WalletMovementType::SALE_PAYMENT,
+            'amount'        => $amount,
+            'source_type'   => Sale::class,
+            'source_id'     => $sale->id,
+            'note'          => $sale->note,
+            'performed_by'  => Auth::id(),
+        ]);
     }
 
     private function deductStock(Sale $sale): void
