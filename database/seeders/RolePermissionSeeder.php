@@ -31,9 +31,7 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($matrix as $roleName => $permissions) {
             $role = SpatieRole::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
-            $role->syncPermissions(
-                array_map(fn (Permission $p) => $p->value, $permissions)
-            );
+            $role->syncPermissions($permissions);
         }
     }
 }
