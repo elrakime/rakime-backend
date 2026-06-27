@@ -18,7 +18,7 @@ class InventoryMovement extends Model
         'batch_id',
         'inventory_id',
         'product_id',
-        'moveable_id',
+        'source_id',
         'movement_type',
         'quantity',
     ];
@@ -80,16 +80,16 @@ class InventoryMovement extends Model
      * Resolve the polymorphic moveable based on movement_type.
      * No type column exists in DB; movement_type determines the model.
      */
-    public function getMoveable(): ?Model
+    public function getSource(): ?Model
     {
         return match ($this->movement_type) {
-            InventoryMovementType::RECEIVE          => Purchase::find($this->moveable_id),
-            InventoryMovementType::RETURN           => PurchaseReturn::find($this->moveable_id),
+            InventoryMovementType::RECEIVE          => Purchase::find($this->source_id),
+            InventoryMovementType::RETURN           => PurchaseReturn::find($this->source_id),
             InventoryMovementType::TRANSFER_IN,
-            InventoryMovementType::TRANSFER_OUT     => InventoryTransfer::find($this->moveable_id),
-            InventoryMovementType::SALE             => Sale::find($this->moveable_id),
-            InventoryMovementType::EXPIRED          => Expiration::find($this->moveable_id),
-            InventoryMovementType::RESTOCK_RECEIVED => Restock::find($this->moveable_id),
+            InventoryMovementType::TRANSFER_OUT     => InventoryTransfer::find($this->source_id),
+            InventoryMovementType::SALE             => Sale::find($this->source_id),
+            InventoryMovementType::EXPIRED          => Expiration::find($this->source_id),
+            InventoryMovementType::RESTOCK_RECEIVED => Restock::find($this->source_id),
             default                                 => null,
         };
     }

@@ -169,7 +169,7 @@ class PurchaseService
                     'batch_id'      => $batch->id,
                     'inventory_id'  => $inventoryId,
                     'product_id'    => $item->product_id,
-                    'moveable_id'   => $purchase->id,
+                    'source_id'   => $purchase->id,
                     'movement_type' => InventoryMovementType::RECEIVE,
                     'quantity'      => $item->quantity,
                 ]);

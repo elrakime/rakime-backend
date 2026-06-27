@@ -13,7 +13,7 @@ class WalletMovementService
     public function list(): LengthAwarePaginator
     {
         return QueryBuilder::for(WalletMovement::class)
-            ->with(['performedBy', 'reference', 'wallet'])
+            ->with(['performedBy', 'source', 'wallet'])
             ->allowedFilters(
                 AllowedFilter::exact('wallet_id'),
                 AllowedFilter::exact('movement_type'),

@@ -128,7 +128,7 @@ class PurchaseReturnService
                         'batch_id'      => $batch->id,
                         'inventory_id'  => $batch->stock->inventory_id,
                         'product_id'    => $purchaseItem->product_id,
-                        'moveable_id'   => $purchaseReturn->id,
+                        'source_id'   => $purchaseReturn->id,
                         'movement_type' => InventoryMovementType::RETURN,
                         'quantity'      => $returnItem->quantity,
                     ]);

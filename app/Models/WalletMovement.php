@@ -18,8 +18,8 @@ class WalletMovement extends Model
         'wallet_id',
         'movement_type',
         'amount',
-        'reference_type',
-        'reference_id',
+        'source_type',
+        'source_id',
         'note',
         'performed_by',
     ];
@@ -58,8 +58,8 @@ class WalletMovement extends Model
         return $this->belongsTo(User::class, 'performed_by');
     }
 
-    public function reference(): MorphTo
+    public function source(): MorphTo
     {
-        return $this->morphTo('reference', 'reference_type', 'reference_id');
+        return $this->morphTo('source', 'source_type', 'source_id');
     }
 }

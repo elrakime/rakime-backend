@@ -15,7 +15,7 @@ class InventoryMovementResource extends JsonResource
             'batch_id'      => $this->batch_id,
             'inventory_id'  => $this->inventory_id,
             'product_id'    => $this->product_id,
-            'moveable_id'   => $this->moveable_id,
+            'source_id'     => $this->source_id,
             'movement_type' => $this->movement_type,
             'quantity'      => $this->quantity,
             'created_at'    => $this->created_at,

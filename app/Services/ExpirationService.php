@@ -128,7 +128,7 @@ class ExpirationService
                         'batch_id'      => $batch->id,
                         'inventory_id'  => $expiration->inventory_id,
                         'product_id'    => $item->stock->product_id,
-                        'moveable_id'   => $expiration->id,
+                        'source_id'   => $expiration->id,
                         'movement_type' => InventoryMovementType::EXPIRED,
                         'quantity'      => $deduct,
                     ]);

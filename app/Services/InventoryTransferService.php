@@ -126,7 +126,7 @@ class InventoryTransferService
                         'batch_id'      => $fromBatch?->id,
                         'inventory_id'  => $transfer->from_inventory_id,
                         'product_id'    => $transferItem->stock->product_id,
-                        'moveable_id'   => $transfer->id,
+                        'source_id'   => $transfer->id,
                         'movement_type' => InventoryMovementType::TRANSFER_OUT,
                         'quantity'      => $transferItem->quantity,
                     ]);
@@ -152,7 +152,7 @@ class InventoryTransferService
                     'batch_id'      => $toBatch->id,
                     'inventory_id'  => $transfer->to_inventory_id,
                     'product_id'    => $transferItem->stock->product_id,
-                    'moveable_id'   => $transfer->id,
+                    'source_id'   => $transfer->id,
                     'movement_type' => InventoryMovementType::TRANSFER_IN,
                     'quantity'      => $transferItem->quantity,
                 ]);

@@ -222,7 +222,7 @@ class RestockService
                 'batch_id'      => $batch->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
-                'moveable_id'   => $purchase->id,
+                'source_id'   => $purchase->id,
                 'movement_type' => InventoryMovementType::RECEIVE,
                 'quantity'      => $quantity,
             ]);
@@ -233,7 +233,7 @@ class RestockService
                 'batch_id'      => $batch->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
-                'moveable_id'   => $restock->id,
+                'source_id'   => $restock->id,
                 'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
                 'quantity'      => $quantity,
             ]);
@@ -299,7 +299,7 @@ class RestockService
                     'batch_id'      => $fromBatch?->id,
                     'inventory_id'  => $fromInventoryId,
                     'product_id'    => $restockItem->product_id,
-                    'moveable_id'   => $transfer->id,
+                    'source_id'   => $transfer->id,
                     'movement_type' => InventoryMovementType::TRANSFER_OUT,
                     'quantity'      => $quantity,
                 ]);
@@ -327,7 +327,7 @@ class RestockService
                 'batch_id'      => $toBatch->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
-                'moveable_id'   => $transfer->id,
+                'source_id'   => $transfer->id,
                 'movement_type' => InventoryMovementType::TRANSFER_IN,
                 'quantity'      => $quantity,
             ]);
@@ -338,7 +338,7 @@ class RestockService
                 'batch_id'      => $toBatch->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
-                'moveable_id'   => $restock->id,
+                'source_id'   => $restock->id,
                 'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
                 'quantity'      => $quantity,
             ]);

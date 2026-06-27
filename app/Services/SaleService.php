@@ -132,7 +132,7 @@ class SaleService
                     'batch_id'      => $batch->id,
                     'inventory_id'  => $batch->stock->inventory_id,
                     'product_id'    => $item->product_id,
-                    'moveable_id'   => $sale->id,
+                    'source_id'   => $sale->id,
                     'movement_type' => InventoryMovementType::SALE,
                     'quantity'      => $deduct,
                 ]);

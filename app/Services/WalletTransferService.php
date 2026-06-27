@@ -54,8 +54,8 @@ class WalletTransferService
                 'wallet_id'      => $transfer->from_wallet_id,
                 'movement_type'  => WalletMovementType::TRANSFER_OUT,
                 'amount'         => -$transfer->amount,
-                'reference_type' => WalletTransfer::class,
-                'reference_id'   => $transfer->id,
+                'source_type' => WalletTransfer::class,
+                'source_id'   => $transfer->id,
                 'note'           => $transfer->note,
                 'performed_by'   => $transfer->performed_by,
             ]);
@@ -64,8 +64,8 @@ class WalletTransferService
                 'wallet_id'      => $transfer->to_wallet_id,
                 'movement_type'  => WalletMovementType::TRANSFER_IN,
                 'amount'         => $transfer->amount,
-                'reference_type' => WalletTransfer::class,
-                'reference_id'   => $transfer->id,
+                'source_type' => WalletTransfer::class,
+                'source_id'   => $transfer->id,
                 'note'           => $transfer->note,
                 'performed_by'   => $transfer->performed_by,
             ]);

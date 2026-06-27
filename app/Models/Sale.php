@@ -59,7 +59,7 @@ class Sale extends Model
 
     public function inventoryMovements(): HasMany
     {
-        return $this->hasMany(InventoryMovement::class, 'moveable_id');
+        return $this->hasMany(InventoryMovement::class, 'source_id');
     }
 
     protected static function booted(): void
