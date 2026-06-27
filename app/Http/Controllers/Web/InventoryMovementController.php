@@ -15,7 +15,7 @@ class InventoryMovementController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY_MOVEMENTS->value)) {
             return $response;
         }
 

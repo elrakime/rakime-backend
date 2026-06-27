@@ -14,7 +14,7 @@ class WalletMovementController extends Controller
 
     public function index(): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_WALLET_MOVEMENTS->value)) {
             return $response;
         }
 

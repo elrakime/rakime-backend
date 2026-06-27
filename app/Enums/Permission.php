@@ -12,12 +12,6 @@ enum Permission: string
     case UPDATE_USERS = 'users.update';
     case DELETE_USERS = 'users.delete';
 
-    // Employees
-    case VIEW_EMPLOYEES   = 'employees.view';
-    case CREATE_EMPLOYEES = 'employees.create';
-    case UPDATE_EMPLOYEES = 'employees.update';
-    case DELETE_EMPLOYEES = 'employees.delete';
-
     // Branches
     case VIEW_BRANCHES   = 'branches.view';
     case CREATE_BRANCHES = 'branches.create';
@@ -80,7 +74,30 @@ enum Permission: string
 
     // Inventory
     case VIEW_INVENTORY   = 'inventory.view';
-    case MANAGE_INVENTORY = 'inventory.manage';
+    case CREATE_INVENTORY = 'inventory.create';
+    case UPDATE_INVENTORY = 'inventory.update';
+    case DELETE_INVENTORY = 'inventory.delete';
+
+    // Inventory Movements
+    case VIEW_INVENTORY_MOVEMENTS = 'inventory_movements.view';
+
+    // Stocks
+    case VIEW_STOCKS   = 'stocks.view';
+    case CREATE_STOCKS = 'stocks.create';
+    case UPDATE_STOCKS = 'stocks.update';
+    case DELETE_STOCKS = 'stocks.delete';
+
+    // Batches
+    case VIEW_BATCHES   = 'batches.view';
+    case CREATE_BATCHES = 'batches.create';
+    case UPDATE_BATCHES = 'batches.update';
+    case DELETE_BATCHES = 'batches.delete';
+
+    // Prices
+    case VIEW_PRICES   = 'prices.view';
+    case CREATE_PRICES = 'prices.create';
+    case UPDATE_PRICES = 'prices.update';
+    case DELETE_PRICES = 'prices.delete';
 
     // Purchases
     case VIEW_PURCHASES    = 'purchases.view';
@@ -89,11 +106,11 @@ enum Permission: string
     case DELETE_PURCHASES  = 'purchases.delete';
     case APPROVE_PURCHASES = 'purchases.approve';
 
-    // Purchase Payments (2 endpoints: index, store)
+    // Purchase Payments
     case VIEW_PURCHASE_PAYMENTS   = 'purchase_payments.view';
     case CREATE_PURCHASE_PAYMENTS = 'purchase_payments.create';
 
-    // Purchase Returns (6 endpoints: index, store, show, update, destroy, approve)
+    // Purchase Returns
     case VIEW_PURCHASE_RETURNS    = 'purchase_returns.view';
     case CREATE_PURCHASE_RETURNS  = 'purchase_returns.create';
     case UPDATE_PURCHASE_RETURNS  = 'purchase_returns.update';
@@ -106,10 +123,12 @@ enum Permission: string
     case UPDATE_SALES = 'sales.update';
     case DELETE_SALES = 'sales.delete';
 
-    // Transfers
-    case VIEW_TRANSFERS    = 'transfers.view';
-    case CREATE_TRANSFERS  = 'transfers.create';
-    case APPROVE_TRANSFERS = 'transfers.approve';
+    // Inventory Transfers
+    case VIEW_INVENTORY_TRANSFERS    = 'inventory_transfers.view';
+    case CREATE_INVENTORY_TRANSFERS  = 'inventory_transfers.create';
+    case UPDATE_INVENTORY_TRANSFERS  = 'inventory_transfers.update';
+    case DELETE_INVENTORY_TRANSFERS  = 'inventory_transfers.delete';
+    case RECEIVE_INVENTORY_TRANSFERS = 'inventory_transfers.receive';
 
     // Restocks
     case VIEW_RESTOCKS    = 'restocks.view';
@@ -118,9 +137,28 @@ enum Permission: string
     case DELETE_RESTOCKS  = 'restocks.delete';
     case APPROVE_RESTOCKS = 'restocks.approve';
 
+    // Expirations
+    case VIEW_EXPIRATIONS    = 'expirations.view';
+    case CREATE_EXPIRATIONS  = 'expirations.create';
+    case UPDATE_EXPIRATIONS  = 'expirations.update';
+    case DELETE_EXPIRATIONS  = 'expirations.delete';
+    case APPROVE_EXPIRATIONS = 'expirations.approve';
+
     // Wallet
-    case VIEW_WALLET   = 'wallet.view';
-    case MANAGE_WALLET = 'wallet.manage';
+    case VIEW_WALLET    = 'wallet.view';
+    case CREATE_WALLET  = 'wallet.create';
+    case UPDATE_WALLET  = 'wallet.update';
+    case DELETE_WALLET  = 'wallet.delete';
+    case WALLET_DEPOSIT = 'wallet.deposit';
+    case WALLET_WITHDRAW = 'wallet.withdraw';
+
+    // Wallet Movements
+    case VIEW_WALLET_MOVEMENTS = 'wallet_movements.view';
+
+    // Wallet Transfers
+    case VIEW_WALLET_TRANSFERS   = 'wallet_transfers.view';
+    case CREATE_WALLET_TRANSFERS = 'wallet_transfers.create';
+    case DELETE_WALLET_TRANSFERS = 'wallet_transfers.delete';
 
     // Roles
     case VIEW_ROLES   = 'roles.view';
@@ -160,14 +198,14 @@ enum Permission: string
     public function get_color(): string
     {
         return match (explode('.', $this->value)[0]) {
-            'users', 'employees', 'branches' => 'red',
-            'categories', 'brands', 'products', 'suppliers' => 'blue',
+            'users', 'branches'               => 'red',
+            'categories', 'brands', 'products', 'suppliers', 'accounts', 'wilayas', 'types', 'colors' => 'blue',
             'clients'                         => 'teal',
-            'inventory'                       => 'orange',
+            'inventory', 'inventory_movements', 'stocks', 'batches', 'prices' => 'orange',
             'purchases', 'purchase_payments', 'purchase_returns' => 'yellow',
             'sales'                           => 'green',
-            'transfers', 'restocks'            => 'cyan',
-            'wallet'                          => 'emerald',
+            'inventory_transfers', 'restocks', 'expirations' => 'cyan',
+            'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

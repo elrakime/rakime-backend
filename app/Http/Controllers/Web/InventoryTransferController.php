@@ -18,7 +18,7 @@ class InventoryTransferController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
@@ -29,7 +29,7 @@ class InventoryTransferController extends Controller
 
     public function store(StoreInventoryTransferRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
@@ -44,7 +44,7 @@ class InventoryTransferController extends Controller
 
     public function show(InventoryTransfer $transfer): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
@@ -59,7 +59,7 @@ class InventoryTransferController extends Controller
 
     public function update(UpdateInventoryTransferRequest $request, InventoryTransfer $transfer): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
@@ -74,7 +74,7 @@ class InventoryTransferController extends Controller
 
     public function destroy(InventoryTransfer $transfer): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
@@ -89,7 +89,7 @@ class InventoryTransferController extends Controller
 
     public function receive(InventoryTransfer $transfer): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::RECEIVE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 

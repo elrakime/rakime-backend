@@ -53,7 +53,7 @@ class PurchasePaymentService
             $wallet->movements()->create([
                 'movement_type'  => WalletMovementType::PURCHASE_PAYMENT,
                 'amount'         => -$data['amount'],
-                'source_type' => 'purchase_payments',
+                'source_type' => PurchasePayment::class,
                 'source_id'   => $payment->id,
                 'note'           => $data['note'] ?? null,
                 'performed_by'   => Auth::id(),

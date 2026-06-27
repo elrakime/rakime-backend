@@ -140,7 +140,7 @@ class InventoryTransferService
 
                 $toBatch = $toStock->batches()->create([
                     'source_id'        => $transferItem->id,
-                    'source_type'      => 'inventory_transfer_item',
+                    'source_type'      => InventoryTransferItem::class,
                     'purchase_price'   => 0,
                     'initial_quantity' => $transferItem->quantity,
                     'current_quantity' => $transferItem->quantity,

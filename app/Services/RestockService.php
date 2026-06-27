@@ -11,6 +11,8 @@ use App\Models\Restock;
 use App\Models\RestockItem;
 use App\Models\Stock;
 use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferItem;
+use App\Models\PurchaseItem;
 use App\Traits\ScopesByUserBranches;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -209,7 +211,7 @@ class RestockService
             // Create batch for this purchase item
             $batch = $stock->batches()->create([
                 'source_id'        => $purchaseItem->id,
-                'source_type'      => 'purchase_items',
+                'source_type'      => PurchaseItem::class,
                 'purchase_price'   => $price,
                 'initial_quantity' => $quantity,
                 'current_quantity' => $quantity,
@@ -314,7 +316,7 @@ class RestockService
             // Create batch for the received transfer item
             $toBatch = $toStock->batches()->create([
                 'source_id'        => $transferItem->id,
-                'source_type'      => 'inventory_transfer_item',
+                'source_type'      => InventoryTransferItem::class,
                 'purchase_price'   => 0,
                 'initial_quantity' => $quantity,
                 'current_quantity' => $quantity,

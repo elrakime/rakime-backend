@@ -18,7 +18,7 @@ class SupplierController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_SUPPLIERS->value)) {
             return $response;
         }
 
@@ -27,7 +27,7 @@ class SupplierController extends Controller
 
     public function store(StoreSupplierRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::CREATE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_SUPPLIERS->value)) {
             return $response;
         }
 
@@ -42,7 +42,7 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_SUPPLIERS->value)) {
             return $response;
         }
 
@@ -55,7 +55,7 @@ class SupplierController extends Controller
 
     public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::UPDATE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_SUPPLIERS->value)) {
             return $response;
         }
 
@@ -70,7 +70,7 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::DELETE_PURCHASES->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_SUPPLIERS->value)) {
             return $response;
         }
 

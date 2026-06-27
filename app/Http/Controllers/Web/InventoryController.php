@@ -31,7 +31,7 @@ class InventoryController extends Controller
             return $response;
         }
 
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_INVENTORY->value)) {
             return $response;
         }
 
@@ -69,7 +69,7 @@ class InventoryController extends Controller
             return $response;
         }
 
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_INVENTORY->value)) {
             return $response;
         }
 
@@ -90,7 +90,7 @@ class InventoryController extends Controller
             return $response;
         }
 
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_INVENTORY->value)) {
             return $response;
         }
 

@@ -1,9 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\BatchController;
-use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\Auth\AuthController;
+use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\InventoryMovementController;
 use App\Http\Controllers\Web\PermissionController;
+use App\Http\Controllers\Web\PriceController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\PurchaseController;
 use App\Http\Controllers\Web\PurchasePaymentController;

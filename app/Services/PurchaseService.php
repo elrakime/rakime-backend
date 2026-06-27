@@ -7,6 +7,7 @@ use App\Enums\PriceType;
 use App\Enums\PurchaseStatus;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
+use App\Models\PurchaseItem;
 use App\Models\Stock;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -145,7 +146,7 @@ class PurchaseService
 
                 $batch = $stock->batches()->create([
                     'source_id'        => $item->id,
-                    'source_type'      => 'purchase_items',
+                    'source_type'      => PurchaseItem::class,
                     'purchase_price'   => $item->price,
                     'initial_quantity' => $item->quantity,
                     'current_quantity' => $item->quantity,

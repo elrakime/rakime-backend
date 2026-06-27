@@ -29,7 +29,7 @@ class WalletController extends Controller
 
     public function store(StoreWalletRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_WALLET->value)) {
             return $response;
         }
 
@@ -59,7 +59,7 @@ class WalletController extends Controller
 
     public function update(UpdateWalletRequest $request, Wallet $wallet): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_WALLET->value)) {
             return $response;
         }
 
@@ -76,7 +76,7 @@ class WalletController extends Controller
 
     public function destroy(Wallet $wallet): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_WALLET->value)) {
             return $response;
         }
 
@@ -91,7 +91,7 @@ class WalletController extends Controller
 
     public function deposit(DepositWalletRequest $request, Wallet $wallet): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::WALLET_DEPOSIT->value)) {
             return $response;
         }
 
@@ -109,7 +109,7 @@ class WalletController extends Controller
 
     public function withdraw(WithdrawWalletRequest $request, Wallet $wallet): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
+        if ($response = $this->authorizePermission(Permission::WALLET_WITHDRAW->value)) {
             return $response;
         }
 

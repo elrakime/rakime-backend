@@ -17,7 +17,7 @@ class StockController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_STOCKS->value)) {
             return $response;
         }
 
@@ -26,7 +26,7 @@ class StockController extends Controller
 
     public function store(StoreStockRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_STOCKS->value)) {
             return $response;
         }
 
@@ -41,7 +41,7 @@ class StockController extends Controller
 
     public function show(Stock $stock): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_STOCKS->value)) {
             return $response;
         }
 
@@ -54,7 +54,7 @@ class StockController extends Controller
 
     public function destroy(Stock $stock): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_STOCKS->value)) {
             return $response;
         }
 

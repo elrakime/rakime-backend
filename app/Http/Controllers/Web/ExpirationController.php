@@ -18,7 +18,7 @@ class ExpirationController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_EXPIRATIONS->value)) {
             return $response;
         }
 
@@ -29,7 +29,7 @@ class ExpirationController extends Controller
 
     public function store(StoreExpirationRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::CREATE_EXPIRATIONS->value)) {
             return $response;
         }
 
@@ -48,7 +48,7 @@ class ExpirationController extends Controller
 
     public function show(Expiration $expiration): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::VIEW_EXPIRATIONS->value)) {
             return $response;
         }
 
@@ -63,7 +63,7 @@ class ExpirationController extends Controller
 
     public function update(UpdateExpirationRequest $request, Expiration $expiration): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::UPDATE_EXPIRATIONS->value)) {
             return $response;
         }
 
@@ -78,7 +78,7 @@ class ExpirationController extends Controller
 
     public function destroy(Expiration $expiration): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::DELETE_EXPIRATIONS->value)) {
             return $response;
         }
 
@@ -93,7 +93,7 @@ class ExpirationController extends Controller
 
     public function approve(Expiration $expiration): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::MANAGE_INVENTORY->value)) {
+        if ($response = $this->authorizePermission(Permission::APPROVE_EXPIRATIONS->value)) {
             return $response;
         }
 
