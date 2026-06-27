@@ -11,10 +11,11 @@ enum WalletMovementType: string
     case TRANSFER_IN         = 'transfer_in';
     case TRANSFER_OUT        = 'transfer_out';
     case EXPENSE             = 'expense';
-    case RETURN              = 'return';
+    case SALARY              = 'salary';
     case INSTALLMENT_PAYMENT = 'installment_payment';
-    case PURCHASE_PAYMENT    = 'purchase_payment';
     case SALE_PAYMENT        = 'sale_payment';
+    case PURCHASE_PAYMENT    = 'purchase_payment';
+    case PURCHASE_RETURN     = 'purchase_return';
     case ADJUSTMENT          = 'adjustment';
 
     public static function keys(): array

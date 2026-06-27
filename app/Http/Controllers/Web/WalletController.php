@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Wallet\DepositWalletRequest;
 use App\Http\Requests\Web\Wallet\StoreWalletRequest;
-use App\Http\Requests\Web\Wallet\StoreWalletMovementRequest;
 use App\Http\Requests\Web\Wallet\UpdateWalletRequest;
+use App\Http\Requests\Web\Wallet\WithdrawWalletRequest;
 use App\Http\Resources\Web\WalletResource;
 use App\Models\Wallet;
 use App\Services\WalletService;
@@ -88,7 +89,7 @@ class WalletController extends Controller
         }
     }
 
-    public function deposit(StoreWalletMovementRequest $request, Wallet $wallet): JsonResponse
+    public function deposit(DepositWalletRequest $request, Wallet $wallet): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
             return $response;
@@ -106,7 +107,7 @@ class WalletController extends Controller
         }
     }
 
-    public function withdraw(StoreWalletMovementRequest $request, Wallet $wallet): JsonResponse
+    public function withdraw(WithdrawWalletRequest $request, Wallet $wallet): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
             return $response;
@@ -117,24 +118,6 @@ class WalletController extends Controller
 
         try {
             $wallet = $this->walletService->withdraw($wallet, $data);
-
-            return $this->successResponse(new WalletResource($wallet));
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
-        }
-    }
-
-    public function expense(StoreWalletMovementRequest $request, Wallet $wallet): JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::MANAGE_WALLET->value)) {
-            return $response;
-        }
-
-        $data = $this->validateRequest($request);
-        $data['performed_by'] = $request->user()?->id;
-
-        try {
-            $wallet = $this->walletService->expense($wallet, $data);
 
             return $this->successResponse(new WalletResource($wallet));
         } catch (\Exception $e) {
