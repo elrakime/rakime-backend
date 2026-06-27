@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('expiration_id')->constrained('expirations');
             $table->foreignId('stock_id')->constrained();
-            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('quantity');
             $table->string('reason')->nullable();
             $table->timestamps();

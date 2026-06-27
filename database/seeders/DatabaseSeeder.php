@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             PurchaseSeeder::class,
             RestockSeeder::class,
             ExpirationSeeder::class,
-            TransferSeeder::class,
+            InventoryTransferSeeder::class,
         ]);
     }
 }

@@ -47,7 +47,7 @@ class BranchSeeder extends Seeder
 
             // Create wallet for the branch
             Wallet::firstOrCreate(
-                ['owner_type' => 'branch', 'owner_id' => $branch->id, 'name' => $data['wallet']],
+                ['owner_type' => Branch::class, 'owner_id' => $branch->id, 'name' => $data['wallet']],
                 ['balance' => 0]
             );
         }

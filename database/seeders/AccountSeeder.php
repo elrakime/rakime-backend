@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
+use App\Models\Wallet;
 use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
@@ -29,7 +30,13 @@ class AccountSeeder extends Seeder
         ];
 
         foreach ($accounts as $data) {
-            Account::firstOrCreate(['ccp_number' => $data['ccp_number']], $data);
+            $account = Account::firstOrCreate(['ccp_number' => $data['ccp_number']], $data);
+            Wallet::create([
+                'owner_type' => Account::class,
+                'owner_id'   => $account->id,
+                'name'       => $data['name'],
+                'balance'    => 0,
+            ]);
         }
     }
 }

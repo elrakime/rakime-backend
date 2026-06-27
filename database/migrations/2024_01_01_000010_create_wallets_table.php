@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('treasuries', function (Blueprint $table) {
+        Schema::create('wallets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->nullable()->constrained();
+            $table->nullableMorphs('owner');
             $table->string('name');
             $table->decimal('balance', 15, 2)->default(0);
             $table->timestamps();

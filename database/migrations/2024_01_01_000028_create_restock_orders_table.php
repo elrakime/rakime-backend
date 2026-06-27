@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('status', RestockStatus::keys())->default(RestockStatus::default()->value);
             $table->string('note')->nullable();
             $table->timestamp('fulfilled_at')->nullable();
+            $table->nullableMorphs('fulfilled_with');
             $table->timestamps();
         });
     }

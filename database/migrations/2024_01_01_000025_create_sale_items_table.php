@@ -13,9 +13,7 @@ return new class extends Migration
             $table->foreignId('sale_id')->constrained();
             $table->foreignId('product_id')->constrained();
             $table->foreignId('stock_id')->constrained();
-            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('price_id')->nullable()->constrained()->nullOnDelete();
-            $table->unsignedInteger('unit_price');
+            $table->unsignedInteger('price');
             $table->unsignedInteger('quantity');
             $table->timestamps();
         });
