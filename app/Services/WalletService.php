@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\WalletMovementType;
 use App\Models\Wallet;
+use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -67,5 +70,43 @@ class WalletService
     public function delete(Wallet $wallet): void
     {
         $wallet->delete();
+    }
+
+    public function deposit(Wallet $wallet, array $data): Wallet
+    {
+        return DB::transaction(function () use ($wallet, $data) {
+            $wallet->increment('balance', $data['amount']);
+
+            WalletMovement::create([
+                'wallet_id'      => $wallet->id,
+                'movement_type'  => WalletMovementType::DEPOSIT,
+                'amount'         => $data['amount'],
+                'note'           => $data['note'] ?? null,
+                'performed_by'   => $data['performed_by'] ?? null,
+            ]);
+
+            return $wallet->refresh()->loadMissing('owner');
+        });
+    }
+
+    public function withdraw(Wallet $wallet, array $data): Wallet
+    {
+        return DB::transaction(function () use ($wallet, $data) {
+            if ($wallet->balance < $data['amount']) {
+                throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
+            }
+
+            $wallet->decrement('balance', $data['amount']);
+
+            WalletMovement::create([
+                'wallet_id'      => $wallet->id,
+                'movement_type'  => WalletMovementType::WITHDRAWAL,
+                'amount'         => -$data['amount'],
+                'note'           => $data['note'] ?? null,
+                'performed_by'   => $data['performed_by'] ?? null,
+            ]);
+
+            return $wallet->refresh()->loadMissing('owner');
+        });
     }
 }
