@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\WalletMovementType;
 use App\Models\Wallet;
-use App\Models\WalletMovement;
 use App\Models\WalletTransfer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -15,6 +13,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class WalletTransferService
 {
+    public function __construct(private readonly WalletService $walletService) {}
+
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(WalletTransfer::class, $request)
@@ -40,35 +40,25 @@ class WalletTransferService
     {
         return DB::transaction(function () use ($data) {
             $fromWallet = Wallet::lockForUpdate()->findOrFail($data['from_wallet_id']);
-
-            if ($fromWallet->balance < $data['amount']) {
-                throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
-            }
-
-            $fromWallet->decrement('balance', $data['amount']);
-            Wallet::where('id', $data['to_wallet_id'])->increment('balance', $data['amount']);
+            $toWallet   = Wallet::findOrFail($data['to_wallet_id']);
 
             $transfer = WalletTransfer::create($data);
 
-            WalletMovement::create([
-                'wallet_id'      => $transfer->from_wallet_id,
-                'movement_type'  => WalletMovementType::TRANSFER_OUT,
-                'amount'         => -$transfer->amount,
-                'source_type' => WalletTransfer::class,
-                'source_id'   => $transfer->id,
-                'note'           => $transfer->note,
-                'performed_by'   => $transfer->performed_by,
-            ]);
+            $this->walletService->transferOut(
+                wallet: $fromWallet,
+                amount: $transfer->amount,
+                source: $transfer,
+                note: $transfer->note,
+                performedBy: $transfer->performed_by,
+            );
 
-            WalletMovement::create([
-                'wallet_id'      => $transfer->to_wallet_id,
-                'movement_type'  => WalletMovementType::TRANSFER_IN,
-                'amount'         => $transfer->amount,
-                'source_type' => WalletTransfer::class,
-                'source_id'   => $transfer->id,
-                'note'           => $transfer->note,
-                'performed_by'   => $transfer->performed_by,
-            ]);
+            $this->walletService->transferIn(
+                wallet: $toWallet,
+                amount: $transfer->amount,
+                source: $transfer,
+                note: $transfer->note,
+                performedBy: $transfer->performed_by,
+            );
 
             return $transfer;
         });

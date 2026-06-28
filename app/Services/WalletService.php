@@ -6,9 +6,10 @@ use App\Enums\WalletMovementType;
 use App\Models\Wallet;
 use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -16,6 +17,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class WalletService
 {
     use ScopesByUserBranches;
+
     public function list(Request $request): Collection
     {
         $query = Wallet::query();
@@ -72,45 +74,276 @@ class WalletService
         $wallet->delete();
     }
 
-    public function deposit(Wallet $wallet, array $data): Wallet
-    {
-        return DB::transaction(function () use ($wallet, $data) {
-            $type = WalletMovementType::from($data['type'] ?? WalletMovementType::DEPOSIT->value);
+    // ============================================================
+    // MOVEMENT METHODS
+    // ============================================================
 
-            $wallet->increment('balance', $data['amount']);
-
-            WalletMovement::create([
-                'wallet_id'     => $wallet->id,
-                'movement_type' => $type,
-                'amount'        => $data['amount'],
-                'note'          => $data['note'] ?? null,
-                'performed_by'  => $data['performed_by'] ?? null,
-            ]);
-
-            return $wallet->refresh()->loadMissing('owner');
-        });
+    /**
+     * Add funds to a wallet (inflow).
+     */
+    public function deposit(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::DEPOSIT,
+            $amount,
+            $note,
+            $performedBy,
+        );
     }
 
-    public function withdraw(Wallet $wallet, array $data): Wallet
+    /**
+     * Remove funds from a wallet (outflow). Throws if insufficient balance.
+     */
+    public function withdraw(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::WITHDRAWAL,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+        );
+    }
+
+    /**
+     * Record an expense deduction.
+     */
+    public function expense(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::EXPENSE,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+        );
+    }
+
+    /**
+     * Record a salary payment deduction.
+     */
+    public function salary(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::SALARY,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+        );
+    }
+
+    /**
+     * Record a balance adjustment (positive or negative).
+     */
+    public function adjustment(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $amount = (float) $amount;
+
+        if ($amount < 0) {
+            $this->guardSufficientBalance($wallet, abs($amount));
+        }
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::ADJUSTMENT,
+            $amount,
+            $note,
+            $performedBy,
+        );
+    }
+
+    /**
+     * Record a transfer out from a wallet.
+     */
+    public function transferOut(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::TRANSFER_OUT,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
+     * Record a transfer in to a wallet.
+     */
+    public function transferIn(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::TRANSFER_IN,
+            $amount,
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
+     * Record a purchase payment deduction.
+     */
+    public function purchasePayment(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::PURCHASE_PAYMENT,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
+     * Record a purchase return credit (inflow).
+     */
+    public function purchaseReturn(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::PURCHASE_RETURN,
+            $amount,
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
+     * Record a sale payment credit (inflow).
+     */
+    public function salePayment(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::SALE_PAYMENT,
+            $amount,
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
+     * Record an installment payment deduction.
+     */
+    public function installmentPayment(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::INSTALLMENT_PAYMENT,
+            -abs((float) $amount),
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    // ============================================================
+    // INTERNAL
+    // ============================================================
+
+    /**
+     * Core: increment/decrement wallet balance and create movement record.
+     */
+    private function recordMovement(
+        Wallet $wallet,
+        WalletMovementType $type,
+        int|float|string $amount,
+        ?string $note,
+        ?int $performedBy,
+        ?Model $source = null,
+    ): WalletMovement {
+        $amount = (float) $amount;
+
+        if ($amount > 0) {
+            $wallet->increment('balance', $amount);
+        } elseif ($amount < 0) {
+            $wallet->decrement('balance', abs($amount));
+        }
+
+        return WalletMovement::create([
+            'wallet_id'     => $wallet->id,
+            'movement_type' => $type,
+            'amount'        => $amount,
+            'source_type'   => $source ? get_class($source) : null,
+            'source_id'     => $source?->id,
+            'note'          => $note,
+            'performed_by'  => $performedBy ?? Auth::id(),
+        ]);
+    }
+
+    private function guardSufficientBalance(Wallet $wallet, int|float|string $amount): void
     {
-        return DB::transaction(function () use ($wallet, $data) {
-            $type = WalletMovementType::from($data['type'] ?? WalletMovementType::WITHDRAWAL->value);
-
-            if ($wallet->balance < $data['amount']) {
-                throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
-            }
-
-            $wallet->decrement('balance', $data['amount']);
-
-            WalletMovement::create([
-                'wallet_id'     => $wallet->id,
-                'movement_type' => $type,
-                'amount'        => -$data['amount'],
-                'note'          => $data['note'] ?? null,
-                'performed_by'  => $data['performed_by'] ?? null,
-            ]);
-
-            return $wallet->refresh()->loadMissing('owner');
-        });
+        if ((float) $wallet->balance < (float) $amount) {
+            throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
+        }
     }
 }

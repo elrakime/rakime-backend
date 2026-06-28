@@ -3,15 +3,15 @@
 namespace App\Services;
 
 use App\Enums\PurchaseStatus;
-use App\Enums\WalletMovementType;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use App\Models\Wallet;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PurchasePaymentService
 {
+    public function __construct(private readonly WalletService $walletService) {}
+
     public function list(Purchase $purchase): \Illuminate\Database\Eloquent\Collection
     {
         return $purchase->payments()->orderBy('paid_at', 'desc')->get();
@@ -47,16 +47,13 @@ class PurchasePaymentService
             ]);
 
             $wallet = Wallet::findOrFail($data['wallet_id']);
-            $wallet->decrement('balance', $data['amount']);
 
-            $wallet->movements()->create([
-                'movement_type'  => WalletMovementType::PURCHASE_PAYMENT,
-                'amount'         => -$data['amount'],
-                'source_type' => PurchasePayment::class,
-                'source_id'   => $payment->id,
-                'note'           => $data['note'] ?? null,
-                'performed_by'   => Auth::id(),
-            ]);
+            $this->walletService->purchasePayment(
+                wallet: $wallet,
+                amount: $data['amount'],
+                source: $payment,
+                note: $data['note'] ?? null,
+            );
 
             return $payment;
         });

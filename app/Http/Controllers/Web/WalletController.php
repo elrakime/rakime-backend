@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
+use App\Enums\WalletMovementType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Wallet\DepositWalletRequest;
 use App\Http\Requests\Web\Wallet\StoreWalletRequest;
@@ -96,12 +97,21 @@ class WalletController extends Controller
         }
 
         $data = $this->validateRequest($request);
-        $data['performed_by'] = $request->user()?->id;
 
         try {
-            $wallet = $this->walletService->deposit($wallet, $data);
+            $method = match ($data['type']) {
+                WalletMovementType::ADJUSTMENT->value => 'adjustment',
+                default                               => 'deposit',
+            };
 
-            return $this->successResponse(new WalletResource($wallet));
+            $movement = $this->walletService->{$method}(
+                wallet: $wallet,
+                amount: $data['amount'],
+                note: $data['note'] ?? null,
+                performedBy: $request->user()?->id,
+            );
+
+            return $this->successResponse(new WalletResource($wallet->fresh()->loadMissing('owner')));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }
@@ -114,12 +124,24 @@ class WalletController extends Controller
         }
 
         $data = $this->validateRequest($request);
-        $data['performed_by'] = $request->user()?->id;
 
         try {
-            $wallet = $this->walletService->withdraw($wallet, $data);
+            $method = match ($data['type']) {
+                WalletMovementType::WITHDRAWAL->value => 'withdraw',
+                WalletMovementType::EXPENSE->value    => 'expense',
+                WalletMovementType::SALARY->value     => 'salary',
+                WalletMovementType::ADJUSTMENT->value => 'adjustment',
+                default                               => 'withdraw',
+            };
 
-            return $this->successResponse(new WalletResource($wallet));
+            $movement = $this->walletService->{$method}(
+                wallet: $wallet,
+                amount: $data['amount'],
+                note: $data['note'] ?? null,
+                performedBy: $request->user()?->id,
+            );
+
+            return $this->successResponse(new WalletResource($wallet->fresh()->loadMissing('owner')));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }

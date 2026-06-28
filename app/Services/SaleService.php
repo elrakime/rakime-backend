@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
-use App\Enums\WalletMovementType;
 use App\Models\Batch;
 use App\Models\Branch;
 use App\Models\Inventory;
@@ -13,11 +12,9 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Stock;
 use App\Models\Wallet;
-use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -26,6 +23,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 class SaleService
 {
     use ScopesByUserBranches;
+
+    public function __construct(private readonly WalletService $walletService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Sale::query();
@@ -127,17 +126,12 @@ class SaleService
             return;
         }
 
-        $wallet->increment('balance', $amount);
-
-        WalletMovement::create([
-            'wallet_id'     => $wallet->id,
-            'movement_type' => WalletMovementType::SALE_PAYMENT,
-            'amount'        => $amount,
-            'source_type'   => Sale::class,
-            'source_id'     => $sale->id,
-            'note'          => $sale->note,
-            'performed_by'  => Auth::id(),
-        ]);
+        $this->walletService->salePayment(
+            wallet: $wallet,
+            amount: $amount,
+            source: $sale,
+            note: $sale->note,
+        );
     }
 
     private function deductStock(Sale $sale): void

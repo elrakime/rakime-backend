@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
-use App\Enums\WalletMovementType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
@@ -11,10 +10,8 @@ use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
 use App\Models\Wallet;
-use App\Models\WalletMovement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -22,6 +19,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseReturnService
 {
+    public function __construct(private readonly WalletService $walletService) {}
     public function list(Request $request, Purchase $purchase): LengthAwarePaginator
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
@@ -146,17 +144,13 @@ class PurchaseReturnService
 
             if ($totalReturnAmount > 0) {
                 $wallet = Wallet::findOrFail($walletId);
-                $wallet->increment('balance', $totalReturnAmount);
 
-                WalletMovement::create([
-                    'wallet_id'     => $wallet->id,
-                    'movement_type' => WalletMovementType::PURCHASE_RETURN,
-                    'amount'        => $totalReturnAmount,
-                    'source_type'   => PurchaseReturn::class,
-                    'source_id'     => $purchaseReturn->id,
-                    'note'          => $purchaseReturn->note,
-                    'performed_by'  => Auth::id(),
-                ]);
+                $this->walletService->purchaseReturn(
+                    wallet: $wallet,
+                    amount: $totalReturnAmount,
+                    source: $purchaseReturn,
+                    note: $purchaseReturn->note,
+                );
             }
 
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
