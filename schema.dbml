@@ -287,7 +287,6 @@ Table purchase_payments {
   id             int                     [pk]
   purchase_id    int                     [ref: > purchases.id]
   amount         int
-  payment_method purchase_payment_method
   paid_at        timestamp
 }
 

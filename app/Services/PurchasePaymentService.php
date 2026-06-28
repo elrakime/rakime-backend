@@ -31,10 +31,9 @@ class PurchasePaymentService
 
         return DB::transaction(function () use ($purchase, $data) {
             $payment = PurchasePayment::create([
-                'purchase_id'    => $purchase->id,
-                'amount'         => $data['amount'],
-                'payment_method' => $data['payment_method'],
-                'paid_at'        => $data['paid_at'],
+                'purchase_id' => $purchase->id,
+                'amount'      => $data['amount'],
+                'paid_at'     => $data['paid_at'],
             ]);
 
             $newPaid = $purchase->paid_amount + $data['amount'];

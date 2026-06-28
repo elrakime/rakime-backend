@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\PurchasePaymentMethod;
 use App\Enums\PurchaseStatus;
 use App\Models\Batch;
 use App\Models\Inventory;
@@ -73,10 +72,9 @@ class PurchaseSeeder extends Seeder
 
         // Full bank payment
         PurchasePayment::create([
-            'purchase_id'    => $purchase1->id,
-            'amount'         => 150000,
-            'payment_method' => PurchasePaymentMethod::BANK->value,
-            'paid_at'        => now()->subDays(8),
+            'purchase_id' => $purchase1->id,
+            'amount'      => 150000,
+            'paid_at'     => now()->subDays(8),
         ]);
 
         // ------ Purchase 2: RECEIVED & partially paid ------
@@ -121,10 +119,9 @@ class PurchaseSeeder extends Seeder
 
         // Partial cash payment
         PurchasePayment::create([
-            'purchase_id'    => $purchase2->id,
-            'amount'         => 100000,
-            'payment_method' => PurchasePaymentMethod::CASH->value,
-            'paid_at'        => now()->subDays(3),
+            'purchase_id' => $purchase2->id,
+            'amount'      => 100000,
+            'paid_at'     => now()->subDays(3),
         ]);
 
         // ------ Purchase Return for Purchase 2 ------

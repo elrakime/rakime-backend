@@ -14,11 +14,10 @@ class StorePurchasePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'wallet_id'     => ['required', 'integer', 'exists:wallets,id'],
-            'amount'         => ['required', 'integer', 'min:1'],
-            'payment_method' => ['required', 'string'],
-            'paid_at'        => ['required', 'date'],
-            'note'           => ['nullable', 'string'],
+            'wallet_id' => ['required', 'integer', 'exists:wallets,id'],
+            'amount'    => ['required', 'integer', 'min:1'],
+            'paid_at'   => ['required', 'date'],
+            'note'      => ['nullable', 'string'],
         ];
     }
 }

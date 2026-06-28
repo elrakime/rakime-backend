@@ -1948,9 +1948,6 @@ items:
                   - name: amount
                     type: text
                     value: '50000'
-                  - name: payment_method
-                    type: text
-                    value: CASH
                   - name: paid_at
                     type: text
                     value: '2026-06-03'
