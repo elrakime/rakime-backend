@@ -71,6 +71,14 @@ class WalletService
 
     public function delete(Wallet $wallet): void
     {
+        if ((float) $wallet->balance !== 0.0) {
+            throw new \Exception(__('wallets.cannot_delete_with_balance'), 422);
+        }
+
+        if ($wallet->has('owner')) {
+            throw new \Exception(__('wallets.cannot_delete_with_owner'), 422);
+        }
+
         $wallet->delete();
     }
 
