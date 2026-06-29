@@ -48,7 +48,7 @@ class WalletService
     public function create(array $data): Wallet
     {
 
-        $owner = match ($data['owner_type']) {
+        $owner = match ($data['owner_type'] ?? null) {
             'branch' => Branch::findOrFail($data['owner_id']),
             'account' => Account::findOrFail($data['owner_id']),
             default => null
@@ -84,7 +84,7 @@ class WalletService
             throw new \Exception(__('wallets.cannot_delete_with_balance'), 422);
         }
 
-        if ($wallet->has('owner')) {
+        if ($wallet->owner) {
             throw new \Exception(__('wallets.cannot_delete_with_owner'), 422);
         }
 
