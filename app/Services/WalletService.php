@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\WalletMovementType;
+use App\Models\Account;
+use App\Models\Branch;
 use App\Models\Wallet;
 use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
@@ -45,11 +47,18 @@ class WalletService
 
     public function create(array $data): Wallet
     {
+
+        $owner = match ($data['owner_type']) {
+            'branch' => Branch::findOrFail($data['owner_id']),
+            'account' => Account::findOrFail($data['owner_id']),
+            default => null
+        };
+
         $wallet = Wallet::create([
-            'owner_type' => $data['owner_type'] ?? null,
-            'owner_id'   => $data['owner_id'] ?? null,
-            'name'       => $data['name'],
-            'balance'    => $data['balance'] ?? 0,
+            'owner_type' => $owner ? get_class($owner) : null,
+            'owner_id' => $owner?->id ?? null,
+            'name' => $data['name'],
+            'balance' => $data['balance'] ?? 0,
         ]);
 
         return $wallet->loadMissing('owner');
@@ -64,7 +73,7 @@ class WalletService
     {
         $wallet->update(array_filter([
             'name' => $data['name'] ?? null,
-        ], fn ($v) => $v !== null));
+        ], fn($v) => $v !== null));
 
         return $wallet->refresh()->loadMissing('owner');
     }
@@ -338,13 +347,13 @@ class WalletService
         }
 
         return WalletMovement::create([
-            'wallet_id'     => $wallet->id,
+            'wallet_id' => $wallet->id,
             'movement_type' => $type,
-            'amount'        => $amount,
-            'source_type'   => $source ? get_class($source) : null,
-            'source_id'     => $source?->id,
-            'note'          => $note,
-            'performed_by'  => $performedBy ?? Auth::id(),
+            'amount' => $amount,
+            'source_type' => $source ? get_class($source) : null,
+            'source_id' => $source?->id,
+            'note' => $note,
+            'performed_by' => $performedBy ?? Auth::id(),
         ]);
     }
 

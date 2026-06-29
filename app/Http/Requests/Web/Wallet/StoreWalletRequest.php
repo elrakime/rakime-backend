@@ -15,7 +15,7 @@ class StoreWalletRequest extends FormRequest
     {
         return [
             'owner_type' => ['nullable', 'string', 'max:255'],
-            'owner_id'   => ['nullable', 'integer'],
+            'owner_id'   => ['nullable', 'required_with:owner_type', 'integer'],
             'name'       => ['required', 'string', 'max:255'],
             'balance'    => ['nullable', 'numeric', 'min:0'],
         ];
