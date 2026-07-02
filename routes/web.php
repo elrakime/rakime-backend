@@ -93,7 +93,6 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('expirations', ExpirationController::class);
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
 
-    Route::post('ccp/key', [CcpController::class, 'getKey']);
-    Route::post('ccp/rip', [CcpController::class, 'getRip']);
+    Route::post('ccp/info', [CcpController::class, 'info']);
 
 });

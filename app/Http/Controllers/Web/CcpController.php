@@ -9,21 +9,15 @@ use Illuminate\Http\Request;
 
 class CcpController extends Controller
 {
-    public function getKey(Request $request): JsonResponse
+    public function info(Request $request): JsonResponse
     {
         $request->validate(['ccp' => 'required|string']);
 
-        $key = (new CcpService($request->ccp))->getKey();
+        $service = new CcpService($request->ccp);
 
-        return $this->successResponse(['key' => $key]);
-    }
-
-    public function getRip(Request $request): JsonResponse
-    {
-        $request->validate(['ccp' => 'required|string']);
-
-        $rip = (new CcpService($request->ccp))->getRip();
-
-        return $this->successResponse(['rip' => $rip]);
+        return $this->successResponse([
+            'key' => $service->getKey(),
+            'rip' => $service->getRip(),
+        ]);
     }
 }
