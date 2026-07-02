@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
+use App\Http\Controllers\Web\CcpController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
@@ -91,5 +92,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('stocks.batches', BatchController::class);
     Route::apiResource('expirations', ExpirationController::class);
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
-    
+
+    Route::post('ccp/key', [CcpController::class, 'getKey']);
+    Route::post('ccp/rip', [CcpController::class, 'getRip']);
+
 });

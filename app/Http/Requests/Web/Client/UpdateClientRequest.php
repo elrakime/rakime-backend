@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Web\Client;
 
+use App\Rules\CcpKey;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,7 +25,7 @@ class UpdateClientRequest extends FormRequest
             'salary'     => ['sometimes', 'required', 'numeric', 'min:0'],
             'nin'        => ['sometimes', 'required', 'string', 'max:50', Rule::unique('clients', 'nin')->ignore($id)],
             'ccp_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('clients', 'ccp_number')->ignore($id)],
-            'ccp_key'    => ['sometimes', 'required', 'string', 'max:10'],
+            'ccp_key'    => ['sometimes', 'required', 'string', 'max:10', new CcpKey],
             'eccp'       => ['sometimes', 'nullable', 'string', 'max:255'],
         ];
     }

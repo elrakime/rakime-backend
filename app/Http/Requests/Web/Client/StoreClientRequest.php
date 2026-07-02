@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Web\Client;
 
+use App\Rules\CcpKey;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreClientRequest extends FormRequest
@@ -21,7 +22,7 @@ class StoreClientRequest extends FormRequest
             'salary'     => ['required', 'numeric', 'min:0'],
             'nin'        => ['required', 'string', 'max:50', 'unique:clients,nin'],
             'ccp_number' => ['required', 'string', 'max:50', 'unique:clients,ccp_number'],
-            'ccp_key'    => ['required', 'string', 'max:10'],
+            'ccp_key'    => ['required', 'string', 'max:10', new CcpKey],
             'eccp'       => ['nullable', 'string', 'max:255'],
         ];
     }
