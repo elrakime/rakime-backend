@@ -48,7 +48,7 @@ class AccountService
         ]);
 
         Wallet::firstOrCreate(
-            ['owner_type' => 'account', 'owner_id' => $account->id],
+            ['owner_type' => Account::class, 'owner_id' => $account->id],
             ['name' => $account->name, 'balance' => 0],
         );
 

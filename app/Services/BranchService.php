@@ -55,7 +55,7 @@ class BranchService
         );
 
         Wallet::firstOrCreate(
-            ['owner_type' => 'branch', 'owner_id' => $branch->id],
+            ['owner_type' => Branch::class, 'owner_id' => $branch->id],
             ['name' => $branch->name, 'balance' => 0],
         );
 
@@ -84,7 +84,7 @@ class BranchService
         );
 
         Wallet::firstOrCreate(
-            ['owner_type' => 'branch', 'owner_id' => $branch->id],
+            ['owner_type' => Branch::class, 'owner_id' => $branch->id],
             ['name' => $branch->name, 'balance' => 0],
         );
 
