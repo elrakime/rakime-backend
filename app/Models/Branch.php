@@ -14,7 +14,7 @@ class Branch extends Model
 {
     use LogsActivity;
 
-    protected $fillable = ['name', 'code'];
+    protected $fillable = ['name', 'code', 'shop_name', 'address', 'phone'];
 
     public function getActivitylogOptions(): LogOptions
     {

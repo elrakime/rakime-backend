@@ -10,9 +10,12 @@ class BranchResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'       => $this->id,
-            'name'     => $this->name,
-            'code'     => $this->code,
+            'id'        => $this->id,
+            'name'      => $this->name,
+            'code'      => $this->code,
+            'shop_name' => $this->shop_name,
+            'address'   => $this->address,
+            'phone'     => $this->phone,
             'accounts' => $this->whenLoaded('accounts', fn () => $this->accounts->map(fn ($a) => [
                 'id'         => $a->id,
                 'name'       => $a->name,

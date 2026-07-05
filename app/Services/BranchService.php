@@ -20,16 +20,22 @@ class BranchService
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('code'),
+                AllowedFilter::partial('shop_name'),
+                AllowedFilter::partial('phone'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")
-                          ->orWhere('code', 'like', "%{$value}%");
+                          ->orWhere('code', 'like', "%{$value}%")
+                          ->orWhere('shop_name', 'like', "%{$value}%")
+                          ->orWhere('address', 'like', "%{$value}%")
+                          ->orWhere('phone', 'like', "%{$value}%");
                     });
                 }),
             )
             ->allowedSorts(
                 AllowedSort::field('name'),
                 AllowedSort::field('code'),
+                AllowedSort::field('shop_name'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -41,8 +47,11 @@ class BranchService
         $accounts = $data['accounts'] ?? [];
 
         $branch = Branch::create([
-            'name' => $data['name'],
-            'code' => $data['code'],
+            'name'      => $data['name'],
+            'code'      => $data['code'],
+            'shop_name' => $data['shop_name'],
+            'address'   => $data['address'] ?? null,
+            'phone'     => $data['phone'] ?? null,
         ]);
 
         if ($accounts) {
@@ -70,8 +79,11 @@ class BranchService
     public function update(Branch $branch, array $data): Branch
     {
         $branch->update(array_filter([
-            'name' => $data['name'] ?? null,
-            'code' => $data['code'] ?? null,
+            'name'      => $data['name'] ?? null,
+            'code'      => $data['code'] ?? null,
+            'shop_name' => $data['shop_name'] ?? null,
+            'address'   => $data['address'] ?? null,
+            'phone'     => $data['phone'] ?? null,
         ], fn ($v) => $v !== null));
 
         if (array_key_exists('accounts', $data)) {
