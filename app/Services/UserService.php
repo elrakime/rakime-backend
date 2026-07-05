@@ -54,7 +54,7 @@ class UserService
 
         // Non-admin users must be linked to at least one branch
         if (! in_array(Role::ADMIN->value, $roles) && empty($branches)) {
-            throw new Exception('Non-admin users must be assigned to at least one branch.', 422);
+            throw new Exception(__('users.non_admin_must_have_branch'), 422);
         }
 
         $user = User::create([
@@ -96,7 +96,7 @@ class UserService
 
         // Non-admin users must be linked to at least one branch
         if (! in_array(Role::ADMIN->value, $effectiveRoles) && is_array($branches) && empty($branches)) {
-            throw new Exception('Non-admin users must be assigned to at least one branch.', 422);
+            throw new Exception(__('users.non_admin_must_have_branch'), 422);
         }
 
         $user->update(array_filter([
@@ -123,6 +123,17 @@ class UserService
 
     public function delete(User $user): void
     {
+        if (auth()->id() === $user->id) {
+            throw new Exception(__('users.cannot_delete_self'), 422);
+        }
+
+        if ($user->sales()->exists() || 
+            $user->productExpirations()->exists() || 
+            $user->restockOrders()->exists() || 
+            $user->installmentContracts()->exists()) {
+            throw new Exception(__('users.cannot_delete_with_related_records'), 422);
+        }
+
         $user->delete();
     }
 }
