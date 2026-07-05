@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\Role;
 use App\Models\User;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -46,13 +48,13 @@ class UserService
         $branches = $data['branches'] ?? [];
 
         // Admin should not be linked to specific branches
-        if (in_array(\App\Enums\Role::ADMIN->value, $roles)) {
+        if (in_array(Role::ADMIN->value, $roles)) {
             $branches = [];
         }
 
         // Non-admin users must be linked to at least one branch
-        if (! in_array(\App\Enums\Role::ADMIN->value, $roles) && empty($branches)) {
-            throw new \InvalidArgumentException('Non-admin users must be assigned to at least one branch.', 422);
+        if (! in_array(Role::ADMIN->value, $roles) && empty($branches)) {
+            throw new Exception('Non-admin users must be assigned to at least one branch.', 422);
         }
 
         $user = User::create([
@@ -88,13 +90,13 @@ class UserService
         $effectiveRoles = $roles ?? $user->roles->pluck('name')->toArray();
 
         // Admin should not be linked to specific branches
-        if (in_array(\App\Enums\Role::ADMIN->value, $effectiveRoles)) {
+        if (in_array(Role::ADMIN->value, $effectiveRoles)) {
             $branches = [];
         }
 
         // Non-admin users must be linked to at least one branch
-        if (! in_array(\App\Enums\Role::ADMIN->value, $effectiveRoles) && is_array($branches) && empty($branches)) {
-            throw new \InvalidArgumentException('Non-admin users must be assigned to at least one branch.', 422);
+        if (! in_array(Role::ADMIN->value, $effectiveRoles) && is_array($branches) && empty($branches)) {
+            throw new Exception('Non-admin users must be assigned to at least one branch.', 422);
         }
 
         $user->update(array_filter([

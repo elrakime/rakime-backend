@@ -6,6 +6,7 @@ use App\Enums\PurchaseStatus;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use App\Models\Wallet;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class PurchasePaymentService
@@ -20,13 +21,13 @@ class PurchasePaymentService
     public function create(Purchase $purchase, array $data): PurchasePayment
     {
         if ($purchase->status === PurchaseStatus::DRAFT) {
-            throw new \Exception(__('purchases.must_be_received'), 422);
+            throw new Exception(__('purchases.must_be_received'), 422);
         }
 
         $remaining = $purchase->total_amount - $purchase->paid_amount;
 
         if ($data['amount'] > $remaining) {
-            throw new \Exception(__('purchases.amount_exceeds_remaining'), 422);
+            throw new Exception(__('purchases.amount_exceeds_remaining'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {

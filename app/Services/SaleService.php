@@ -13,6 +13,7 @@ use App\Models\SaleItem;
 use App\Models\Stock;
 use App\Models\Wallet;
 use App\Traits\ScopesByUserBranches;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -174,7 +175,7 @@ class SaleService
         $inventory = Inventory::where('branch_id', $branchId)->first();
 
         if (!$inventory) {
-            throw new \Exception(__('sales.no_inventory_for_branch'), 422);
+            throw new Exception(__('sales.no_inventory_for_branch'), 422);
         }
 
         return $inventory;
@@ -212,7 +213,7 @@ class SaleService
             $stockId = $item['stock_id'];
 
             if (!isset($stocks[$stockId])) {
-                throw new \Exception(
+                throw new Exception(
                     __('sales.stock_not_in_branch_inventory', ['stock' => $stockId]), 422
                 );
             }
@@ -220,7 +221,7 @@ class SaleService
             $stock = $stocks[$stockId];
 
             if (($stock->total_current ?? 0) < $item['quantity']) {
-                throw new \Exception(
+                throw new Exception(
                     __('sales.insufficient_stock', ['stock' => $stockId, 'available' => $stock->total_current ?? 0]), 422
                 );
             }

@@ -7,6 +7,7 @@ use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Stock;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -71,7 +72,7 @@ class InventoryTransferService
     public function update(InventoryTransfer $transfer, array $data): InventoryTransfer
     {
         if ($transfer->received_at) {
-            throw new \Exception(__('transfers.cannot_update_received'), 422);
+            throw new Exception(__('transfers.cannot_update_received'), 422);
         }
 
         return DB::transaction(function () use ($transfer, $data) {
@@ -165,7 +166,7 @@ class InventoryTransferService
     public function delete(InventoryTransfer $transfer): void
     {
         if ($transfer->received_at) {
-            throw new \Exception(__('transfers.cannot_delete_received'), 422);
+            throw new Exception(__('transfers.cannot_delete_received'), 422);
         }
 
         $transfer->items()->delete();

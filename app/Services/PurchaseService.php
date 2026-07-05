@@ -9,6 +9,7 @@ use App\Models\InventoryMovement;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Stock;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -79,7 +80,7 @@ class PurchaseService
     public function update(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw new \Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_draft'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {
@@ -113,7 +114,7 @@ class PurchaseService
     public function delete(Purchase $purchase): void
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw new \Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_draft'), 422);
         }
 
         $purchase->delete();
@@ -122,7 +123,7 @@ class PurchaseService
     public function receive(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::DRAFT) {
-            throw new \Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_draft'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {

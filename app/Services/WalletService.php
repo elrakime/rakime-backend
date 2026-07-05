@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Wallet;
 use App\Models\WalletMovement;
 use App\Traits\ScopesByUserBranches;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -81,11 +82,11 @@ class WalletService
     public function delete(Wallet $wallet): void
     {
         if ((float) $wallet->balance !== 0.0) {
-            throw new \Exception(__('wallets.cannot_delete_with_balance'), 422);
+            throw new Exception(__('wallets.cannot_delete_with_balance'), 422);
         }
 
         if ($wallet->owner) {
-            throw new \Exception(__('wallets.cannot_delete_with_owner'), 422);
+            throw new Exception(__('wallets.cannot_delete_with_owner'), 422);
         }
 
         $wallet->delete();
@@ -360,7 +361,7 @@ class WalletService
     private function guardSufficientBalance(Wallet $wallet, int|float|string $amount): void
     {
         if ((float) $wallet->balance < (float) $amount) {
-            throw new \Exception(__('wallet_transfers.insufficient_balance'), 422);
+            throw new Exception(__('wallet_transfers.insufficient_balance'), 422);
         }
     }
 }

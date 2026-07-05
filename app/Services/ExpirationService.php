@@ -7,6 +7,7 @@ use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
 use App\Models\InventoryMovement;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -73,7 +74,7 @@ class ExpirationService
     public function update(Expiration $expiration, array $data): Expiration
     {
         if ($expiration->approved_at) {
-            throw new \Exception(__('expirations.cannot_update_approved'), 422);
+            throw new Exception(__('expirations.cannot_update_approved'), 422);
         }
 
         return DB::transaction(function () use ($expiration, $data) {

@@ -3,17 +3,18 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\PurchaseStatus;
 use App\Enums\RestockStatus;
-use App\Models\Batch;
 use App\Models\InventoryMovement;
+use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferItem;
 use App\Models\Purchase;
+use App\Models\PurchaseItem;
 use App\Models\Restock;
 use App\Models\RestockItem;
 use App\Models\Stock;
-use App\Models\InventoryTransfer;
-use App\Models\InventoryTransferItem;
-use App\Models\PurchaseItem;
 use App\Traits\ScopesByUserBranches;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,7 @@ class RestockService
     public function update(Restock $restock, array $data): Restock
     {
         if ($restock->status !== RestockStatus::DRAFT) {
-            throw new \Exception(__('restocks.not_draft'), 422);
+            throw new Exception(__('restocks.not_draft'), 422);
         }
 
         return DB::transaction(function () use ($restock, $data) {
@@ -112,7 +113,7 @@ class RestockService
     public function delete(Restock $restock): void
     {
         if ($restock->status !== RestockStatus::DRAFT) {
-            throw new \Exception(__('restocks.not_draft'), 422);
+            throw new Exception(__('restocks.not_draft'), 422);
         }
 
         DB::transaction(function () use ($restock) {
@@ -124,7 +125,7 @@ class RestockService
     public function submit(Restock $restock): Restock
     {
         if ($restock->status !== RestockStatus::DRAFT) {
-            throw new \Exception(__('restocks.not_draft'), 422);
+            throw new Exception(__('restocks.not_draft'), 422);
         }
 
         $restock->update(['status' => RestockStatus::SUBMITTED]);
@@ -135,7 +136,7 @@ class RestockService
     public function cancel(Restock $restock): Restock
     {
         if (!in_array($restock->status, [RestockStatus::DRAFT, RestockStatus::SUBMITTED])) {
-            throw new \Exception(__('restocks.cannot_cancel'), 422);
+            throw new Exception(__('restocks.cannot_cancel'), 422);
         }
 
         $restock->update(['status' => RestockStatus::CANCELLED]);
@@ -146,7 +147,7 @@ class RestockService
     public function fulfill(Restock $restock, array $data): Restock
     {
         if ($restock->status !== RestockStatus::SUBMITTED) {
-            throw new \Exception(__('restocks.must_be_submitted'), 422);
+            throw new Exception(__('restocks.must_be_submitted'), 422);
         }
 
         $type = $data['type'];
@@ -156,7 +157,7 @@ class RestockService
                 'purchase' => $this->fulfillViaPurchase($restock, $data),
                 'transfer' => $this->fulfillViaTransfer($restock, $data),
                 'none'     => $this->fulfillNoAction($restock),
-                default    => throw new \Exception(__('restocks.invalid_fulfill_type'), 422),
+                default    => throw new Exception(__('restocks.invalid_fulfill_type'), 422),
             };
 
             $restock->update([
@@ -178,13 +179,13 @@ class RestockService
         $inventory = \App\Models\Inventory::where('branch_id', $restock->branch_id)->first();
 
         if (!$inventory) {
-            throw new \Exception(__('restocks.no_inventory_for_branch'), 422);
+            throw new Exception(__('restocks.no_inventory_for_branch'), 422);
         }
 
         // Create a new purchase from the supplier (prices default to 0 for restock fulfillment)
         $purchase = Purchase::create([
             'supplier_id'  => $data['supplier_id'],
-            'status'       => \App\Enums\PurchaseStatus::RECEIVED,
+            'status'       => PurchaseStatus::RECEIVED,
             'total_amount' => 0,
             'paid_amount'  => 0,
             'note'         => $data['note'] ?? null,
@@ -256,7 +257,7 @@ class RestockService
         $toInventory = \App\Models\Inventory::where('branch_id', $restock->branch_id)->first();
 
         if (!$toInventory) {
-            throw new \Exception(__('restocks.no_inventory_for_branch'), 422);
+            throw new Exception(__('restocks.no_inventory_for_branch'), 422);
         }
 
         $fromInventoryId = $data['from_inventory_id'];

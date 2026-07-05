@@ -10,6 +10,7 @@ use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
 use App\Models\Wallet;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +71,7 @@ class PurchaseReturnService
     public function update(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
     {
         if ($purchaseReturn->approved_at) {
-            throw new \Exception(__('purchase_returns.cannot_update_approved'), 422);
+            throw new Exception(__('purchase_returns.cannot_update_approved'), 422);
         }
 
         if (isset($data['items'])) {
@@ -160,7 +161,7 @@ class PurchaseReturnService
     public function delete(PurchaseReturn $purchaseReturn): void
     {
         if ($purchaseReturn->approved_at) {
-            throw new \Exception(__('purchase_returns.cannot_delete_approved'), 422);
+            throw new Exception(__('purchase_returns.cannot_delete_approved'), 422);
         }
 
         DB::transaction(function () use ($purchaseReturn) {
@@ -178,7 +179,7 @@ class PurchaseReturnService
             ->count();
 
         if ($validCount !== count($itemIds)) {
-            throw new \Exception(__('purchase_returns.invalid_purchase_items'), 422);
+            throw new Exception(__('purchase_returns.invalid_purchase_items'), 422);
         }
     }
 
