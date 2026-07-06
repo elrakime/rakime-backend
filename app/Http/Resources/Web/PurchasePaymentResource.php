@@ -14,6 +14,7 @@ class PurchasePaymentResource extends JsonResource
             'purchase_id' => $this->purchase_id,
             'amount'      => $this->amount,
             'paid_at'     => $this->paid_at,
+            'canceled_at' => $this->canceled_at,
             'created_at'  => $this->created_at,
         ];
     }

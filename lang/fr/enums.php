@@ -22,6 +22,7 @@ return [
         'INSTALLMENT_PAYMENT' => 'Paiement par échéance',
         'PURCHASE_PAYMENT'    => "Paiement d'achat",
         'SALE_PAYMENT'        => 'Paiement de vente',
+        'PAYMENT_CANCEL'      => 'Paiement annulé',
         'ADJUSTMENT'          => 'Ajustement',
     ],
 

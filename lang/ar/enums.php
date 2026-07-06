@@ -22,6 +22,7 @@ return [
         'INSTALLMENT_PAYMENT' => 'دفع قسط',
         'PURCHASE_PAYMENT'    => 'دفع مشتريات',
         'SALE_PAYMENT'        => 'دفع مبيعات',
+        'PAYMENT_CANCEL'      => 'إلغاء الدفع',
         'ADJUSTMENT'          => 'تسوية',
     ],
 

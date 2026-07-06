@@ -283,6 +283,26 @@ class WalletService
     }
 
     /**
+     * Record a payment cancellation credit (inflow).
+     */
+    public function paymentCancel(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+        ?int $performedBy = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::PAYMENT_CANCEL,
+            $amount,
+            $note,
+            $performedBy,
+            $source,
+        );
+    }
+
+    /**
      * Record a sale payment credit (inflow).
      */
     public function salePayment(

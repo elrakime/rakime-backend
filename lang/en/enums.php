@@ -22,6 +22,7 @@ return [
         'INSTALLMENT_PAYMENT' => 'Installment Payment',
         'PURCHASE_PAYMENT'    => 'Purchase Payment',
         'SALE_PAYMENT'        => 'Sale Payment',
+        'PAYMENT_CANCEL'      => 'Payment Cancel',
         'ADJUSTMENT'          => 'Adjustment',
     ],
 

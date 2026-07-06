@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Enums\PurchaseStatus;
+use App\Enums\WalletMovementType;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use App\Models\Wallet;
+use App\Models\WalletMovement;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -57,6 +59,51 @@ class PurchasePaymentService
             );
 
             return $payment;
+        });
+    }
+
+    public function cancel(Purchase $purchase, PurchasePayment $payment): PurchasePayment
+    {
+        if ($payment->canceled_at) {
+            throw new Exception(__('purchases.payment_already_canceled'), 422);
+        }
+
+        if ($purchase->status === PurchaseStatus::DRAFT) {
+            throw new Exception(__('purchases.must_be_received'), 422);
+        }
+
+        return DB::transaction(function () use ($purchase, $payment) {
+            $payment->update(['canceled_at' => now()]);
+
+            $newPaid = $purchase->paid_amount - $payment->amount;
+            $status  = $newPaid <= 0
+                ? PurchaseStatus::RECEIVED
+                : ($newPaid >= $purchase->total_amount
+                    ? PurchaseStatus::PAID
+                    : PurchaseStatus::PARTIALLY_PAID);
+
+            $purchase->update([
+                'paid_amount' => max(0, $newPaid),
+                'status'      => $status,
+            ]);
+
+            $movement = WalletMovement::where('source_type', PurchasePayment::class)
+                ->where('source_id', $payment->id)
+                ->where('movement_type', WalletMovementType::PURCHASE_PAYMENT)
+                ->first();
+
+            if ($movement) {
+                $wallet = $movement->wallet;
+
+                $this->walletService->paymentCancel(
+                    wallet: $wallet,
+                    amount: $payment->amount,
+                    source: $payment,
+                    note: __('purchases.payment_canceled_note', ['amount' => $payment->amount]),
+                );
+            }
+
+            return $payment->refresh();
         });
     }
 }

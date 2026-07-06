@@ -78,6 +78,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
     Route::apiResource('purchases.payments', PurchasePaymentController::class)->parameters(['payments' => 'purchase_payment'])->only(['index', 'store']);
+    Route::post('purchases/{purchase}/payments/{purchase_payment}/cancel', [PurchasePaymentController::class, 'cancel']);
     Route::apiResource('purchases.returns', PurchaseReturnController::class)->parameters(['returns' => 'purchase_return']);
     Route::post('purchases/{purchase}/returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
 

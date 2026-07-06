@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\PurchasePayment\StorePurchasePaymentRequest;
 use App\Http\Resources\Web\PurchasePaymentResource;
 use App\Models\Purchase;
+use App\Models\PurchasePayment;
 use App\Services\PurchasePaymentService;
 use Illuminate\Http\JsonResponse;
 
@@ -39,6 +40,21 @@ class PurchasePaymentController extends Controller
             $payment = $this->purchasePaymentService->create($purchase, $this->validateRequest($request));
 
             return $this->successResponse(new PurchasePaymentResource($payment), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function cancel(Purchase $purchase, PurchasePayment $purchase_payment): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::CREATE_PURCHASE_PAYMENTS->value)) {
+            return $response;
+        }
+
+        try {
+            $payment = $this->purchasePaymentService->cancel($purchase, $purchase_payment);
+
+            return $this->successResponse(new PurchasePaymentResource($payment));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }

@@ -14,13 +14,15 @@ class PurchasePayment extends Model
         'purchase_id',
         'amount',
         'paid_at',
+        'canceled_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'amount'  => 'integer',
-            'paid_at' => 'datetime',
+            'amount'      => 'integer',
+            'paid_at'     => 'datetime',
+            'canceled_at' => 'datetime',
         ];
     }
 
