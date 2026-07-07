@@ -16,7 +16,6 @@ class StorePurchaseRequest extends FormRequest
         return [
             'supplier_id'          => ['required', 'integer', 'exists:suppliers,id'],
             'note'                 => ['nullable', 'string'],
-            'purchased_at'         => ['required', 'date'],
             'items'                => ['required', 'array', 'min:1'],
             'items.*.product_id'   => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity'     => ['required', 'integer', 'min:1'],

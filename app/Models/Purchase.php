@@ -25,7 +25,6 @@ class Purchase extends Model
         'total_amount',
         'paid_amount',
         'note',
-        'purchased_at',
         'received_at',
     ];
 
@@ -35,7 +34,6 @@ class Purchase extends Model
             'status'       => PurchaseStatus::class,
             'total_amount' => 'integer',
             'paid_amount'  => 'integer',
-            'purchased_at' => 'datetime',
             'received_at'  => 'datetime',
         ];
     }

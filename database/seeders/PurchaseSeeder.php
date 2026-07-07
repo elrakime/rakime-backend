@@ -35,7 +35,6 @@ class PurchaseSeeder extends Seeder
             'total_amount' => 150000,
             'paid_amount'  => 150000,
             'note'         => 'First purchase order',
-            'purchased_at' => now()->subDays(10),
             'received_at'  => now()->subDays(9),
         ]);
 
@@ -65,7 +64,6 @@ class PurchaseSeeder extends Seeder
                     'purchase_price'   => $price,
                     'initial_quantity'  => $quantity,
                     'current_quantity'  => $quantity,
-                    'purchased_at'     => now()->subDays(9),
                 ]
             );
         }
@@ -85,7 +83,6 @@ class PurchaseSeeder extends Seeder
             'total_amount' => 200000,
             'paid_amount'  => 100000,
             'note'         => 'Second purchase order',
-            'purchased_at' => now()->subDays(5),
             'received_at'  => now()->subDays(4),
         ]);
 
@@ -113,7 +110,6 @@ class PurchaseSeeder extends Seeder
                 'purchase_price'   => 20000,
                 'initial_quantity'  => 10,
                 'current_quantity'  => 10,
-                'purchased_at'     => now()->subDays(4),
             ]
         );
 

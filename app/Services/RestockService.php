@@ -189,7 +189,6 @@ class RestockService
             'total_amount' => 0,
             'paid_amount'  => 0,
             'note'         => $data['note'] ?? null,
-            'purchased_at' => now(),
             'received_at'  => now(),
         ]);
 

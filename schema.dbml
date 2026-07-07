@@ -271,7 +271,6 @@ Table purchases {
   total_amount int
   paid_amount  int             [default: 0]
   note         varchar
-  purchased_at timestamp
   received_at  timestamp       [null]
 }
 

@@ -36,7 +36,6 @@ class PurchaseService
             )
             ->allowedSorts(
                 AllowedSort::field('total_amount'),
-                AllowedSort::field('purchased_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -57,7 +56,6 @@ class PurchaseService
                 'total_amount' => $totalAmount,
                 'paid_amount'  => 0,
                 'note'         => $data['note'] ?? null,
-                'purchased_at' => $data['purchased_at'],
             ]);
 
             $purchase->items()->createMany(
@@ -87,7 +85,6 @@ class PurchaseService
             $purchase->update(array_filter([
                 'supplier_id'  => $data['supplier_id'] ?? null,
                 'note'         => $data['note'] ?? null,
-                'purchased_at' => $data['purchased_at'] ?? null,
             ], fn ($v) => $v !== null));
 
             if (array_key_exists('items', $data)) {
