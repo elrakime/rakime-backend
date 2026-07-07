@@ -17,14 +17,12 @@ class Expiration extends Model
         'inventory_id',
         'reference',
         'note',
-        'reported_at',
         'approved_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'reported_at' => 'datetime',
             'approved_at' => 'datetime',
         ];
     }

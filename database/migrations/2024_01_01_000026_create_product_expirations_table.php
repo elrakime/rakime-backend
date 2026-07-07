@@ -14,7 +14,6 @@ return new class extends Migration
             $table->foreignId('inventory_id')->constrained();
             $table->string('reference');
             $table->string('note')->nullable();
-            $table->timestamp('reported_at');
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });

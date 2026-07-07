@@ -357,7 +357,6 @@ Table product_expirations {
   inventory_id int        [ref: > inventories.id]
   reference    varchar
   note         varchar    [null]
-  reported_at  timestamp
 }
 
 Table product_expiration_items {

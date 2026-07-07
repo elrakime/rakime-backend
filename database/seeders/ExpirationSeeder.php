@@ -26,7 +26,6 @@ class ExpirationSeeder extends Seeder
             'inventory_id' => $inventory->id,
             'reference'    => 'EXP-2024-001',
             'note'         => 'Products expired in storage',
-            'reported_at'  => now()->subDays(1),
             'approved_at'  => now(),
         ]);
 

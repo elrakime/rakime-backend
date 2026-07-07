@@ -33,7 +33,6 @@ class ExpirationService
             )
             ->allowedSorts(
                 AllowedSort::field('reference'),
-                AllowedSort::field('reported_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -48,7 +47,6 @@ class ExpirationService
                 'user_id'      => $data['user_id'],
                 'inventory_id' => $data['inventory_id'],
                 'note'         => $data['note'] ?? null,
-                'reported_at'  => $data['reported_at'] ?? now(),
             ]);
 
             if (!empty($data['items'])) {
@@ -81,7 +79,6 @@ class ExpirationService
             $expiration->update(array_filter([
                 'inventory_id' => $data['inventory_id'] ?? null,
                 'note'         => $data['note'] ?? null,
-                'reported_at'  => $data['reported_at'] ?? null,
             ], fn ($v) => $v !== null));
 
             if (array_key_exists('items', $data)) {

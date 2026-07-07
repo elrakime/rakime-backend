@@ -15,7 +15,6 @@ class ExpirationResource extends JsonResource
             'inventory_id' => $this->inventory_id,
             'reference'    => $this->reference,
             'note'         => $this->note,
-            'reported_at'  => $this->reported_at,
             'approved_at'  => $this->approved_at,
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
