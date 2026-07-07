@@ -115,7 +115,7 @@ class InventoryTransferService
                 if ($fromStock) {
                     $fromBatch = $fromStock->batches()
                         ->where('current_quantity', '>', 0)
-                        ->orderBy('purchased_at')
+                        ->orderBy('created_at')
                         ->first();
 
                     if ($fromBatch) {
@@ -145,7 +145,6 @@ class InventoryTransferService
                     'purchase_price'   => 0,
                     'initial_quantity' => $transferItem->quantity,
                     'current_quantity' => $transferItem->quantity,
-                    'purchased_at'     => $transfer->transferred_at,
                 ]);
 
                 InventoryMovement::create([

@@ -72,7 +72,6 @@ class StockService
                 'purchase_price'    => $data['purchase_price'] ?? 0,
                 'initial_quantity'  => $data['initial_quantity'],
                 'current_quantity'  => $data['current_quantity'] ?? $data['initial_quantity'],
-                'purchased_at'      => $data['purchased_at'] ?? now(),
             ]);
         }
 

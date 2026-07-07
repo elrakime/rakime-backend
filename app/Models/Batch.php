@@ -17,7 +17,6 @@ class Batch extends Model
         'purchase_price',
         'initial_quantity',
         'current_quantity',
-        'purchased_at',
     ];
 
     protected function casts(): array
@@ -26,7 +25,6 @@ class Batch extends Model
             'purchase_price'   => 'integer',
             'initial_quantity' => 'integer',
             'current_quantity' => 'integer',
-            'purchased_at'     => 'datetime',
         ];
     }
 

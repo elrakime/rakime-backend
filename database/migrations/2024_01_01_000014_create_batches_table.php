@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedInteger('purchase_price');
             $table->unsignedInteger('initial_quantity');
             $table->unsignedInteger('current_quantity');
-            $table->timestamp('purchased_at');
             $table->timestamps();
         });
     }

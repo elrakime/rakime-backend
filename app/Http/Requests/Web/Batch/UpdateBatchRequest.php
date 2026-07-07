@@ -19,7 +19,6 @@ class UpdateBatchRequest extends FormRequest
             'purchase_price'   => ['sometimes', 'integer', 'min:0'],
             'initial_quantity' => ['sometimes', 'integer', 'min:0'],
             'current_quantity' => ['sometimes', 'integer', 'min:0'],
-            'purchased_at'     => ['nullable', 'date'],
         ];
     }
 }

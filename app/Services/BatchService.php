@@ -28,7 +28,6 @@ class BatchService
                 AllowedSort::field('purchase_price'),
                 AllowedSort::field('initial_quantity'),
                 AllowedSort::field('current_quantity'),
-                AllowedSort::field('purchased_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -44,7 +43,6 @@ class BatchService
             'purchase_price'   => $data['purchase_price'],
             'initial_quantity' => $data['initial_quantity'],
             'current_quantity' => $data['current_quantity'] ?? $data['initial_quantity'],
-            'purchased_at'     => $data['purchased_at'] ?? now(),
         ]);
     }
 
@@ -61,7 +59,6 @@ class BatchService
             'purchase_price'   => $data['purchase_price'] ?? null,
             'initial_quantity' => $data['initial_quantity'] ?? null,
             'current_quantity' => $data['current_quantity'] ?? null,
-            'purchased_at'     => $data['purchased_at'] ?? null,
         ], fn ($v) => $v !== null));
 
         return $batch->refresh();

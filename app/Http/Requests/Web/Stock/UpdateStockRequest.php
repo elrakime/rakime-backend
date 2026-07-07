@@ -31,7 +31,6 @@ class UpdateStockRequest extends FormRequest
             'purchase_price'    => ['nullable', 'integer', 'min:0'],
             'selling_price'     => ['nullable', 'integer', 'min:0'],
             'installment_price' => ['nullable', 'integer', 'min:0'],
-            'purchased_at'      => ['nullable', 'date'],
         ];
     }
 }

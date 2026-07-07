@@ -19,7 +19,6 @@ class StoreBatchRequest extends FormRequest
             'purchase_price'   => ['required', 'integer', 'min:0'],
             'initial_quantity' => ['required', 'integer', 'min:0'],
             'current_quantity' => ['nullable', 'integer', 'min:0'],
-            'purchased_at'     => ['nullable', 'date'],
         ];
     }
 }

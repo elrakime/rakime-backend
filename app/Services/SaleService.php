@@ -145,7 +145,7 @@ class SaleService
             $batches = Batch::with('stock')
                 ->where('stock_id', $item->stock_id)
                 ->where('current_quantity', '>', 0)
-                ->orderBy('purchased_at')
+                ->orderBy('created_at')
                 ->get();
 
             foreach ($batches as $batch) {

@@ -216,7 +216,6 @@ class RestockService
                 'purchase_price'   => $price,
                 'initial_quantity' => $quantity,
                 'current_quantity' => $quantity,
-                'purchased_at'     => now(),
             ]);
 
             // Record inventory movement for receiving the purchase
@@ -290,7 +289,7 @@ class RestockService
             if ($fromStock) {
                 $fromBatch = $fromStock->batches()
                     ->where('current_quantity', '>', 0)
-                    ->orderBy('purchased_at')
+                    ->orderBy('created_at')
                     ->first();
 
                 if ($fromBatch) {
@@ -321,7 +320,6 @@ class RestockService
                 'purchase_price'   => 0,
                 'initial_quantity' => $quantity,
                 'current_quantity' => $quantity,
-                'purchased_at'     => now(),
             ]);
 
             // Record transfer-in movement

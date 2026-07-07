@@ -29,7 +29,6 @@ class StoreStockRequest extends FormRequest
             'initial_quantity'       => ['nullable', 'integer', 'min:0'],
             'current_quantity'       => ['nullable', 'integer', 'min:0'],
             'purchase_price'         => ['nullable', 'integer', 'min:0'],
-            'purchased_at'              => ['nullable', 'date'],
             'selling_prices'            => ['nullable', 'array'],
             'selling_prices.*'          => ['integer', 'min:0'],
             'installment_prices'        => ['nullable', 'array'],

@@ -151,7 +151,6 @@ class PurchaseService
                     'purchase_price'   => $item->price,
                     'initial_quantity' => $item->quantity,
                     'current_quantity' => $item->quantity,
-                    'purchased_at'     => $purchase->purchased_at,
                 ]);
 
                 $prices = collect();
