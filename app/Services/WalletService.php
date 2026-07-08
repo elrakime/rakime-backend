@@ -12,7 +12,6 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -103,14 +102,12 @@ class WalletService
         Wallet $wallet,
         int|float|string $amount,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         return $this->recordMovement(
             $wallet,
             WalletMovementType::DEPOSIT,
             $amount,
             $note,
-            $performedBy,
         );
     }
 
@@ -121,7 +118,6 @@ class WalletService
         Wallet $wallet,
         int|float|string $amount,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -130,7 +126,6 @@ class WalletService
             WalletMovementType::WITHDRAWAL,
             -abs((float) $amount),
             $note,
-            $performedBy,
         );
     }
 
@@ -141,7 +136,6 @@ class WalletService
         Wallet $wallet,
         int|float|string $amount,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -150,7 +144,6 @@ class WalletService
             WalletMovementType::EXPENSE,
             -abs((float) $amount),
             $note,
-            $performedBy,
         );
     }
 
@@ -161,7 +154,6 @@ class WalletService
         Wallet $wallet,
         int|float|string $amount,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -170,7 +162,6 @@ class WalletService
             WalletMovementType::SALARY,
             -abs((float) $amount),
             $note,
-            $performedBy,
         );
     }
 
@@ -181,7 +172,6 @@ class WalletService
         Wallet $wallet,
         int|float|string $amount,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $amount = (float) $amount;
 
@@ -194,7 +184,6 @@ class WalletService
             WalletMovementType::ADJUSTMENT,
             $amount,
             $note,
-            $performedBy,
         );
     }
 
@@ -206,7 +195,6 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -215,7 +203,6 @@ class WalletService
             WalletMovementType::TRANSFER_OUT,
             -abs((float) $amount),
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -228,14 +215,12 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         return $this->recordMovement(
             $wallet,
             WalletMovementType::TRANSFER_IN,
             $amount,
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -248,7 +233,6 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -257,7 +241,6 @@ class WalletService
             WalletMovementType::PURCHASE_PAYMENT,
             -abs((float) $amount),
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -270,14 +253,12 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         return $this->recordMovement(
             $wallet,
             WalletMovementType::PURCHASE_RETURN,
             $amount,
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -290,14 +271,12 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         return $this->recordMovement(
             $wallet,
             WalletMovementType::PAYMENT_CANCEL,
             $amount,
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -310,14 +289,12 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         return $this->recordMovement(
             $wallet,
             WalletMovementType::SALE_PAYMENT,
             $amount,
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -330,7 +307,6 @@ class WalletService
         int|float|string $amount,
         Model $source,
         ?string $note = null,
-        ?int $performedBy = null,
     ): WalletMovement {
         $this->guardSufficientBalance($wallet, $amount);
 
@@ -339,7 +315,6 @@ class WalletService
             WalletMovementType::INSTALLMENT_PAYMENT,
             -abs((float) $amount),
             $note,
-            $performedBy,
             $source,
         );
     }
@@ -356,7 +331,6 @@ class WalletService
         WalletMovementType $type,
         int|float|string $amount,
         ?string $note,
-        ?int $performedBy,
         ?Model $source = null,
     ): WalletMovement {
         $amount = (float) $amount;
@@ -374,7 +348,6 @@ class WalletService
             'source_type' => $source ? get_class($source) : null,
             'source_id' => $source?->id,
             'note' => $note,
-            'performed_by' => $performedBy ?? Auth::id(),
         ]);
     }
 

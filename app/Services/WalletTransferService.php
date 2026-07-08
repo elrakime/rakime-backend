@@ -22,7 +22,6 @@ class WalletTransferService
             ->allowedFilters(
                 AllowedFilter::exact('from_wallet_id'),
                 AllowedFilter::exact('to_wallet_id'),
-                AllowedFilter::exact('performed_by'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('note', 'like', "%{$value}%");
                 }),
@@ -49,7 +48,6 @@ class WalletTransferService
                 amount: $transfer->amount,
                 source: $transfer,
                 note: $transfer->note,
-                performedBy: $transfer->performed_by,
             );
 
             $this->walletService->transferIn(
@@ -57,7 +55,6 @@ class WalletTransferService
                 amount: $transfer->amount,
                 source: $transfer,
                 note: $transfer->note,
-                performedBy: $transfer->performed_by,
             );
 
             return $transfer;

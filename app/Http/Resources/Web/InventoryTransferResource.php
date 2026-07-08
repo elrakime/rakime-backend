@@ -13,7 +13,6 @@ class InventoryTransferResource extends JsonResource
             'id'                => $this->id,
             'from_inventory_id' => $this->from_inventory_id,
             'to_inventory_id'   => $this->to_inventory_id,
-            'performed_by'      => $this->performed_by,
             'note'              => $this->note,
             'transferred_at'    => $this->transferred_at,
             'received_at'       => $this->received_at,

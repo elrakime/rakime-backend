@@ -15,7 +15,6 @@ class WalletTransferResource extends JsonResource
             'to_wallet_id'   => $this->to_wallet_id,
             'amount'         => $this->amount,
             'note'           => $this->note,
-            'performed_by'   => $this->performed_by,
             'fromWallet'     => $this->whenLoaded('fromWallet'),
             'toWallet'       => $this->whenLoaded('toWallet'),
             'performedBy'    => $this->whenLoaded('performedBy'),

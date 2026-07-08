@@ -34,8 +34,6 @@ class WalletTransferController extends Controller
 
         $data = $this->validateRequest($request);
 
-        $data['performed_by'] = $request->user()?->id;
-
         try {
             $transfer = $this->walletTransferService->create($data);
 

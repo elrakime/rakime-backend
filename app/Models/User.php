@@ -91,6 +91,6 @@ class User extends Authenticatable implements HasMedia
 
     public function walletMovements(): HasMany
     {
-        return $this->hasMany(WalletMovement::class, 'performed_by');
+        return $this->hasMany(WalletMovement::class, 'created_by');
     }
 }

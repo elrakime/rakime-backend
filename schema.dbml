@@ -180,8 +180,6 @@ Table wallet_movements {
   reference_type        varchar                [null, note: "e.g. installment_cash_payments, purchase_payments, inventory_transfers"]
   reference_id          int                    [null, note: "FK to the source document"]
   note                  varchar                [null]
-  performed_by_type     actor_type
-  performed_by_id       int
   created_at            timestamp
 }
 
@@ -247,7 +245,6 @@ Table inventory_transfers {
   id                int       [pk]
   from_inventory_id int       [ref: > inventories.id]
   to_inventory_id   int       [ref: > inventories.id]
-  performed_by      int       [ref: > users.id, null]
   note              varchar
   transferred_at    timestamp
 }

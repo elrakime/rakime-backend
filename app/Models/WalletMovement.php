@@ -23,7 +23,6 @@ class WalletMovement extends Model
         'source_type',
         'source_id',
         'note',
-        'performed_by',
     ];
 
     protected function casts(): array
@@ -57,7 +56,7 @@ class WalletMovement extends Model
 
     public function performedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'performed_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function source(): MorphTo

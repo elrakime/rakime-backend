@@ -17,7 +17,6 @@ class WalletTransfer extends Model
         'to_wallet_id',
         'amount',
         'note',
-        'performed_by',
     ];
 
     protected function casts(): array
@@ -39,6 +38,6 @@ class WalletTransfer extends Model
 
     public function performedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'performed_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

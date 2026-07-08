@@ -263,7 +263,6 @@ class RestockService
         $transfer = InventoryTransfer::create([
             'from_inventory_id' => $fromInventoryId,
             'to_inventory_id'   => $toInventory->id,
-            'performed_by'      => auth()->id(),
             'note'              => $data['note'] ?? null,
             'transferred_at'    => now(),
             'received_at'       => now(),

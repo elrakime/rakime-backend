@@ -21,7 +21,6 @@ class InventoryTransfer extends Model
     protected $fillable = [
         'from_inventory_id',
         'to_inventory_id',
-        'performed_by',
         'note',
         'transferred_at',
         'received_at',
@@ -62,7 +61,7 @@ class InventoryTransfer extends Model
 
     public function performedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'performed_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function items(): HasMany

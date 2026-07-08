@@ -10,7 +10,6 @@ use App\Models\Stock;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -47,7 +46,6 @@ class InventoryTransferService
             $transfer = InventoryTransfer::create([
                 'from_inventory_id' => $data['from_inventory_id'],
                 'to_inventory_id'   => $data['to_inventory_id'],
-                'performed_by'      => Auth::id(),
                 'note'              => $data['note'] ?? null,
                 'transferred_at'    => $data['transferred_at'] ?? now(),
             ]);
