@@ -15,14 +15,12 @@ class PurchaseReturn extends Model
         'purchase_id',
         'reference',
         'note',
-        'returned_at',
         'approved_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'returned_at' => 'datetime',
             'approved_at' => 'datetime',
         ];
     }

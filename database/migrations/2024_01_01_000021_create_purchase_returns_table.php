@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('purchase_id')->constrained();
             $table->string('reference');
             $table->string('note')->nullable();
-            $table->timestamp('returned_at');
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });

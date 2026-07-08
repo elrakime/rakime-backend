@@ -36,7 +36,6 @@ class PurchaseReturnService
             )
             ->allowedSorts(
                 AllowedSort::field('reference'),
-                AllowedSort::field('returned_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -52,7 +51,6 @@ class PurchaseReturnService
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $purchase->id,
                 'note'        => $data['note'] ?? null,
-                'returned_at' => $data['returned_at'] ?? now(),
             ]);
 
             foreach ($data['items'] as $item) {
@@ -82,7 +80,6 @@ class PurchaseReturnService
         return DB::transaction(function () use ($purchaseReturn, $data) {
             $purchaseReturn->update([
                 'note'        => $data['note'] ?? $purchaseReturn->note,
-                'returned_at' => $data['returned_at'] ?? $purchaseReturn->returned_at,
             ]);
 
             if (isset($data['items'])) {

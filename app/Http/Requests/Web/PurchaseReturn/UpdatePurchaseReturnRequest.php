@@ -15,7 +15,6 @@ class UpdatePurchaseReturnRequest extends FormRequest
     {
         return [
             'note'                         => ['nullable', 'string', 'max:65535'],
-            'returned_at'                  => ['nullable', 'date'],
             'items'                        => ['nullable', 'array', 'min:1'],
             'items.*.purchase_item_id'     => ['required_with:items', 'integer', 'exists:purchase_items,id'],
             'items.*.quantity'             => ['required_with:items', 'integer', 'min:1'],

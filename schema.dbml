@@ -292,7 +292,6 @@ Table purchase_returns {
   id          int     [pk]
   purchase_id int     [ref: > purchases.id]
   reference   varchar
-  returned_at timestamp
 }
 
 Table purchase_return_items {

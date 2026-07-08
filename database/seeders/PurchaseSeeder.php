@@ -123,7 +123,6 @@ class PurchaseSeeder extends Seeder
             'purchase_id' => $purchase2->id,
             'reference'   => 'PR-2024-001',
             'note'        => 'Defective item returned',
-            'returned_at' => now()->subDays(2),
             'approved_at' => now()->subDays(2),
         ]);
 
