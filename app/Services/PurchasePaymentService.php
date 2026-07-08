@@ -17,7 +17,7 @@ class PurchasePaymentService
 
     public function list(Purchase $purchase): \Illuminate\Database\Eloquent\Collection
     {
-        return $purchase->payments()->orderBy('paid_at', 'desc')->get();
+        return $purchase->payments()->orderBy('created_at', 'desc')->get();
     }
 
     public function create(Purchase $purchase, array $data): PurchasePayment
@@ -36,7 +36,6 @@ class PurchasePaymentService
             $payment = PurchasePayment::create([
                 'purchase_id' => $purchase->id,
                 'amount'      => $data['amount'],
-                'paid_at'     => $data['paid_at'],
             ]);
 
             $newPaid = $purchase->paid_amount + $data['amount'];

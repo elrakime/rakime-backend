@@ -13,7 +13,6 @@ class PurchasePayment extends Model
     protected $fillable = [
         'purchase_id',
         'amount',
-        'paid_at',
         'canceled_at',
     ];
 
@@ -21,7 +20,6 @@ class PurchasePayment extends Model
     {
         return [
             'amount'      => 'integer',
-            'paid_at'     => 'datetime',
             'canceled_at' => 'datetime',
         ];
     }

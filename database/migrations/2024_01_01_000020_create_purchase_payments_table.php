@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('purchase_id')->constrained();
             $table->unsignedInteger('amount');
-            $table->timestamp('paid_at');
             $table->timestamps();
         });
     }

@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('installment_id')->unique()->constrained();
             $table->unsignedInteger('amount');
             $table->foreignId('received_by')->constrained('users');
-            $table->timestamp('paid_at');
             $table->string('note')->nullable();
             $table->timestamps();
         });

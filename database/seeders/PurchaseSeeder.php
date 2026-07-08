@@ -72,7 +72,6 @@ class PurchaseSeeder extends Seeder
         PurchasePayment::create([
             'purchase_id' => $purchase1->id,
             'amount'      => 150000,
-            'paid_at'     => now()->subDays(8),
         ]);
 
         // ------ Purchase 2: RECEIVED & partially paid ------
@@ -117,7 +116,6 @@ class PurchaseSeeder extends Seeder
         PurchasePayment::create([
             'purchase_id' => $purchase2->id,
             'amount'      => 100000,
-            'paid_at'     => now()->subDays(3),
         ]);
 
         // ------ Purchase Return for Purchase 2 ------

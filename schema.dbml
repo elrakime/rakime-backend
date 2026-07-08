@@ -286,7 +286,6 @@ Table purchase_payments {
   id             int                     [pk]
   purchase_id    int                     [ref: > purchases.id]
   amount         int
-  paid_at        timestamp
 }
 
 Table purchase_returns {
@@ -465,6 +464,5 @@ Table installment_cash_payments {
   installment_id int       [ref: > installments.id, unique, note: "one cash payment per month max"]
   amount         int       [note: "must equal installment.amount"]
   received_by    int       [ref: > employees.id]
-  paid_at        timestamp
   note           varchar   [null]
 }

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_payments', function (Blueprint $table) {
-            $table->timestamp('canceled_at')->nullable()->after('paid_at');
+            $table->timestamp('canceled_at')->nullable()->after('amount');
         });
     }
 

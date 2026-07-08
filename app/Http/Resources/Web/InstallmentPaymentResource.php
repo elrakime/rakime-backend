@@ -14,7 +14,6 @@ class InstallmentPaymentResource extends JsonResource
             'installment_id' => $this->installment_id,
             'amount'         => $this->amount,
             'received_by'    => $this->received_by,
-            'paid_at'        => $this->paid_at,
             'note'           => $this->note,
             'created_at'     => $this->created_at,
 

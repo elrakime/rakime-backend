@@ -14,7 +14,6 @@ class InstallmentPayment extends Model
         'installment_id',
         'amount',
         'received_by',
-        'paid_at',
         'note',
     ];
 
@@ -22,7 +21,6 @@ class InstallmentPayment extends Model
     {
         return [
             'amount'  => 'integer',
-            'paid_at' => 'datetime',
         ];
     }
 
