@@ -17,7 +17,6 @@ class UpdateSaleRequest extends FormRequest
             'branch_id' => ['sometimes', 'integer', 'exists:branches,id'],
             'client_id' => ['sometimes', 'integer', 'exists:clients,id'],
             'note'      => ['nullable', 'string'],
-            'sold_at'   => ['nullable', 'date'],
         ];
     }
 }

@@ -332,7 +332,6 @@ Table sales {
   total_amount int
   paid_amount  int             [default: 0]
   note         varchar
-  sold_at      timestamp
 }
 
 Table sale_items {

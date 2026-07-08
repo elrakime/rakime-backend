@@ -17,7 +17,6 @@ class StoreSaleRequest extends FormRequest
             'branch_id'       => ['required', 'integer', 'exists:branches,id'],
             'client_id'       => ['nullable', 'integer', 'exists:clients,id'],
             'note'            => ['nullable', 'string'],
-            'sold_at'         => ['nullable', 'date'],
             'items'                 => ['required', 'array', 'min:1'],
             'items.*.stock_id'      => ['required', 'integer', 'exists:stocks,id'],
             'items.*.quantity'      => ['required', 'integer', 'min:1'],

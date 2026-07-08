@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('reference');
             $table->unsignedInteger('total_amount');
             $table->string('note')->nullable();
-            $table->timestamp('sold_at');
             $table->timestamps();
         });
     }

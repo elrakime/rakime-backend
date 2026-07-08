@@ -48,7 +48,6 @@ class SaleService
             ->allowedSorts(
                 AllowedSort::field('reference'),
                 AllowedSort::field('total_amount'),
-                AllowedSort::field('sold_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -70,7 +69,6 @@ class SaleService
                 'client_id'    => $data['client_id'] ?? null,
                 'total_amount' => $totalAmount,
                 'note'         => $data['note'] ?? null,
-                'sold_at'      => $data['sold_at'] ?? now(),
             ]);
 
             foreach ($resolvedItems as $item) {
@@ -102,7 +100,6 @@ class SaleService
             'branch_id' => $data['branch_id'] ?? $sale->branch_id,
             'client_id' => $data['client_id'] ?? $sale->client_id,
             'note'      => $data['note'] ?? $sale->note,
-            'sold_at'   => $data['sold_at'] ?? $sale->sold_at,
         ]);
 
         return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);

@@ -21,14 +21,12 @@ class Sale extends Model
         'reference',
         'total_amount',
         'note',
-        'sold_at',
     ];
 
     protected function casts(): array
     {
         return [
             'total_amount' => 'integer',
-            'sold_at'      => 'datetime',
         ];
     }
 
