@@ -14,6 +14,8 @@ return new class extends Migration
             $table->foreignId('stock_id')->constrained();
             $table->unsignedInteger('quantity');
             $table->string('reason')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

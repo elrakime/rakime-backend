@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Traits\HasUserstamps;
 
 class Type extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = ['category_id', 'name'];

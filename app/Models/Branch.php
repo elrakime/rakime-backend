@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Traits\HasUserstamps;
 
 class Branch extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
     protected $fillable = ['name', 'code', 'shop_name', 'address', 'phone'];
 

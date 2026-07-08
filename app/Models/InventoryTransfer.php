@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasUserstamps;
 
 class InventoryTransfer extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = [

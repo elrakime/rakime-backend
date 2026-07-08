@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Traits\HasUserstamps;
 
 class Account extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = [

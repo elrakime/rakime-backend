@@ -10,11 +10,13 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Traits\HasUserstamps;
 
 class Category extends Model implements HasMedia
 {
     use InteractsWithMedia;
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = ['name'];

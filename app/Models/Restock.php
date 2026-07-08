@@ -12,10 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasUserstamps;
 
 class Restock extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
     protected $fillable = [
         'user_id',

@@ -7,9 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use App\Traits\HasUserstamps;
 
 class PurchaseItem extends Model
 {
+    use HasUserstamps;
 
     protected $fillable = [
         'purchase_id',

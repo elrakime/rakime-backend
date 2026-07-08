@@ -14,6 +14,8 @@ return new class extends Migration
             $table->foreignId('purchase_item_id')->constrained('purchase_items')->cascadeOnDelete();
             $table->unsignedInteger('quantity');
             $table->string('reason');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

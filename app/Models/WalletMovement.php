@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Traits\HasUserstamps;
 
 class WalletMovement extends Model
 {
+    use HasUserstamps;
     
 
     protected $fillable = [

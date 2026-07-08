@@ -19,6 +19,8 @@ return new class extends Migration
             $table->nullableMorphs('source');
             $table->enum('movement_type', InventoryMovementType::keys());
             $table->integer('quantity');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

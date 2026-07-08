@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasUserstamps;
 
 class Wallet extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = ['owner_type', 'owner_id', 'name', 'balance'];

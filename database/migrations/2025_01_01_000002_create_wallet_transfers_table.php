@@ -15,6 +15,8 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->string('note')->nullable();
             $table->foreignId('performed_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -13,6 +13,8 @@ return new class extends Migration
             $table->nullableMorphs('owner');
             $table->string('name');
             $table->decimal('balance', 15, 2)->default(0);
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

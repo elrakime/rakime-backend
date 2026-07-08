@@ -8,9 +8,11 @@ use App\Enums\DrawStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUserstamps;
 
 class Draw extends Model
 {
+    use HasUserstamps;
 
     protected $fillable = [
         'subscription_id',

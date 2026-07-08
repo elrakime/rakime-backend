@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('branch_id')->nullable()->constrained();
             $table->string('name');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

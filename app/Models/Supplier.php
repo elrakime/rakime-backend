@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasUserstamps;
 
 class Supplier extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = ['name', 'phone', 'email', 'address', 'is_active'];

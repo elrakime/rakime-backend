@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('reference');
             $table->string('note')->nullable();
             $table->timestamp('approved_at')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

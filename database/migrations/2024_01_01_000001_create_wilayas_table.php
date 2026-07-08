@@ -11,6 +11,8 @@ return new class extends Migration
         Schema::create('wilayas', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

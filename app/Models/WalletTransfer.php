@@ -6,9 +6,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUserstamps;
 
 class WalletTransfer extends Model
 {
+    use HasUserstamps;
 
     protected $fillable = [
         'from_wallet_id',

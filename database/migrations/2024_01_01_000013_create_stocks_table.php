@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('inventory_id')->constrained();
             $table->foreignId('product_id')->constrained();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

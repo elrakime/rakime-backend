@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasUserstamps;
 
 class Sale extends Model
 {
     use LogsActivity;
+    use HasUserstamps;
 
     protected $fillable = [
         'user_id',

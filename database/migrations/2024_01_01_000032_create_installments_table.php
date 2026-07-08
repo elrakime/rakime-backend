@@ -18,6 +18,8 @@ return new class extends Migration
             $table->enum('status', InstallmentStatus::keys())->default(InstallmentStatus::default()->value);
             $table->string('payment_method', 50);
             $table->date('due_date');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

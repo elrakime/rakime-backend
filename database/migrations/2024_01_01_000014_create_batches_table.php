@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedInteger('purchase_price');
             $table->unsignedInteger('initial_quantity');
             $table->unsignedInteger('current_quantity');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

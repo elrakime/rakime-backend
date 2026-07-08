@@ -6,9 +6,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUserstamps;
 
 class ContractItem extends Model
 {
+    use HasUserstamps;
 
     protected $fillable = [
         'contract_id',

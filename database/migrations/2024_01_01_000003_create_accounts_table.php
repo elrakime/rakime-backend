@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedTinyInteger('draw_day');
             $table->unsignedInteger('min_withdraw_amount');
             $table->unsignedInteger('max_withdraw_count');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -14,6 +14,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->unsignedInteger('quantity');
             $table->unsignedInteger('price');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

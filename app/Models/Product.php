@@ -12,11 +12,13 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Traits\HasUserstamps;
 
 class Product extends Model implements HasMedia
 {
     use InteractsWithMedia;
     use LogsActivity;
+    use HasUserstamps;
 
 
     protected $fillable = [

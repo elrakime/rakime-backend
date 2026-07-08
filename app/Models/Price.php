@@ -7,9 +7,11 @@ namespace App\Models;
 use App\Enums\PriceType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUserstamps;
 
 class Price extends Model
 {
+    use HasUserstamps;
     protected $fillable = [
         'stock_id',
         'type',

@@ -8,9 +8,11 @@ use App\Enums\InventoryMovementType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUserstamps;
 
 class InventoryMovement extends Model
 {
+    use HasUserstamps;
     
 
     protected $fillable = [
