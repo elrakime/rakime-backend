@@ -325,7 +325,6 @@ Table stocks {
 
 Table sales {
   id           int             [pk]
-  user_id      int             [ref: > users.id]
   client_id    int             [ref: > clients.id]
   reference    varchar
   status       purchase_status

@@ -11,7 +11,6 @@ return new class extends Migration
     {
         Schema::create('restocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->foreignId('branch_id')->constrained();
             $table->string('reference');
             $table->enum('status', RestockStatus::keys())->default(RestockStatus::default()->value);

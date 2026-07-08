@@ -35,7 +35,6 @@ class ExpirationController extends Controller
 
         try {
             $validated = $this->validateRequest($request);
-            $validated['user_id'] = $request->user()->id;
 
             $expiration = $this->expirationService->create($validated);
 

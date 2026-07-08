@@ -15,7 +15,6 @@ class Expiration extends Model
     use HasUserstamps;
 
     protected $fillable = [
-        'user_id',
         'inventory_id',
         'reference',
         'note',
@@ -41,7 +40,7 @@ class Expiration extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function inventory(): BelongsTo

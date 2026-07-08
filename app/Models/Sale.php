@@ -17,7 +17,6 @@ class Sale extends Model
     use HasUserstamps;
 
     protected $fillable = [
-        'user_id',
         'branch_id',
         'client_id',
         'reference',
@@ -39,7 +38,7 @@ class Sale extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function branch(): BelongsTo

@@ -64,7 +64,6 @@ class SaleService
             $totalAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
 
             $sale = Sale::create([
-                'user_id'      => $data['user_id'] ?? auth()->id(),
                 'branch_id'    => $data['branch_id'],
                 'client_id'    => $data['client_id'] ?? null,
                 'total_amount' => $totalAmount,

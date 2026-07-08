@@ -22,11 +22,11 @@ class ExpirationSeeder extends Seeder
         }
 
         $expiration = Expiration::create([
-            'user_id'      => $user->id,
             'inventory_id' => $inventory->id,
             'reference'    => 'EXP-2024-001',
             'note'         => 'Products expired in storage',
             'approved_at'  => now(),
+            'created_by'   => $user->id,
         ]);
 
         ExpirationItem::create([

@@ -57,7 +57,6 @@ class RestockService
     {
         return DB::transaction(function () use ($data) {
             $restock = Restock::create([
-                'user_id'   => $data['user_id'] ?? auth()->id(),
                 'branch_id' => $data['branch_id'],
                 'status'    => RestockStatus::DRAFT,
                 'note'      => $data['note'] ?? null,

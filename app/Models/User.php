@@ -66,12 +66,12 @@ class User extends Authenticatable implements HasMedia
 
     public function sales(): HasMany
     {
-        return $this->hasMany(Sale::class);
+        return $this->hasMany(Sale::class, 'created_by');
     }
 
     public function restockOrders(): HasMany
     {
-        return $this->hasMany(Restock::class);
+        return $this->hasMany(Restock::class, 'created_by');
     }
 
     public function cashPaymentsReceived(): HasMany
@@ -81,12 +81,12 @@ class User extends Authenticatable implements HasMedia
 
     public function installmentContracts(): HasMany
     {
-        return $this->hasMany(Contract::class);
+        return $this->hasMany(Contract::class, 'created_by');
     }
 
     public function productExpirations(): HasMany
     {
-        return $this->hasMany(Expiration::class);
+        return $this->hasMany(Expiration::class, 'created_by');
     }
 
     public function walletMovements(): HasMany

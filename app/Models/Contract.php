@@ -19,7 +19,6 @@ class Contract extends Model
     use HasUserstamps;
 
     protected $fillable = [
-        'user_id',
         'client_id',
         'account_id',
         'branch_id',
@@ -90,7 +89,7 @@ class Contract extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function client(): BelongsTo

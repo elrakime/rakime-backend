@@ -23,7 +23,6 @@ class ExpirationService
             ->with(['user', 'inventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
-                AllowedFilter::exact('user_id'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%")
@@ -44,7 +43,6 @@ class ExpirationService
     {
         return DB::transaction(function () use ($data) {
             $expiration = Expiration::create([
-                'user_id'      => $data['user_id'],
                 'inventory_id' => $data['inventory_id'],
                 'note'         => $data['note'] ?? null,
             ]);

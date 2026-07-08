@@ -11,7 +11,6 @@ class ExpirationResource extends JsonResource
     {
         return [
             'id'           => $this->id,
-            'user_id'      => $this->user_id,
             'inventory_id' => $this->inventory_id,
             'reference'    => $this->reference,
             'note'         => $this->note,

@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('client_id')->nullable()->constrained()->nullOnDelete();
             $table->string('reference');
