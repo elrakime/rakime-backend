@@ -23,10 +23,11 @@ class PurchaseService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Purchase::class, $request)
-            ->with(['supplier', 'items.product'])
+            ->with(['supplier', 'items.product', 'inventory'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),
+                AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
@@ -72,7 +73,7 @@ class PurchaseService
 
     public function show(Purchase $purchase): Purchase
     {
-        return $purchase->loadMissing(['supplier', 'items.product', 'payments']);
+        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'inventory']);
     }
 
     public function update(Purchase $purchase, array $data): Purchase

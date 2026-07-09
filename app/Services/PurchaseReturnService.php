@@ -25,9 +25,12 @@ class PurchaseReturnService
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
             ->where('purchase_id', $purchase->id)
-            ->with(['purchase', 'items.purchaseItem.product'])
+            ->with(['purchase.inventory', 'items.purchaseItem.product'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
+                AllowedFilter::callback('inventory_id', function ($query, $value) {
+                    $query->whereHas('purchase', fn ($q) => $q->where('inventory_id', $value));
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%");
@@ -97,7 +100,7 @@ class PurchaseReturnService
 
     public function show(PurchaseReturn $purchaseReturn): PurchaseReturn
     {
-        return $purchaseReturn->loadMissing(['purchase', 'items.purchaseItem.product']);
+        return $purchaseReturn->loadMissing(['purchase.inventory', 'items.purchaseItem.product']);
     }
 
     public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
