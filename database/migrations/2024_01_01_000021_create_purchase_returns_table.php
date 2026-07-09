@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\PurchaseReturnStatus;
 
 return new class extends Migration
 {
@@ -13,6 +14,7 @@ return new class extends Migration
             $table->foreignId('purchase_id')->constrained();
             $table->string('reference');
             $table->string('note')->nullable();
+            $table->string('status')->default(PurchaseReturnStatus::PENDING->value);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

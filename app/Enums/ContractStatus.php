@@ -6,7 +6,6 @@ namespace App\Enums;
 
 enum ContractStatus: string
 {
-    case DRAFT     = 'draft';
     case PENDING   = 'pending';
     case APPROVED  = 'approved';
     case REJECTED  = 'rejected';
@@ -45,7 +44,6 @@ enum ContractStatus: string
     public function get_color(): string
     {
         return match ($this) {
-            self::DRAFT     => 'gray',
             self::PENDING   => 'amber',
             self::APPROVED  => 'blue',
             self::REJECTED  => 'red',
@@ -59,6 +57,6 @@ enum ContractStatus: string
 
     public static function default(): self
     {
-        return self::DRAFT;
+        return self::PENDING;
     }
 }

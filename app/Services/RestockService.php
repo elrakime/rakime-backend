@@ -58,7 +58,7 @@ class RestockService
         return DB::transaction(function () use ($data) {
             $restock = Restock::create([
                 'branch_id' => $data['branch_id'],
-                'status'    => RestockStatus::DRAFT,
+                'status'    => RestockStatus::PENDING,
                 'note'      => $data['note'] ?? null,
             ]);
 
@@ -82,7 +82,7 @@ class RestockService
 
     public function update(Restock $restock, array $data): Restock
     {
-        if ($restock->status !== RestockStatus::DRAFT) {
+        if ($restock->status !== RestockStatus::PENDING) {
             throw new Exception(__('restocks.not_draft'), 422);
         }
 
@@ -111,7 +111,7 @@ class RestockService
 
     public function delete(Restock $restock): void
     {
-        if ($restock->status !== RestockStatus::DRAFT) {
+        if ($restock->status !== RestockStatus::PENDING) {
             throw new Exception(__('restocks.not_draft'), 422);
         }
 
@@ -123,18 +123,12 @@ class RestockService
 
     public function submit(Restock $restock): Restock
     {
-        if ($restock->status !== RestockStatus::DRAFT) {
-            throw new Exception(__('restocks.not_draft'), 422);
-        }
-
-        $restock->update(['status' => RestockStatus::SUBMITTED]);
-
         return $restock->fresh()->loadMissing(['user', 'branch', 'items.product']);
     }
 
     public function cancel(Restock $restock): Restock
     {
-        if (!in_array($restock->status, [RestockStatus::DRAFT, RestockStatus::SUBMITTED])) {
+        if ($restock->status !== RestockStatus::PENDING) {
             throw new Exception(__('restocks.cannot_cancel'), 422);
         }
 
@@ -145,7 +139,7 @@ class RestockService
 
     public function fulfill(Restock $restock, array $data): Restock
     {
-        if ($restock->status !== RestockStatus::SUBMITTED) {
+        if ($restock->status !== RestockStatus::PENDING) {
             throw new Exception(__('restocks.must_be_submitted'), 422);
         }
 

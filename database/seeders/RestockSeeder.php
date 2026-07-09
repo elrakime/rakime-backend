@@ -25,7 +25,7 @@ class RestockSeeder extends Seeder
         $restock = Restock::create([
             'branch_id'    => $branch->id,
             'reference'    => 'RST-2024-001',
-            'status'       => RestockStatus::SUBMITTED,
+            'status'       => RestockStatus::PENDING,
             'note'         => 'Restock request for low inventory',
             'created_by'   => $user->id,
         ]);

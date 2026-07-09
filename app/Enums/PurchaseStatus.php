@@ -6,10 +6,10 @@ namespace App\Enums;
 
 enum PurchaseStatus: string
 {
-    case DRAFT         = 'draft';
-    case RECEIVED      = 'received';
-    case PAID          = 'paid';
-    case PARTIALLY_PAID = 'partially_paid';
+    case PENDING         = 'pending';
+    case RECEIVED        = 'received';
+    case PAID            = 'paid';
+    case PARTIALLY_PAID  = 'partially_paid';
 
     public static function keys(): array
     {
@@ -40,15 +40,15 @@ enum PurchaseStatus: string
     public function get_color(): string
     {
         return match ($this) {
-            self::DRAFT          => 'gray',
-            self::RECEIVED       => 'blue',
-            self::PAID           => 'green',
-            self::PARTIALLY_PAID => 'amber',
+            self::PENDING         => 'amber',
+            self::RECEIVED        => 'blue',
+            self::PAID            => 'green',
+            self::PARTIALLY_PAID  => 'orange',
         };
     }
 
     public static function default(): self
     {
-        return self::DRAFT;
+        return self::PENDING;
     }
 }

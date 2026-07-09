@@ -52,7 +52,7 @@ class PurchaseService
 
             $purchase = Purchase::create([
                 'supplier_id'  => $data['supplier_id'],
-                'status'       => PurchaseStatus::DRAFT,
+                'status'       => PurchaseStatus::PENDING,
                 'total_amount' => $totalAmount,
                 'paid_amount'  => 0,
                 'note'         => $data['note'] ?? null,
@@ -77,7 +77,7 @@ class PurchaseService
 
     public function update(Purchase $purchase, array $data): Purchase
     {
-        if ($purchase->status !== PurchaseStatus::DRAFT) {
+        if ($purchase->status !== PurchaseStatus::PENDING) {
             throw new Exception(__('purchases.not_draft'), 422);
         }
 
@@ -110,7 +110,7 @@ class PurchaseService
 
     public function delete(Purchase $purchase): void
     {
-        if ($purchase->status !== PurchaseStatus::DRAFT) {
+        if ($purchase->status !== PurchaseStatus::PENDING) {
             throw new Exception(__('purchases.not_draft'), 422);
         }
 
@@ -119,7 +119,7 @@ class PurchaseService
 
     public function receive(Purchase $purchase, array $data): Purchase
     {
-        if ($purchase->status !== PurchaseStatus::DRAFT) {
+        if ($purchase->status !== PurchaseStatus::PENDING) {
             throw new Exception(__('purchases.not_draft'), 422);
         }
 

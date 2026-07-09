@@ -22,7 +22,7 @@ class PurchasePaymentService
 
     public function create(Purchase $purchase, array $data): PurchasePayment
     {
-        if ($purchase->status === PurchaseStatus::DRAFT) {
+        if ($purchase->status === PurchaseStatus::PENDING) {
             throw new Exception(__('purchases.must_be_received'), 422);
         }
 
@@ -63,7 +63,7 @@ class PurchasePaymentService
 
     public function cancel(Purchase $purchase, PurchasePayment $payment): PurchasePayment
     {
-        if ($purchase->status === PurchaseStatus::DRAFT) {
+        if ($purchase->status === PurchaseStatus::PENDING) {
             throw new Exception(__('purchases.must_be_received'), 422);
         }
 

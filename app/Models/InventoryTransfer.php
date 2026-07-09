@@ -10,19 +10,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Traits\HasStatusHistory;
 use App\Traits\HasUserstamps;
+use App\Enums\InventoryTransferStatus;
 
 class InventoryTransfer extends Model
 {
     use LogsActivity;
+    use HasStatusHistory;
     use HasUserstamps;
-
 
     protected $fillable = [
         'from_inventory_id',
         'to_inventory_id',
         'note',
+        'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => InventoryTransferStatus::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -57,5 +67,15 @@ class InventoryTransfer extends Model
     public function inventoryMovements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'source_id');
+    }
+
+    public function scopeReceived($query)
+    {
+        return $query->where('status', InventoryTransferStatus::RECEIVED);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', InventoryTransferStatus::PENDING);
     }
 }

@@ -43,14 +43,9 @@ class Restock extends Model
         return LogOptions::defaults()->logFillable();
     }
 
-    public function scopeDraft(Builder $query): void
+    public function scopePending(Builder $query): void
     {
-        $query->where('status', RestockStatus::DRAFT);
-    }
-
-    public function scopeSubmitted(Builder $query): void
-    {
-        $query->where('status', RestockStatus::SUBMITTED);
+        $query->where('status', RestockStatus::PENDING);
     }
 
     public function scopeFulfilled(Builder $query): void

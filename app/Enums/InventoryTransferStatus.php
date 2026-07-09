@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum RestockStatus: string
+enum InventoryTransferStatus: string
 {
-    case PENDING   = 'pending';
-    case FULFILLED = 'fulfilled';
-    case CANCELLED = 'cancelled';
+    case PENDING     = 'pending';
+    case TRANSFERRED = 'transferred';
+    case RECEIVED    = 'received';
+    case CANCELED    = 'canceled';
 
     public static function keys(): array
     {
@@ -33,15 +34,16 @@ enum RestockStatus: string
 
     public function get_name(): string
     {
-        return __('enums.restock_status.' . $this->value);
+        return __('enums.inventory_transfer_status.' . $this->value);
     }
 
     public function get_color(): string
     {
         return match ($this) {
-            self::PENDING   => 'amber',
-            self::FULFILLED => 'green',
-            self::CANCELLED => 'red',
+            self::PENDING     => 'amber',
+            self::TRANSFERRED => 'blue',
+            self::RECEIVED    => 'green',
+            self::CANCELED    => 'red',
         };
     }
 

@@ -45,9 +45,9 @@ class Purchase extends Model
         return LogOptions::defaults()->logFillable();
     }
 
-    public function scopeDraft(Builder $query): void
+    public function scopePending(Builder $query): void
     {
-        $query->where('status', PurchaseStatus::DRAFT);
+        $query->where('status', PurchaseStatus::PENDING);
     }
 
     public function scopeReceived(Builder $query): void

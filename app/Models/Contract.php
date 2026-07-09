@@ -52,9 +52,9 @@ class Contract extends Model
         return LogOptions::defaults()->logFillable();
     }
 
-    public function scopeDraft(Builder $query): void
+    public function scopePending(Builder $query): void
     {
-        $query->where('status', ContractStatus::DRAFT);
+        $query->where('status', ContractStatus::PENDING);
     }
 
     public function scopePending(Builder $query): void
