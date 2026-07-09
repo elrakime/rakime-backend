@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasUserstamps
 {
+    public function initializeHasUserstamps(): void
+    {
+        $this->with = array_unique(array_merge($this->with, ['creator', 'updater']));
+    }
+
     public static function bootHasUserstamps(): void
     {
         static::creating(function ($model) {
