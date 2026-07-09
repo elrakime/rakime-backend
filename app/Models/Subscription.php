@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasStatusHistory;
 use App\Traits\HasUserstamps;
 
 class Subscription extends Model
 {
+    use HasStatusHistory;
     use HasUserstamps;
 
     protected $fillable = [
