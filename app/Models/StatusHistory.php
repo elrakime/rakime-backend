@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class StatusHistory extends Model
 {
-    protected $fillable = ['from_status', 'to_status', 'changed_by', 'note'];
+    protected $fillable = ['from_status', 'to_status', 'changed_by', 'changed_at', 'note'];
 
     public function statusable(): MorphTo
     {

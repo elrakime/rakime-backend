@@ -16,6 +16,7 @@ trait HasStatusHistory
                     'from_status' => $model->getOriginal('status'),
                     'to_status'   => $model->status,
                     'changed_by'  => auth()->id(),
+                    'changed_at'  => now(),
                 ]);
             }
         });
