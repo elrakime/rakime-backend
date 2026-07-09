@@ -165,7 +165,6 @@ class PurchaseService
 
                 InventoryMovement::create([
                     'stock_id'      => $stock->id,
-                    'batch_id'      => $batch->id,
                     'inventory_id'  => $inventoryId,
                     'product_id'    => $item->product_id,
                     'source_id'   => $purchase->id,

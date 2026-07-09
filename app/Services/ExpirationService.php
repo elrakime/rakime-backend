@@ -109,21 +109,20 @@ class ExpirationService
                     $deduct = min($remaining, $batch->current_quantity);
                     $batch->decrement('current_quantity', $deduct);
 
-                    InventoryMovement::create([
-                        'stock_id'      => $item->stock_id,
-                        'batch_id'      => $batch->id,
-                        'inventory_id'  => $expiration->inventory_id,
-                        'product_id'    => $item->stock->product_id,
-                        'source_id'   => $expiration->id,
-                        'movement_type' => InventoryMovementType::EXPIRED,
-                        'quantity'      => $deduct,
-                    ]);
-
                     $remaining -= $deduct;
                     if ($remaining <= 0) {
                         break;
                     }
                 }
+
+                InventoryMovement::create([
+                    'stock_id'      => $item->stock_id,
+                    'inventory_id'  => $expiration->inventory_id,
+                    'product_id'    => $item->stock->product_id,
+                    'source_id'   => $expiration->id,
+                    'movement_type' => InventoryMovementType::EXPIRED,
+                    'quantity'      => $item->quantity,
+                ]);
             }
 
             return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);

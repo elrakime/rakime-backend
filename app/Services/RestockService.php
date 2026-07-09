@@ -211,7 +211,6 @@ class RestockService
             // Record inventory movement for receiving the purchase
             InventoryMovement::create([
                 'stock_id'      => $stock->id,
-                'batch_id'      => $batch->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
                 'source_id'   => $purchase->id,
@@ -222,7 +221,6 @@ class RestockService
             // Record inventory movement for the restock fulfillment
             InventoryMovement::create([
                 'stock_id'      => $stock->id,
-                'batch_id'      => $batch->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
                 'source_id'   => $restock->id,
@@ -285,7 +283,6 @@ class RestockService
 
                 InventoryMovement::create([
                     'stock_id'      => $fromStock->id,
-                    'batch_id'      => $fromBatch?->id,
                     'inventory_id'  => $fromInventoryId,
                     'product_id'    => $restockItem->product_id,
                     'source_id'   => $transfer->id,
@@ -312,7 +309,6 @@ class RestockService
             // Record transfer-in movement
             InventoryMovement::create([
                 'stock_id'      => $toStock->id,
-                'batch_id'      => $toBatch->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
                 'source_id'   => $transfer->id,
@@ -323,7 +319,6 @@ class RestockService
             // Record restock fulfillment movement
             InventoryMovement::create([
                 'stock_id'      => $toStock->id,
-                'batch_id'      => $toBatch->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
                 'source_id'   => $restock->id,

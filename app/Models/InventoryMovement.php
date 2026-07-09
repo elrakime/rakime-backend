@@ -17,7 +17,6 @@ class InventoryMovement extends Model
 
     protected $fillable = [
         'stock_id',
-        'batch_id',
         'inventory_id',
         'product_id',
         'source_id',
@@ -61,11 +60,6 @@ class InventoryMovement extends Model
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
-    }
-
-    public function batch(): BelongsTo
-    {
-        return $this->belongsTo(Batch::class);
     }
 
     public function inventory(): BelongsTo

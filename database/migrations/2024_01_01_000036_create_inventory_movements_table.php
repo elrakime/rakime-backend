@@ -13,7 +13,6 @@ return new class extends Migration
         Schema::create('inventory_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('stock_id')->constrained();
-            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->foreignId('inventory_id')->constrained();
             $table->foreignId('product_id')->constrained();
             $table->nullableMorphs('source');

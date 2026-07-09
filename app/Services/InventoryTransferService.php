@@ -107,7 +107,6 @@ class InventoryTransferService
 
                     InventoryMovement::create([
                         'stock_id'      => $fromStock->id,
-                        'batch_id'      => $fromBatch?->id,
                         'inventory_id'  => $transfer->from_inventory_id,
                         'product_id'    => $transferItem->stock->product_id,
                         'source_id'   => $transfer->id,
@@ -132,7 +131,6 @@ class InventoryTransferService
 
                 InventoryMovement::create([
                     'stock_id'      => $toStock->id,
-                    'batch_id'      => $toBatch->id,
                     'inventory_id'  => $transfer->to_inventory_id,
                     'product_id'    => $transferItem->stock->product_id,
                     'source_id'   => $transfer->id,

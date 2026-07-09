@@ -12,7 +12,6 @@ class InventoryMovementResource extends JsonResource
         return [
             'id'            => $this->id,
             'stock_id'      => $this->stock_id,
-            'batch_id'      => $this->batch_id,
             'inventory_id'  => $this->inventory_id,
             'product_id'    => $this->product_id,
             'source_id'     => $this->source_id,
@@ -33,10 +32,6 @@ class InventoryMovementResource extends JsonResource
             ]),
             'stock' => $this->whenLoaded('stock', fn () => [
                 'id' => $this->stock->id,
-            ]),
-            'batch' => $this->whenLoaded('batch', fn () => [
-                'id'               => $this->batch->id,
-                'current_quantity' => $this->batch->current_quantity,
             ]),
         ];
     }

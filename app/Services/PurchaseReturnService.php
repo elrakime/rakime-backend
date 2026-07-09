@@ -123,7 +123,6 @@ class PurchaseReturnService
 
                     InventoryMovement::create([
                         'stock_id'      => $batch->stock_id,
-                        'batch_id'      => $batch->id,
                         'inventory_id'  => $batch->stock->inventory_id,
                         'product_id'    => $purchaseItem->product_id,
                         'source_id'   => $purchaseReturn->id,

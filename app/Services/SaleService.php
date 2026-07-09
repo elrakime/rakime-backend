@@ -148,21 +148,21 @@ class SaleService
                 $deduct = min($remaining, $batch->current_quantity);
                 $batch->decrement('current_quantity', $deduct);
 
-                InventoryMovement::create([
-                    'stock_id'      => $item->stock_id,
-                    'batch_id'      => $batch->id,
-                    'inventory_id'  => $batch->stock->inventory_id,
-                    'product_id'    => $item->product_id,
-                    'source_id'   => $sale->id,
-                    'movement_type' => InventoryMovementType::SALE,
-                    'quantity'      => $deduct,
-                ]);
-
                 $remaining -= $deduct;
                 if ($remaining <= 0) {
                     break;
                 }
             }
+
+            $firstBatch = $batches->first();
+            InventoryMovement::create([
+                'stock_id'      => $item->stock_id,
+                'inventory_id'  => $firstBatch?->stock->inventory_id,
+                'product_id'    => $item->product_id,
+                'source_id'     => $sale->id,
+                'movement_type' => InventoryMovementType::SALE,
+                'quantity'      => $item->quantity,
+            ]);
         }
     }
 

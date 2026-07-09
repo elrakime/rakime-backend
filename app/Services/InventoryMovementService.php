@@ -14,12 +14,11 @@ class InventoryMovementService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(InventoryMovement::class, $request)
-            ->with(['stock.product', 'batch', 'inventory', 'product'])
+            ->with(['stock.product', 'inventory', 'product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('stock_id'),
                 AllowedFilter::exact('product_id'),
-                AllowedFilter::exact('batch_id'),
                 AllowedFilter::exact('movement_type'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
