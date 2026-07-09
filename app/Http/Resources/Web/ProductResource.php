@@ -30,6 +30,8 @@ class ProductResource extends JsonResource
             'min_quantity' => $this->min_quantity,
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
+            'created_by'   => new AvatarResource($this->whenLoaded('creator')),
+            'updated_by'   => new AvatarResource($this->whenLoaded('updater')),
         ];
     }
 }

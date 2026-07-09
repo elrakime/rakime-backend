@@ -18,6 +18,8 @@ class WalletResource extends JsonResource
             'owner'      => $this->whenLoaded('owner'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'created_by' => new UserResource($this->whenLoaded('creator')),
+            'updated_by' => new UserResource($this->whenLoaded('updater')),S
         ];
     }
 }

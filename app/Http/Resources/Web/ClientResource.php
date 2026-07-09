@@ -33,6 +33,8 @@ class ClientResource extends JsonResource
             'eccp'       => $this->eccp,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'created_by' => new AvatarResource($this->whenLoaded('creator')),
+            'updated_by' => new AvatarResource($this->whenLoaded('updater')),
         ];
     }
 }

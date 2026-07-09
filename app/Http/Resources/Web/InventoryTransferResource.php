@@ -16,6 +16,8 @@ class InventoryTransferResource extends JsonResource
             'note'              => $this->note,
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
+            'created_by'        => new AvatarResource($this->whenLoaded('creator')),
+            'updated_by'        => new AvatarResource($this->whenLoaded('updater')),
 
             'from_inventory' => new InventoryResource($this->whenLoaded('fromInventory')),
             'to_inventory'   => new InventoryResource($this->whenLoaded('toInventory')),

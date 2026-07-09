@@ -20,6 +20,8 @@ class StockResource extends JsonResource
             'product_id'   => $this->product_id,
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
+            'created_by'   => new AvatarResource($this->whenLoaded('creator')),
+            'updated_by'   => new AvatarResource($this->whenLoaded('updater')),
             
             'selling_price' => $this->whenLoaded('sellingPrice', fn () => $this->sellingPrice?->amount),
             'installment_price' => $this->whenLoaded('installmentPrice', fn () => $this->installmentPrice?->amount),
