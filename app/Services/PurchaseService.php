@@ -125,7 +125,8 @@ class PurchaseService
 
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update([
-                'status'      => PurchaseStatus::RECEIVED,
+                'status'       => PurchaseStatus::RECEIVED,
+                'inventory_id' => $data['inventory_id'],
             ]);
 
             $inventoryId = $data['inventory_id'];

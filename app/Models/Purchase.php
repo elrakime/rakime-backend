@@ -24,6 +24,7 @@ class Purchase extends Model
 
     protected $fillable = [
         'supplier_id',
+        'inventory_id',
         'reference',
         'status',
         'total_amount',
@@ -34,9 +35,10 @@ class Purchase extends Model
     protected function casts(): array
     {
         return [
-            'status'       => PurchaseStatus::class,
-            'total_amount' => 'integer',
-            'paid_amount'  => 'integer',
+            'status'        => PurchaseStatus::class,
+            'total_amount'  => 'integer',
+            'paid_amount'   => 'integer',
+            'inventory_id'  => 'integer',
         ];
     }
 
@@ -63,6 +65,11 @@ class Purchase extends Model
     public function scopePartiallyPaid(Builder $query): void
     {
         $query->where('status', PurchaseStatus::PARTIALLY_PAID);
+    }
+
+    public function inventory(): BelongsTo
+    {
+        return $this->belongsTo(Inventory::class);
     }
 
     public function supplier(): BelongsTo
