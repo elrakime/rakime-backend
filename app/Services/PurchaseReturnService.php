@@ -119,14 +119,18 @@ class PurchaseReturnService
                     ->first();
 
                 if ($batch) {
+                    $oldQuantity = $batch->stock->batches()->sum('current_quantity');
                     $batch->decrement('current_quantity', $returnItem->quantity);
 
                     InventoryMovement::create([
                         'stock_id'      => $batch->stock_id,
                         'inventory_id'  => $batch->stock->inventory_id,
                         'product_id'    => $purchaseItem->product_id,
-                        'source_id'   => $purchaseReturn->id,
+                        'source_id'     => $purchaseReturn->id,
+                        'source_type'   => PurchaseReturn::class,
                         'movement_type' => InventoryMovementType::RETURN,
+                        'old_quantity'  => $oldQuantity,
+                        'new_quantity'  => $oldQuantity - $returnItem->quantity,
                         'quantity'      => $returnItem->quantity,
                     ]);
                 }

@@ -199,6 +199,8 @@ class RestockService
                 'product_id'   => $restockItem->product_id,
             ]);
 
+            $oldQuantity = $stock->batches()->sum('current_quantity');
+
             // Create batch for this purchase item
             $batch = $stock->batches()->create([
                 'source_id'        => $purchaseItem->id,
@@ -213,8 +215,11 @@ class RestockService
                 'stock_id'      => $stock->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
-                'source_id'   => $purchase->id,
+                'source_id'     => $purchase->id,
+                'source_type'   => Purchase::class,
                 'movement_type' => InventoryMovementType::RECEIVE,
+                'old_quantity'  => $oldQuantity,
+                'new_quantity'  => $oldQuantity + $quantity,
                 'quantity'      => $quantity,
             ]);
 
@@ -223,8 +228,11 @@ class RestockService
                 'stock_id'      => $stock->id,
                 'inventory_id'  => $inventory->id,
                 'product_id'    => $restockItem->product_id,
-                'source_id'   => $restock->id,
+                'source_id'     => $restock->id,
+                'source_type'   => Restock::class,
                 'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
+                'old_quantity'  => $oldQuantity,
+                'new_quantity'  => $oldQuantity + $quantity,
                 'quantity'      => $quantity,
             ]);
 
@@ -277,6 +285,8 @@ class RestockService
                     ->orderBy('created_at')
                     ->first();
 
+                $oldQuantity = $fromStock->batches()->sum('current_quantity');
+
                 if ($fromBatch) {
                     $fromBatch->decrement('current_quantity', $quantity);
                 }
@@ -285,8 +295,11 @@ class RestockService
                     'stock_id'      => $fromStock->id,
                     'inventory_id'  => $fromInventoryId,
                     'product_id'    => $restockItem->product_id,
-                    'source_id'   => $transfer->id,
+                    'source_id'     => $transfer->id,
+                    'source_type'   => InventoryTransfer::class,
                     'movement_type' => InventoryMovementType::TRANSFER_OUT,
+                    'old_quantity'  => $oldQuantity,
+                    'new_quantity'  => $oldQuantity - $quantity,
                     'quantity'      => $quantity,
                 ]);
             }
@@ -296,6 +309,8 @@ class RestockService
                 'inventory_id' => $toInventory->id,
                 'product_id'   => $restockItem->product_id,
             ]);
+
+            $oldQuantity = $toStock->batches()->sum('current_quantity');
 
             // Create batch for the received transfer item
             $toBatch = $toStock->batches()->create([
@@ -311,8 +326,11 @@ class RestockService
                 'stock_id'      => $toStock->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
-                'source_id'   => $transfer->id,
+                'source_id'     => $transfer->id,
+                'source_type'   => InventoryTransfer::class,
                 'movement_type' => InventoryMovementType::TRANSFER_IN,
+                'old_quantity'  => $oldQuantity,
+                'new_quantity'  => $oldQuantity + $quantity,
                 'quantity'      => $quantity,
             ]);
 
@@ -321,8 +339,11 @@ class RestockService
                 'stock_id'      => $toStock->id,
                 'inventory_id'  => $toInventory->id,
                 'product_id'    => $restockItem->product_id,
-                'source_id'   => $restock->id,
+                'source_id'     => $restock->id,
+                'source_type'   => Restock::class,
                 'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
+                'old_quantity'  => $oldQuantity,
+                'new_quantity'  => $oldQuantity + $quantity,
                 'quantity'      => $quantity,
             ]);
 

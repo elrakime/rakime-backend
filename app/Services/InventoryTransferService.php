@@ -101,6 +101,8 @@ class InventoryTransferService
                         ->orderBy('created_at')
                         ->first();
 
+                    $oldQuantity = $fromStock->batches()->sum('current_quantity');
+
                     if ($fromBatch) {
                         $fromBatch->decrement('current_quantity', $transferItem->quantity);
                     }
@@ -109,8 +111,11 @@ class InventoryTransferService
                         'stock_id'      => $fromStock->id,
                         'inventory_id'  => $transfer->from_inventory_id,
                         'product_id'    => $transferItem->stock->product_id,
-                        'source_id'   => $transfer->id,
+                        'source_id'     => $transfer->id,
+                        'source_type'   => InventoryTransfer::class,
                         'movement_type' => InventoryMovementType::TRANSFER_OUT,
+                        'old_quantity'  => $oldQuantity,
+                        'new_quantity'  => $oldQuantity - $transferItem->quantity,
                         'quantity'      => $transferItem->quantity,
                     ]);
                 }
@@ -120,6 +125,8 @@ class InventoryTransferService
                     'inventory_id' => $transfer->to_inventory_id,
                     'product_id'   => $transferItem->stock->product_id,
                 ]);
+
+                $oldQuantity = $toStock->batches()->sum('current_quantity');
 
                 $toBatch = $toStock->batches()->create([
                     'source_id'        => $transferItem->id,
@@ -133,8 +140,11 @@ class InventoryTransferService
                     'stock_id'      => $toStock->id,
                     'inventory_id'  => $transfer->to_inventory_id,
                     'product_id'    => $transferItem->stock->product_id,
-                    'source_id'   => $transfer->id,
+                    'source_id'     => $transfer->id,
+                    'source_type'   => InventoryTransfer::class,
                     'movement_type' => InventoryMovementType::TRANSFER_IN,
+                    'old_quantity'  => $oldQuantity,
+                    'new_quantity'  => $oldQuantity + $transferItem->quantity,
                     'quantity'      => $transferItem->quantity,
                 ]);
             }

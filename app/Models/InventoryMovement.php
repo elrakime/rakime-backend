@@ -20,7 +20,10 @@ class InventoryMovement extends Model
         'inventory_id',
         'product_id',
         'source_id',
+        'source_type',
         'movement_type',
+        'old_quantity',
+        'new_quantity',
         'quantity',
     ];
 
@@ -28,6 +31,8 @@ class InventoryMovement extends Model
     {
         return [
             'movement_type' => InventoryMovementType::class,
+            'old_quantity'  => 'integer',
+            'new_quantity'  => 'integer',
             'quantity'      => 'integer',
             'created_at'    => 'datetime',
         ];
@@ -73,20 +78,14 @@ class InventoryMovement extends Model
     }
 
     /**
-     * Resolve the polymorphic moveable based on movement_type.
-     * No type column exists in DB; movement_type determines the model.
+     * Resolve the polymorphic source model via source_type column.
      */
     public function getSource(): ?Model
     {
-        return match ($this->movement_type) {
-            InventoryMovementType::RECEIVE          => Purchase::find($this->source_id),
-            InventoryMovementType::RETURN           => PurchaseReturn::find($this->source_id),
-            InventoryMovementType::TRANSFER_IN,
-            InventoryMovementType::TRANSFER_OUT     => InventoryTransfer::find($this->source_id),
-            InventoryMovementType::SALE             => Sale::find($this->source_id),
-            InventoryMovementType::EXPIRED          => Expiration::find($this->source_id),
-            InventoryMovementType::RESTOCK_RECEIVED => Restock::find($this->source_id),
-            default                                 => null,
-        };
+        if (! $this->source_type || ! $this->source_id) {
+            return null;
+        }
+
+        return $this->source_type::find($this->source_id);
     }
 }

@@ -143,6 +143,8 @@ class PurchaseService
                     'product_id'   => $item->product_id,
                 ]);
 
+                $oldQuantity = $stock->batches()->sum('current_quantity');
+
                 $batch = $stock->batches()->create([
                     'source_id'        => $item->id,
                     'source_type'      => PurchaseItem::class,
@@ -167,8 +169,11 @@ class PurchaseService
                     'stock_id'      => $stock->id,
                     'inventory_id'  => $inventoryId,
                     'product_id'    => $item->product_id,
-                    'source_id'   => $purchase->id,
+                    'source_id'     => $purchase->id,
+                    'source_type'   => Purchase::class,
                     'movement_type' => InventoryMovementType::RECEIVE,
+                    'old_quantity'  => $oldQuantity,
+                    'new_quantity'  => $oldQuantity + $item->quantity,
                     'quantity'      => $item->quantity,
                 ]);
             }

@@ -144,6 +144,8 @@ class SaleService
                 ->orderBy('created_at')
                 ->get();
 
+            $oldQuantity = $batches->sum('current_quantity');
+
             foreach ($batches as $batch) {
                 $deduct = min($remaining, $batch->current_quantity);
                 $batch->decrement('current_quantity', $deduct);
@@ -160,7 +162,10 @@ class SaleService
                 'inventory_id'  => $firstBatch?->stock->inventory_id,
                 'product_id'    => $item->product_id,
                 'source_id'     => $sale->id,
+                'source_type'   => Sale::class,
                 'movement_type' => InventoryMovementType::SALE,
+                'old_quantity'  => $oldQuantity,
+                'new_quantity'  => $oldQuantity - $item->quantity,
                 'quantity'      => $item->quantity,
             ]);
         }

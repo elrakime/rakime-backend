@@ -105,6 +105,8 @@ class ExpirationService
                     ->orderBy('created_at')
                     ->get();
 
+                $oldQuantity = $batches->sum('current_quantity');
+
                 foreach ($batches as $batch) {
                     $deduct = min($remaining, $batch->current_quantity);
                     $batch->decrement('current_quantity', $deduct);
@@ -119,8 +121,11 @@ class ExpirationService
                     'stock_id'      => $item->stock_id,
                     'inventory_id'  => $expiration->inventory_id,
                     'product_id'    => $item->stock->product_id,
-                    'source_id'   => $expiration->id,
+                    'source_id'     => $expiration->id,
+                    'source_type'   => Expiration::class,
                     'movement_type' => InventoryMovementType::EXPIRED,
+                    'old_quantity'  => $oldQuantity,
+                    'new_quantity'  => $oldQuantity - $item->quantity,
                     'quantity'      => $item->quantity,
                 ]);
             }
