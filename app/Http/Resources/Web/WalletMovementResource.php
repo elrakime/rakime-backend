@@ -24,6 +24,7 @@ class WalletMovementResource extends JsonResource
             'performedBy'    => $this->whenLoaded('performedBy'),
             'source'         => $this->whenLoaded('source'),
             'created_at'     => $this->created_at,
+            'updated_at'     => $this->updated_at,
         ];
     }
 }

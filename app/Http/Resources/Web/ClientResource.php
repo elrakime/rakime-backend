@@ -32,6 +32,7 @@ class ClientResource extends JsonResource
             'ccp_key'    => $this->ccp_key,
             'eccp'       => $this->eccp,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

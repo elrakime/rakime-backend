@@ -19,6 +19,7 @@ class WalletTransferResource extends JsonResource
             'toWallet'       => $this->whenLoaded('toWallet'),
             'performedBy'    => $this->whenLoaded('performedBy'),
             'created_at'     => $this->created_at,
+            'updated_at'     => $this->updated_at,
         ];
     }
 }

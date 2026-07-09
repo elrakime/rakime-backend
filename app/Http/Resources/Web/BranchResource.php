@@ -28,6 +28,7 @@ class BranchResource extends JsonResource
                 'phone' => $u->phone,
             ])),
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

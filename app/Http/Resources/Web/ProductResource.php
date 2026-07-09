@@ -29,6 +29,7 @@ class ProductResource extends JsonResource
             'image'        => $this->getFirstMediaUrl('image') ?: ($this->image ?: null),
             'min_quantity' => $this->min_quantity,
             'created_at'   => $this->created_at,
+            'updated_at'   => $this->updated_at,
         ];
     }
 }

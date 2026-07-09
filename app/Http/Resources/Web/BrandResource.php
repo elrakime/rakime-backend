@@ -14,6 +14,7 @@ class BrandResource extends JsonResource
             'name'       => $this->name,
             'image'      => $this->getFirstMediaUrl('image') ?: null,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

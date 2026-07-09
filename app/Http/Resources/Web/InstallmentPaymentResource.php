@@ -16,6 +16,7 @@ class InstallmentPaymentResource extends JsonResource
             'received_by'    => $this->received_by,
             'note'           => $this->note,
             'created_at'     => $this->created_at,
+            'updated_at'     => $this->updated_at,
 
             'receivedBy' => new UserResource($this->whenLoaded('receivedBy')),
         ];

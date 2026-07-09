@@ -17,6 +17,7 @@ class TypeResource extends JsonResource
                 'name' => $this->category->name,
             ]),
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

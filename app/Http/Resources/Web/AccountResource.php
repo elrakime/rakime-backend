@@ -18,6 +18,7 @@ class AccountResource extends JsonResource
             'min_withdraw_amount' => $this->min_withdraw_amount,
             'max_withdraw_count'  => $this->max_withdraw_count,
             'created_at'          => $this->created_at,
+            'updated_at'          => $this->updated_at,
         ];
     }
 }

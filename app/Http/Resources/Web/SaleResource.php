@@ -17,6 +17,7 @@ class SaleResource extends JsonResource
             'total_amount' => $this->total_amount,
             'note'         => $this->note,
             'created_at'   => $this->created_at,
+            'updated_at'   => $this->updated_at,
 
             'user'   => $this->whenLoaded('user', fn () => [
                 'id'   => $this->user->id,
