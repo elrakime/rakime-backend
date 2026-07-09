@@ -18,6 +18,8 @@ class WalletMovementResource extends JsonResource
                 'color' => $this->movement_type->get_color(),
             ],
             'amount'         => $this->amount,
+            'old_balance'    => $this->old_balance,
+            'new_balance'    => $this->new_balance,
             'source_type'   => $this->source_type,
             'source_id'     => $this->source_id,
             'note'           => $this->note,

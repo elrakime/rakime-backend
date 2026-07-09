@@ -14,6 +14,8 @@ return new class extends Migration
             $table->foreignId('wallet_id')->constrained('wallets');
             $table->enum('movement_type', WalletMovementType::keys());
             $table->decimal('amount', 15, 2);
+            $table->decimal('old_balance', 15, 2)->nullable();
+            $table->decimal('new_balance', 15, 2)->nullable();
             $table->nullableMorphs('source');
             $table->string('note')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

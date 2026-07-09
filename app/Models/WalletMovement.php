@@ -20,6 +20,8 @@ class WalletMovement extends Model
         'wallet_id',
         'movement_type',
         'amount',
+        'old_balance',
+        'new_balance',
         'source_type',
         'source_id',
         'note',
@@ -30,6 +32,8 @@ class WalletMovement extends Model
         return [
             'movement_type' => WalletMovementType::class,
             'amount'        => 'decimal:2',
+            'old_balance'   => 'decimal:2',
+            'new_balance'   => 'decimal:2',
             'created_at'    => 'datetime',
         ];
     }

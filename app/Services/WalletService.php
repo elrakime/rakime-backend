@@ -334,6 +334,7 @@ class WalletService
         ?Model $source = null,
     ): WalletMovement {
         $amount = (float) $amount;
+        $oldBalance = (float) $wallet->balance;
 
         if ($amount > 0) {
             $wallet->increment('balance', $amount);
@@ -341,10 +342,14 @@ class WalletService
             $wallet->decrement('balance', abs($amount));
         }
 
+        $newBalance = $oldBalance + $amount;
+
         return WalletMovement::create([
             'wallet_id' => $wallet->id,
             'movement_type' => $type,
             'amount' => $amount,
+            'old_balance' => $oldBalance,
+            'new_balance' => $newBalance,
             'source_type' => $source ? get_class($source) : null,
             'source_id' => $source?->id,
             'note' => $note,
