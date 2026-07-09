@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedInteger('amount');
             $table->unsignedSmallInteger('total_months');
             $table->enum('status', SubscriptionStatus::keys())->default(SubscriptionStatus::default()->value);
-            $table->timestamp('cancelled_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

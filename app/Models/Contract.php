@@ -32,7 +32,6 @@ class Contract extends Model
         'total_amount',
         'monthly_amount',
         'note',
-        'confirmed_at',
     ];
 
     protected function casts(): array
@@ -44,7 +43,6 @@ class Contract extends Model
             'months_count'   => 'integer',
             'total_amount'   => 'integer',
             'monthly_amount' => 'integer',
-            'confirmed_at'   => 'datetime',
             'created_at'     => 'datetime',
         ];
     }

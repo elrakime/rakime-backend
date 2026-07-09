@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,25 +17,7 @@ class Expiration extends Model
         'inventory_id',
         'reference',
         'note',
-        'approved_at',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'approved_at' => 'datetime',
-        ];
-    }
-
-    public function scopeApproved(Builder $query): void
-    {
-        $query->whereNotNull('approved_at');
-    }
-
-    public function scopePending(Builder $query): void
-    {
-        $query->whereNull('approved_at');
-    }
 
     public function user(): BelongsTo
     {

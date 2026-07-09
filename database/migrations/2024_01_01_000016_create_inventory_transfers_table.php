@@ -13,8 +13,6 @@ return new class extends Migration
             $table->foreignId('from_inventory_id')->constrained('inventories');
             $table->foreignId('to_inventory_id')->constrained('inventories');
             $table->string('note')->nullable();
-            $table->timestamp('transferred_at');
-            $table->timestamp('received_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

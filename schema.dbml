@@ -246,7 +246,6 @@ Table inventory_transfers {
   from_inventory_id int       [ref: > inventories.id]
   to_inventory_id   int       [ref: > inventories.id]
   note              varchar
-  transferred_at    timestamp
 }
 
 Table inventory_transfer_items {
@@ -268,7 +267,6 @@ Table purchases {
   total_amount int
   paid_amount  int             [default: 0]
   note         varchar
-  received_at  timestamp       [null]
 }
 
 Table purchase_items {
@@ -372,7 +370,6 @@ Table restock_orders {
   status       restock_order_status
   note         varchar              [null]
   created_at   timestamp
-  fulfilled_at timestamp            [null]
 }
 
 Table restock_order_items {
@@ -402,7 +399,6 @@ Table installment_contracts {
   total_amount    int             [null, note: "snapshotted at confirmation (sum of installment_price × qty)"]
   monthly_amount  int             [null, note: "total_amount / months_count, computed at confirmation"]
   note            varchar         [null]
-  confirmed_at    timestamp       [null]
   created_at      timestamp
 }
 
@@ -439,7 +435,6 @@ Table installment_subscriptions {
   total_months        int                 [note: "mirrors contract.months_count"]
   status              subscription_status [default: "ACTIVE"]
   created_at          timestamp
-  cancelled_at        timestamp           [null]
 }
 
 Table installment_draws {
@@ -450,7 +445,6 @@ Table installment_draws {
   amount          int
   status          draw_status [default: "PENDING"]
   scheduled_date  date        [note: "account.draw_day of month_number's month"]
-  processed_at    timestamp   [null]
 }
 
 Table installment_cash_payments {

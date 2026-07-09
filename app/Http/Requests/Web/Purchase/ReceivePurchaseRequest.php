@@ -15,7 +15,6 @@ class ReceivePurchaseRequest extends FormRequest
     {
         return [
             'inventory_id'                   => ['required', 'integer', 'exists:inventories,id'],
-            'received_at'                    => ['nullable', 'date'],
             'items'                          => ['nullable', 'array'],
             'items.*.product_id'             => ['required_with:items', 'integer', 'exists:products,id'],
             'items.*.selling_prices'          => ['nullable', 'array'],

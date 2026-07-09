@@ -29,7 +29,6 @@ class Purchase extends Model
         'total_amount',
         'paid_amount',
         'note',
-        'received_at',
     ];
 
     protected function casts(): array
@@ -38,7 +37,6 @@ class Purchase extends Model
             'status'       => PurchaseStatus::class,
             'total_amount' => 'integer',
             'paid_amount'  => 'integer',
-            'received_at'  => 'datetime',
         ];
     }
 

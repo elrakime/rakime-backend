@@ -35,7 +35,6 @@ class PurchaseSeeder extends Seeder
             'total_amount' => 150000,
             'paid_amount'  => 150000,
             'note'         => 'First purchase order',
-            'received_at'  => now()->subDays(9),
         ]);
 
         foreach ($products as $i => $product) {
@@ -82,7 +81,6 @@ class PurchaseSeeder extends Seeder
             'total_amount' => 200000,
             'paid_amount'  => 100000,
             'note'         => 'Second purchase order',
-            'received_at'  => now()->subDays(4),
         ]);
 
         $p2Product = $products->last();
@@ -123,7 +121,6 @@ class PurchaseSeeder extends Seeder
             'purchase_id' => $purchase2->id,
             'reference'   => 'PR-2024-001',
             'note'        => 'Defective item returned',
-            'approved_at' => now()->subDays(2),
         ]);
 
         PurchaseReturnItem::create([

@@ -14,8 +14,6 @@ class InventoryTransferResource extends JsonResource
             'from_inventory_id' => $this->from_inventory_id,
             'to_inventory_id'   => $this->to_inventory_id,
             'note'              => $this->note,
-            'transferred_at'    => $this->transferred_at,
-            'received_at'       => $this->received_at,
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
 

@@ -24,8 +24,6 @@ class InventoryTransferSeeder extends Seeder
             'from_inventory_id' => $fromInventory->id,
             'to_inventory_id'   => $toInventory->id,
             'note'              => 'Stock transfer to second branch',
-            'transferred_at'    => now()->subDays(1),
-            'received_at'       => now(),
         ]);
 
         // Ensure stock exists in destination inventory

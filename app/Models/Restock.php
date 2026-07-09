@@ -26,7 +26,6 @@ class Restock extends Model
         'reference',
         'status',
         'note',
-        'fulfilled_at',
         'fulfilled_with_id',
         'fulfilled_with_type',
     ];
@@ -36,7 +35,6 @@ class Restock extends Model
         return [
             'status'       => RestockStatus::class,
             'created_at'   => 'datetime',
-            'fulfilled_at' => 'datetime',
         ];
     }
 

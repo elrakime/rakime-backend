@@ -27,7 +27,6 @@ class PurchaseResource extends JsonResource
             'paid_amount'      => $this->paid_amount,
             'remaining_amount' => $this->total_amount - $this->paid_amount,
             'note'             => $this->note,
-            'received_at'      => $this->received_at,
             'created_at'       => $this->created_at,
         ];
     }

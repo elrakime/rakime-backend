@@ -27,7 +27,6 @@ class RestockSeeder extends Seeder
             'reference'    => 'RST-2024-001',
             'status'       => RestockStatus::SUBMITTED,
             'note'         => 'Restock request for low inventory',
-            'fulfilled_at' => null,
             'created_by'   => $user->id,
         ]);
 

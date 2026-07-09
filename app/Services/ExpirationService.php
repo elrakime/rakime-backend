@@ -69,10 +69,6 @@ class ExpirationService
 
     public function update(Expiration $expiration, array $data): Expiration
     {
-        if ($expiration->approved_at) {
-            throw new Exception(__('expirations.cannot_update_approved'), 422);
-        }
-
         return DB::transaction(function () use ($expiration, $data) {
             $expiration->update(array_filter([
                 'inventory_id' => $data['inventory_id'] ?? null,
@@ -98,15 +94,9 @@ class ExpirationService
 
     public function approve(Expiration $expiration): Expiration
     {
-        if ($expiration->approved_at) {
-            return $expiration;
-        }
-
         $expiration->loadMissing(['items.stock.product']);
 
         return DB::transaction(function () use ($expiration) {
-            $expiration->update(['approved_at' => now()]);
-
             foreach ($expiration->items as $item) {
                 $remaining = $item->quantity;
 

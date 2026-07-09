@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedInteger('total_amount');
             $table->unsignedInteger('paid_amount')->default(0);
             $table->string('note')->nullable();
-            $table->timestamp('received_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

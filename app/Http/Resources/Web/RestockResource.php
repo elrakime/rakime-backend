@@ -15,7 +15,6 @@ class RestockResource extends JsonResource
             'reference'    => $this->reference,
             'status'       => $this->status,
             'note'         => $this->note,
-            'fulfilled_at' => $this->fulfilled_at,
             'fulfilled_with' => $this->whenLoaded('fulfilledWith', fn () => [
                 'id'   => $this->fulfilledWith->id,
                 'type' => class_basename($this->fulfilledWith),

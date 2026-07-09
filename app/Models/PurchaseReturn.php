@@ -17,25 +17,7 @@ class PurchaseReturn extends Model
         'purchase_id',
         'reference',
         'note',
-        'approved_at',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'approved_at' => 'datetime',
-        ];
-    }
-
-    public function scopeApproved($query): void
-    {
-        $query->whereNotNull('approved_at');
-    }
-
-    public function scopePending($query): void
-    {
-        $query->whereNull('approved_at');
-    }
 
     public function purchase(): BelongsTo
     {

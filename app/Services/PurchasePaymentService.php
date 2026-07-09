@@ -63,17 +63,11 @@ class PurchasePaymentService
 
     public function cancel(Purchase $purchase, PurchasePayment $payment): PurchasePayment
     {
-        if ($payment->canceled_at) {
-            throw new Exception(__('purchases.payment_already_canceled'), 422);
-        }
-
         if ($purchase->status === PurchaseStatus::DRAFT) {
             throw new Exception(__('purchases.must_be_received'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $payment) {
-            $payment->update(['canceled_at' => now()]);
-
             $newPaid = $purchase->paid_amount - $payment->amount;
             $status  = $newPaid <= 0
                 ? PurchaseStatus::RECEIVED

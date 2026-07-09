@@ -126,7 +126,6 @@ class PurchaseService
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update([
                 'status'      => PurchaseStatus::RECEIVED,
-                'received_at' => $data['received_at'] ?? Carbon::now(),
             ]);
 
             $inventoryId = $data['inventory_id'];

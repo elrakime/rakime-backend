@@ -17,7 +17,6 @@ class StoreInventoryTransferRequest extends FormRequest
             'from_inventory_id'  => ['required', 'integer', 'exists:inventories,id', 'different:to_inventory_id'],
             'to_inventory_id'    => ['required', 'integer', 'exists:inventories,id', 'different:from_inventory_id'],
             'note'               => ['nullable', 'string'],
-            'transferred_at'     => ['nullable', 'date'],
             'items'              => ['required', 'array', 'min:1'],
             'items.*.stock_id'   => ['required', 'integer', 'exists:stocks,id'],
             'items.*.quantity'   => ['required', 'integer', 'min:1'],

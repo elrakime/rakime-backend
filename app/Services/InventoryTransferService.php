@@ -7,7 +7,6 @@ use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Stock;
-use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,8 +30,6 @@ class InventoryTransferService
                 }),
             )
             ->allowedSorts(
-                AllowedSort::field('transferred_at'),
-                AllowedSort::field('received_at'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -47,7 +44,6 @@ class InventoryTransferService
                 'from_inventory_id' => $data['from_inventory_id'],
                 'to_inventory_id'   => $data['to_inventory_id'],
                 'note'              => $data['note'] ?? null,
-                'transferred_at'    => $data['transferred_at'] ?? now(),
             ]);
 
             foreach ($data['items'] as $item) {
@@ -69,16 +65,11 @@ class InventoryTransferService
 
     public function update(InventoryTransfer $transfer, array $data): InventoryTransfer
     {
-        if ($transfer->received_at) {
-            throw new Exception(__('transfers.cannot_update_received'), 422);
-        }
-
         return DB::transaction(function () use ($transfer, $data) {
             $transfer->update(array_filter([
                 'from_inventory_id' => $data['from_inventory_id'] ?? null,
                 'to_inventory_id'   => $data['to_inventory_id'] ?? null,
                 'note'              => $data['note'] ?? null,
-                'transferred_at'    => $data['transferred_at'] ?? null,
             ], fn ($v) => $v !== null));
 
             if (array_key_exists('items', $data)) {
@@ -99,13 +90,7 @@ class InventoryTransferService
 
     public function receive(InventoryTransfer $transfer): InventoryTransfer
     {
-        if ($transfer->received_at) {
-            return $transfer;
-        }
-
         return DB::transaction(function () use ($transfer) {
-            $transfer->update(['received_at' => now()]);
-
             foreach ($transfer->items as $transferItem) {
                 $fromStock = $transferItem->stock;
 
@@ -162,10 +147,6 @@ class InventoryTransferService
 
     public function delete(InventoryTransfer $transfer): void
     {
-        if ($transfer->received_at) {
-            throw new Exception(__('transfers.cannot_delete_received'), 422);
-        }
-
         $transfer->items()->delete();
         $transfer->delete();
     }

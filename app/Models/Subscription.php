@@ -24,7 +24,6 @@ class Subscription extends Model
         'amount',
         'total_months',
         'status',
-        'cancelled_at',
     ];
 
     protected function casts(): array
@@ -35,7 +34,6 @@ class Subscription extends Model
             'amount'              => 'integer',
             'total_months'        => 'integer',
             'created_at'          => 'datetime',
-            'cancelled_at'        => 'datetime',
         ];
     }
 

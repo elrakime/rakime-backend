@@ -161,7 +161,6 @@ class RestockService
 
             $restock->update([
                 'status'             => RestockStatus::FULFILLED,
-                'fulfilled_at'       => now(),
                 'fulfilled_with_id'  => $fulfilledWith?->id,
                 'fulfilled_with_type' => $fulfilledWith ? get_class($fulfilledWith) : null,
             ]);
@@ -188,7 +187,6 @@ class RestockService
             'total_amount' => 0,
             'paid_amount'  => 0,
             'note'         => $data['note'] ?? null,
-            'received_at'  => now(),
         ]);
 
         foreach ($restock->items as $restockItem) {
@@ -264,8 +262,6 @@ class RestockService
             'from_inventory_id' => $fromInventoryId,
             'to_inventory_id'   => $toInventory->id,
             'note'              => $data['note'] ?? null,
-            'transferred_at'    => now(),
-            'received_at'       => now(),
         ]);
 
         foreach ($restock->items as $restockItem) {

@@ -68,10 +68,6 @@ class PurchaseReturnService
 
     public function update(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
     {
-        if ($purchaseReturn->approved_at) {
-            throw new Exception(__('purchase_returns.cannot_update_approved'), 422);
-        }
-
         if (isset($data['items'])) {
             $purchaseReturn->load('purchase');
             $this->validateItemsBelongToPurchase($purchaseReturn->purchase_id, $data['items']);
@@ -106,13 +102,7 @@ class PurchaseReturnService
 
     public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
     {
-        if ($purchaseReturn->approved_at) {
-            return $purchaseReturn;
-        }
-
         return DB::transaction(function () use ($purchaseReturn, $walletId) {
-            $purchaseReturn->update(['approved_at' => now()]);
-
             $purchaseReturn->load('items.purchaseItem');
 
             $totalReturnAmount = 0;

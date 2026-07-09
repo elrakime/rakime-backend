@@ -21,7 +21,6 @@ class DrawResource extends JsonResource
                 'color' => $this->status->get_color(),
             ],
             'scheduled_date'  => $this->scheduled_date,
-            'processed_at'    => $this->processed_at,
             'created_at'      => $this->created_at,
             'updated_at'      => $this->updated_at,
         ];

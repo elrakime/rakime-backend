@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedInteger('amount');
             $table->enum('status', DrawStatus::keys())->default(DrawStatus::default()->value);
             $table->date('scheduled_date');
-            $table->timestamp('processed_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

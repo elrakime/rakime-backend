@@ -23,7 +23,6 @@ class Draw extends Model
         'amount',
         'status',
         'scheduled_date',
-        'processed_at',
     ];
 
     protected function casts(): array
@@ -33,7 +32,6 @@ class Draw extends Model
             'month_number'   => 'integer',
             'amount'         => 'integer',
             'scheduled_date' => 'date',
-            'processed_at'   => 'datetime',
         ];
     }
 

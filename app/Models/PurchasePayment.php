@@ -15,14 +15,12 @@ class PurchasePayment extends Model
     protected $fillable = [
         'purchase_id',
         'amount',
-        'canceled_at',
     ];
 
     protected function casts(): array
     {
         return [
             'amount'      => 'integer',
-            'canceled_at' => 'datetime',
         ];
     }
 
