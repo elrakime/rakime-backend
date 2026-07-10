@@ -22,6 +22,8 @@ class ExpirationResource extends JsonResource
             'user'      => new UserResource($this->whenLoaded('user')),
             'inventory' => new InventoryResource($this->whenLoaded('inventory')),
             'items'     => ExpirationItemResource::collection($this->whenLoaded('items')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

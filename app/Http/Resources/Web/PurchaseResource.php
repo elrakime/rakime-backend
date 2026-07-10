@@ -31,6 +31,8 @@ class PurchaseResource extends JsonResource
             'updated_at'       => $this->updated_at,
             'created_by'       => new AvatarResource($this->whenLoaded('creator')),
             'updated_by'       => new AvatarResource($this->whenLoaded('updater')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

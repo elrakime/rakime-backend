@@ -21,6 +21,8 @@ class PurchaseReturnResource extends JsonResource
 
             'purchase' => new PurchaseResource($this->whenLoaded('purchase')),
             'items' => PurchaseReturnItemResource::collection($this->whenLoaded('items')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

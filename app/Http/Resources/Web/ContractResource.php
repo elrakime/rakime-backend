@@ -37,6 +37,8 @@ class ContractResource extends JsonResource
             'branch'       => new BranchResource($this->whenLoaded('branch')),
             'items'        => ContractItemResource::collection($this->whenLoaded('items')),
             'installments' => InstallmentResource::collection($this->whenLoaded('installments')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

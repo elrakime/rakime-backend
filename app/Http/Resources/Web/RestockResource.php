@@ -34,6 +34,8 @@ class RestockResource extends JsonResource
                 'name' => $this->branch->name,
             ]),
             'items' => RestockItemResource::collection($this->whenLoaded('items')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

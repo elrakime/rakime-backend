@@ -23,6 +23,8 @@ class InventoryTransferResource extends JsonResource
             'to_inventory'   => new InventoryResource($this->whenLoaded('toInventory')),
             'performer'      => new UserResource($this->whenLoaded('performedBy')),
             'items'          => InventoryTransferItemResource::collection($this->whenLoaded('items')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }

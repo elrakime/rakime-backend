@@ -33,6 +33,8 @@ class InstallmentResource extends JsonResource
 
             'cashPayment' => new InstallmentPaymentResource($this->whenLoaded('cashPayment')),
             'draws'       => DrawResource::collection($this->whenLoaded('draws')),
+
+            'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
     }
 }
