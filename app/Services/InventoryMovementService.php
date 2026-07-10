@@ -2,7 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Expiration;
 use App\Models\InventoryMovement;
+use App\Models\InventoryTransfer;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\Restock;
+use App\Models\Sale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -14,7 +20,16 @@ class InventoryMovementService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(InventoryMovement::class, $request)
-            ->with(['stock.product', 'inventory', 'product'])
+            ->with(['stock.product', 'inventory', 'product', 'source' => function ($morphTo) {
+                $morphTo->morphWith([
+                    Expiration::class        => [],
+                    InventoryTransfer::class => ['fromInventory', 'toInventory'],
+                    Purchase::class          => ['supplier'],
+                    PurchaseReturn::class    => ['purchase.supplier'],
+                    Restock::class           => [],
+                    Sale::class              => ['client'],
+                ]);
+            }])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('stock_id'),

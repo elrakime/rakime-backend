@@ -8,6 +8,7 @@ use App\Enums\InventoryMovementType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Traits\HasUserstamps;
 
 class InventoryMovement extends Model
@@ -77,15 +78,8 @@ class InventoryMovement extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Resolve the polymorphic source model via source_type column.
-     */
-    public function getSource(): ?Model
+    public function source(): MorphTo
     {
-        if (! $this->source_type || ! $this->source_id) {
-            return null;
-        }
-
-        return $this->source_type::find($this->source_id);
+        return $this->morphTo();
     }
 }
