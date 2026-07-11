@@ -33,7 +33,8 @@ class ClientService
                         $q->where('firstname', 'like', "%{$value}%")
                           ->orWhere('lastname', 'like', "%{$value}%")
                           ->orWhere('phone', 'like', "%{$value}%")
-                          ->orWhere('nin', 'like', "%{$value}%");
+                          ->orWhere('nin', 'like', "%{$value}%")
+                          ->orWhere('ccp_number', 'like', "%{$value}%");
                     });
                 }),
             )
