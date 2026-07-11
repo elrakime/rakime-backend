@@ -26,6 +26,7 @@ class ClientService
                 AllowedFilter::partial('lastname'),
                 AllowedFilter::partial('phone'),
                 AllowedFilter::partial('nin'),
+                AllowedFilter::partial('ccp_number'),
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('wilaya_id'),
                 AllowedFilter::callback('search', function ($query, string $value) {
