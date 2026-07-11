@@ -49,12 +49,18 @@ class InventoryMovementResource extends JsonResource
                     'reference' => $source->reference ?? null,
                     ...match (true) {
                         $source instanceof Sale              => [
+                            'id' => $source->id,
+                            'reference' => $source->reference,
+                            'total_amount' => $source->total_amount,
                             'client' => $this->whenLoadedNested($source, 'client', fn () => [
                                 'id'   => $source->client->id,
                                 'name' => $source->client->name,
                             ]),
                         ],
                         $source instanceof Purchase          => [
+                            'id' => $source->id,
+                            'reference' => $source->reference,
+                            'purchase_amount' => $source->purchase_amount,
                             'supplier' => $this->whenLoadedNested($source, 'supplier', fn () => [
                                 'id'   => $source->supplier->id,
                                 'name' => $source->supplier->name,
@@ -63,7 +69,7 @@ class InventoryMovementResource extends JsonResource
                         $source instanceof PurchaseReturn    => [
                             'purchase' => $this->whenLoadedNested($source, 'purchase', fn () => [
                                 'id'       => $source->purchase->id,
-                                'reference'=> $source->purchase->reference,
+                                'purchase_amount' => $source->purchase_amount,
                                 'supplier' => $source->purchase->relationLoaded('supplier') && $source->purchase->supplier ? [
                                     'id'   => $source->purchase->supplier->id,
                                     'name' => $source->purchase->supplier->name,
