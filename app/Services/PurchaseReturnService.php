@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\PurchaseReturnStatus;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
@@ -147,13 +148,15 @@ class PurchaseReturnService
                 );
             }
 
+            $purchaseReturn->update(['status' => PurchaseReturnStatus::COMPLETED]);
+
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
         });
     }
 
     public function delete(PurchaseReturn $purchaseReturn): void
     {
-        if ($purchaseReturn->approved_at) {
+        if ($purchaseReturn->status === PurchaseReturnStatus::COMPLETED) {
             throw new Exception(__('purchase_returns.cannot_delete_approved'), 422);
         }
 

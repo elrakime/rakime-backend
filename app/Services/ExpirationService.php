@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ExpirationStatus;
 use App\Enums\InventoryMovementType;
 use App\Models\Batch;
 use App\Models\Expiration;
@@ -129,6 +130,8 @@ class ExpirationService
                     'quantity'      => $item->quantity,
                 ]);
             }
+
+            $expiration->update(['status' => ExpirationStatus::APPROVED]);
 
             return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });

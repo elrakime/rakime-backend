@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PurchasePaymentStatus;
 use App\Enums\PurchaseStatus;
 use App\Enums\WalletMovementType;
 use App\Models\Purchase;
@@ -95,6 +96,8 @@ class PurchasePaymentService
                     note: __('purchases.payment_canceled_note', ['amount' => $payment->amount]),
                 );
             }
+
+            $payment->update(['status' => PurchasePaymentStatus::CANCELED]);
 
             return $payment->refresh();
         });

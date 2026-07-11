@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InventoryMovementType;
+use App\Enums\InventoryTransferStatus;
 use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
@@ -91,6 +92,8 @@ class InventoryTransferService
     public function receive(InventoryTransfer $transfer): InventoryTransfer
     {
         return DB::transaction(function () use ($transfer) {
+            $transfer->loadMissing('items.stock');
+
             foreach ($transfer->items as $transferItem) {
                 $fromStock = $transferItem->stock;
 
@@ -148,6 +151,8 @@ class InventoryTransferService
                     'quantity'      => $transferItem->quantity,
                 ]);
             }
+
+            $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);
 
             return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
