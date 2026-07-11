@@ -2,11 +2,9 @@
 
 namespace App\Http\Resources\Web;
 
-use App\Models\Expiration;
 use App\Models\InventoryTransfer;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
-use App\Models\Restock;
 use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
