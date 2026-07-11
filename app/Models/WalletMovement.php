@@ -58,11 +58,6 @@ class WalletMovement extends Model
         return $this->belongsTo(Wallet::class);
     }
 
-    public function performedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
     public function source(): MorphTo
     {
         return $this->morphTo('source', 'source_type', 'source_id');

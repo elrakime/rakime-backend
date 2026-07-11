@@ -18,7 +18,7 @@ class WalletTransferService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(WalletTransfer::class, $request)
-            ->with(['fromWallet', 'toWallet', 'performedBy'])
+            ->with(['fromWallet', 'toWallet'])
             ->allowedFilters(
                 AllowedFilter::exact('from_wallet_id'),
                 AllowedFilter::exact('to_wallet_id'),
@@ -63,7 +63,7 @@ class WalletTransferService
 
     public function show(WalletTransfer $walletTransfer): WalletTransfer
     {
-        return $walletTransfer->load(['fromWallet', 'toWallet', 'performedBy']);
+        return $walletTransfer->load(['fromWallet', 'toWallet']);
     }
 
     public function delete(WalletTransfer $walletTransfer): void

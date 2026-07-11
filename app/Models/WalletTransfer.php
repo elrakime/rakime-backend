@@ -35,9 +35,4 @@ class WalletTransfer extends Model
     {
         return $this->belongsTo(Wallet::class, 'to_wallet_id');
     }
-
-    public function performedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
 }

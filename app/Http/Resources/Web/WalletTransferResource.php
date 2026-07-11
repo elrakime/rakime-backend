@@ -17,7 +17,6 @@ class WalletTransferResource extends JsonResource
             'note'           => $this->note,
             'fromWallet'     => $this->whenLoaded('fromWallet'),
             'toWallet'       => $this->whenLoaded('toWallet'),
-            'performedBy'    => $this->whenLoaded('performedBy'),
             'created_at'     => $this->created_at,
             'updated_at'     => $this->updated_at,
             'created_by'     => new AvatarResource($this->whenLoaded('creator')),

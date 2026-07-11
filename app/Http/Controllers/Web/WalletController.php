@@ -137,7 +137,6 @@ class WalletController extends Controller
                 wallet: $wallet,
                 amount: $data['amount'],
                 note: $data['note'] ?? null,
-                performedBy: $request->user()?->id,
             );
 
             return $this->successResponse(new WalletResource($wallet->fresh()->loadMissing('owner')));

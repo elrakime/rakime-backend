@@ -49,11 +49,6 @@ class InventoryTransfer extends Model
         return $this->belongsTo(Inventory::class, 'to_inventory_id');
     }
 
-    public function performedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
     public function items(): HasMany
     {
         return $this->hasMany(InventoryTransferItem::class);
