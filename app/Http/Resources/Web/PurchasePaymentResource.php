@@ -13,6 +13,11 @@ class PurchasePaymentResource extends JsonResource
             'id'          => $this->id,
             'purchase_id' => $this->purchase_id,
             'amount'      => $this->amount,
+            'status'      => [
+                'value' => $this->status->value,
+                'name'  => $this->status->get_name(),
+                'color' => $this->status->get_color(),
+            ],
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'created_by'  => new AvatarResource($this->whenLoaded('creator')),

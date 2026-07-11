@@ -13,7 +13,11 @@ class RestockResource extends JsonResource
             'id'           => $this->id,
             'branch_id'    => $this->branch_id,
             'reference'    => $this->reference,
-            'status'       => $this->status,
+            'status'       => [
+                'value' => $this->status->value,
+                'name'  => $this->status->get_name(),
+                'color' => $this->status->get_color(),
+            ],
             'note'         => $this->note,
             'fulfilled_with' => $this->whenLoaded('fulfilledWith', fn () => [
                 'id'   => $this->fulfilledWith->id,

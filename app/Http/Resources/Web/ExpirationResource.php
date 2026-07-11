@@ -13,6 +13,11 @@ class ExpirationResource extends JsonResource
             'id'           => $this->id,
             'inventory_id' => $this->inventory_id,
             'reference'    => $this->reference,
+            'status'       => [
+                'value' => $this->status->value,
+                'name'  => $this->status->get_name(),
+                'color' => $this->status->get_color(),
+            ],
             'note'         => $this->note,
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
