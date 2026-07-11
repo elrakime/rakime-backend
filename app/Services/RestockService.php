@@ -32,7 +32,13 @@ class RestockService
         $this->scopeByUserBranches($query);
 
         return QueryBuilder::for($query, $request)
-            ->with(['user', 'branch', 'items.product', 'fulfilledWith'])
+            ->with(['user', 'branch', 'items.product'])
+            ->with('fulfilledWith', function ($morphTo) {
+                $morphTo->morphWith([
+                    Purchase::class          => ['inventory', 'supplier'],
+                    InventoryTransfer::class => ['fromInventory', 'toInventory'],
+                ]);
+            })
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('status'),
@@ -77,7 +83,13 @@ class RestockService
 
     public function show(Restock $restock): Restock
     {
-        return $restock->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
+        $restock->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
+        $restock->loadMorph('fulfilledWith', [
+            Purchase::class          => ['inventory', 'supplier'],
+            InventoryTransfer::class => ['fromInventory', 'toInventory'],
+        ]);
+
+        return $restock;
     }
 
     public function update(Restock $restock, array $data): Restock
@@ -159,7 +171,13 @@ class RestockService
                 'fulfilled_with_type' => $fulfilledWith ? get_class($fulfilledWith) : null,
             ]);
 
-            return $restock->fresh()->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
+            $restock = $restock->fresh()->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
+            $restock->loadMorph('fulfilledWith', [
+                Purchase::class          => ['inventory', 'supplier'],
+                InventoryTransfer::class => ['fromInventory', 'toInventory'],
+            ]);
+
+            return $restock;
         });
     }
 

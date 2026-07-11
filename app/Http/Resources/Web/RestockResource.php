@@ -19,11 +19,16 @@ class RestockResource extends JsonResource
                 'color' => $this->status->get_color(),
             ],
             'note'         => $this->note,
-            'fulfilled_with' => $this->whenLoaded('fulfilledWith', fn () => [
-                'id'   => $this->fulfilledWith->id,
-                'type' => class_basename($this->fulfilledWith),
-                'reference' => $this->fulfilledWith->reference ?? null,
-            ]),
+            'fulfilled_with' => $this->whenLoaded('fulfilledWith', function () {
+                $fulfilledWith = $this->fulfilledWith;
+                if ($fulfilledWith instanceof \App\Models\Purchase) {
+                    return new PurchaseResource($fulfilledWith);
+                }
+                if ($fulfilledWith instanceof \App\Models\InventoryTransfer) {
+                    return new InventoryTransferResource($fulfilledWith);
+                }
+                return null;
+            }),
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
             'created_by'   => new AvatarResource($this->whenLoaded('creator')),
