@@ -42,7 +42,7 @@ class InventoryTransferController extends Controller
         }
     }
 
-    public function show(InventoryTransfer $transfer): JsonResponse
+    public function show(InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY_TRANSFERS->value)) {
             return $response;
@@ -50,36 +50,36 @@ class InventoryTransferController extends Controller
 
         try {
             return $this->successResponse(
-                new InventoryTransferResource($this->transferService->show($transfer)),
+                new InventoryTransferResource($this->transferService->show($inventory_transfer)),
             );
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
     }
 
-    public function update(UpdateInventoryTransferRequest $request, InventoryTransfer $transfer): JsonResponse
+    public function update(UpdateInventoryTransferRequest $request, InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::UPDATE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
         try {
-            $transfer = $this->transferService->update($transfer, $this->validateRequest($request));
+            $inventory_transfer = $this->transferService->update($inventory_transfer, $this->validateRequest($request));
 
-            return $this->successResponse(new InventoryTransferResource($transfer));
+            return $this->successResponse(new InventoryTransferResource($inventory_transfer));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
     }
 
-    public function destroy(InventoryTransfer $transfer): JsonResponse
+    public function destroy(InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::DELETE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
         try {
-            $this->transferService->delete($transfer);
+            $this->transferService->delete($inventory_transfer);
 
             return $this->successResponse(message: __('app.deleted'));
         } catch (\Exception $e) {
@@ -87,16 +87,16 @@ class InventoryTransferController extends Controller
         }
     }
 
-    public function receive(InventoryTransfer $transfer): JsonResponse
+    public function receive(InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::RECEIVE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
 
         try {
-            $transfer = $this->transferService->receive($transfer);
+            $inventory_transfer = $this->transferService->receive($inventory_transfer);
 
-            return $this->successResponse(new InventoryTransferResource($transfer));
+            return $this->successResponse(new InventoryTransferResource($inventory_transfer));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }

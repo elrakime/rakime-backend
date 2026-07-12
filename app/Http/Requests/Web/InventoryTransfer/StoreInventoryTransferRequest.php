@@ -22,29 +22,4 @@ class StoreInventoryTransferRequest extends FormRequest
             'items.*.quantity'   => ['required', 'integer', 'min:1'],
         ];
     }
-
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            $fromInventoryId = $this->input('from_inventory_id');
-            $items = $this->input('items', []);
-
-            foreach ($items as $index => $item) {
-                if (!isset($item['stock_id'])) {
-                    continue;
-                }
-
-                $exists = \App\Models\Stock::where('id', $item['stock_id'])
-                    ->where('inventory_id', $fromInventoryId)
-                    ->exists();
-
-                if (!$exists) {
-                    $validator->errors()->add(
-                        "items.{$index}.stock_id",
-                        __('validation.exists', ['attribute' => "items.{$index}.stock_id"]),
-                    );
-                }
-            }
-        });
-    }
 }

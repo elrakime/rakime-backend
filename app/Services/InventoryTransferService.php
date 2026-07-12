@@ -8,6 +8,7 @@ use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Stock;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,8 @@ class InventoryTransferService
 
     public function create(array $data): InventoryTransfer
     {
+        $this->validateStocksBelongToInventory($data['from_inventory_id'], $data['items']);
+
         return DB::transaction(function () use ($data) {
             $transfer = InventoryTransfer::create([
                 'from_inventory_id' => $data['from_inventory_id'],
@@ -74,6 +77,10 @@ class InventoryTransferService
             ], fn ($v) => $v !== null));
 
             if (array_key_exists('items', $data)) {
+
+                $fromInventoryId = $transfer->from_inventory_id;
+                $this->validateStocksBelongToInventory($fromInventoryId, $data['items']);
+
                 $transfer->items()->delete();
 
                 foreach ($data['items'] as $item) {
@@ -162,5 +169,25 @@ class InventoryTransferService
     {
         $transfer->items()->delete();
         $transfer->delete();
+    }
+
+    private function validateStocksBelongToInventory(int $inventoryId, array $items): void
+    {
+        foreach ($items as $index => $item) {
+            if (!isset($item['stock_id'])) {
+                continue;
+            }
+
+            $exists = Stock::where('id', $item['stock_id'])
+                ->where('inventory_id', $inventoryId)
+                ->exists();
+
+            if (!$exists) {
+                throw new Exception(
+                    "Stock #{$item['stock_id']} does not belong to inventory #{$inventoryId}.",
+                    422,
+                );
+            }
+        }
     }
 }
