@@ -58,7 +58,7 @@ class PurchasePaymentService
                 note: $data['note'] ?? null,
             );
 
-            return $payment;
+            return $payment->fresh();
         });
     }
 

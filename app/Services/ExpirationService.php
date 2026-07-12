@@ -59,7 +59,7 @@ class ExpirationService
                 }
             }
 
-            return $expiration->load(['user', 'inventory', 'items.stock.product']);
+            return $expiration->fresh()->load(['user', 'inventory', 'items.stock.product']);
         });
     }
 

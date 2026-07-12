@@ -66,7 +66,7 @@ class PurchaseReturnService
                 ]);
             }
 
-            return $purchaseReturn->load(['purchase', 'items.purchaseItem.product']);
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
         });
     }
 

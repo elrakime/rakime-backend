@@ -58,7 +58,7 @@ class InventoryTransferService
                 ]);
             }
 
-            return $transfer->load(['fromInventory', 'toInventory', 'items.stock.product']);
+            return $transfer->fresh()->load(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
