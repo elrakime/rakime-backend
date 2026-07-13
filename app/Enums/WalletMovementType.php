@@ -53,6 +53,7 @@ enum WalletMovementType: string
             self::TRANSFER_IN         => 'blue',
             self::TRANSFER_OUT        => 'purple',
             self::EXPENSE             => 'orange',
+            self::SALARY              => 'cyan',
             self::INSTALLMENT_PAYMENT => 'amber',
             self::PURCHASE_PAYMENT    => 'orange',
             self::PURCHASE_RETURN     => 'emerald',
