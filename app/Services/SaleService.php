@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\DiscountType;
 use App\Enums\InventoryMovementType;
 use App\Models\Batch;
 use App\Models\Branch;
@@ -215,9 +216,9 @@ class SaleService
         if (!empty($data['discount_type']) && isset($data['discount_value'])) {
             $discountValue = (int) $data['discount_value'];
 
-            if ($data['discount_type'] === 'percentage') {
+            if ($data['discount_type'] === DiscountType::PERCENTAGE->value) {
                 $discountAmount = (int) round($grossAmount * $discountValue / 100);
-            } elseif ($data['discount_type'] === 'fixed') {
+            } elseif ($data['discount_type'] === DiscountType::FIXED->value) {
                 $discountAmount = $discountValue;
             }
         }
