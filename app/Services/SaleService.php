@@ -61,13 +61,21 @@ class SaleService
             $inventory = $this->getBranchInventory($data['branch_id']);
             $resolvedItems = $this->resolveItems($inventory->id, $data['items']);
 
-            $totalAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
+            $grossAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
+
+            [$taxAmount, $discountAmount, $totalAmount] = $this->calculateTotals($grossAmount, $data);
 
             $sale = Sale::create([
-                'branch_id'    => $data['branch_id'],
-                'client_id'    => $data['client_id'] ?? null,
-                'total_amount' => $totalAmount,
-                'note'         => $data['note'] ?? null,
+                'branch_id'       => $data['branch_id'],
+                'client_id'       => $data['client_id'] ?? null,
+                'gross_amount'    => $grossAmount,
+                'tax_rate'        => $data['tax_rate'] ?? null,
+                'tax_amount'      => $taxAmount,
+                'discount_type'   => $data['discount_type'] ?? null,
+                'discount_value'  => $data['discount_value'] ?? null,
+                'discount_amount' => $discountAmount,
+                'total_amount'    => $totalAmount,
+                'note'            => $data['note'] ?? null,
             ]);
 
             foreach ($resolvedItems as $item) {
@@ -82,7 +90,7 @@ class SaleService
 
             $this->deductStock($sale);
 
-            $this->creditBranchWallet($data['branch_id'], $totalAmount, $sale);
+            $this->creditBranchWallet($data['branch_id'], $grossAmount, $sale);
 
             return $sale->load(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
@@ -95,11 +103,35 @@ class SaleService
 
     public function update(Sale $sale, array $data): Sale
     {
-        $sale->update([
+        $updateData = [
             'branch_id' => $data['branch_id'] ?? $sale->branch_id,
             'client_id' => $data['client_id'] ?? $sale->client_id,
             'note'      => $data['note'] ?? $sale->note,
-        ]);
+        ];
+
+        if (array_key_exists('tax_rate', $data) || array_key_exists('discount_type', $data) || array_key_exists('discount_value', $data)) {
+            $taxRate       = $data['tax_rate'] ?? $sale->tax_rate;
+            $discountType  = $data['discount_type'] ?? $sale->discount_type;
+            $discountValue = $data['discount_value'] ?? $sale->discount_value;
+
+            [$taxAmount, $discountAmount, $totalAmount] = $this->calculateTotals(
+                $sale->gross_amount,
+                [
+                    'tax_rate'       => $taxRate,
+                    'discount_type'  => $discountType,
+                    'discount_value' => $discountValue,
+                ],
+            );
+
+            $updateData['tax_rate']        = $taxRate;
+            $updateData['tax_amount']      = $taxAmount;
+            $updateData['discount_type']   = $discountType;
+            $updateData['discount_value']  = $discountValue;
+            $updateData['discount_amount'] = $discountAmount;
+            $updateData['total_amount']    = $totalAmount;
+        }
+
+        $sale->update($updateData);
 
         return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
     }
@@ -169,6 +201,30 @@ class SaleService
                 'quantity'      => $item->quantity,
             ]);
         }
+    }
+
+    private function calculateTotals(int $grossAmount, array $data): array
+    {
+        $taxAmount = 0;
+        $discountAmount = 0;
+
+        if (!empty($data['tax_rate'])) {
+            $taxAmount = (int) round($grossAmount * (int) $data['tax_rate'] / 100);
+        }
+
+        if (!empty($data['discount_type']) && isset($data['discount_value'])) {
+            $discountValue = (int) $data['discount_value'];
+
+            if ($data['discount_type'] === 'percentage') {
+                $discountAmount = (int) round($grossAmount * $discountValue / 100);
+            } elseif ($data['discount_type'] === 'fixed') {
+                $discountAmount = $discountValue;
+            }
+        }
+
+        $totalAmount = $grossAmount + $taxAmount - $discountAmount;
+
+        return [$taxAmount, $discountAmount, $totalAmount];
     }
 
     private function getBranchInventory(int $branchId): Inventory

@@ -10,16 +10,22 @@ class SaleResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'branch_id'    => $this->branch_id,
-            'client_id'    => $this->client_id,
-            'reference'    => $this->reference,
-            'total_amount' => $this->total_amount,
-            'note'         => $this->note,
-            'created_at'   => $this->created_at,
-            'updated_at'   => $this->updated_at,
-            'created_by'   => new AvatarResource($this->whenLoaded('creator')),
-            'updated_by'   => new AvatarResource($this->whenLoaded('updater')),
+            'id'              => $this->id,
+            'branch_id'       => $this->branch_id,
+            'client_id'       => $this->client_id,
+            'reference'       => $this->reference,
+            'gross_amount'    => $this->gross_amount,
+            'tax_rate'        => $this->tax_rate,
+            'tax_amount'      => $this->tax_amount,
+            'discount_type'   => $this->discount_type,
+            'discount_value'  => $this->discount_value,
+            'discount_amount' => $this->discount_amount,
+            'total_amount'    => $this->total_amount,
+            'note'            => $this->note,
+            'created_at'      => $this->created_at,
+            'updated_at'      => $this->updated_at,
+            'created_by'      => new AvatarResource($this->whenLoaded('creator')),
+            'updated_by'      => new AvatarResource($this->whenLoaded('updater')),
 
             'user'   => $this->whenLoaded('user', fn () => [
                 'id'   => $this->user->id,

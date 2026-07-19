@@ -20,6 +20,12 @@ class Sale extends Model
         'branch_id',
         'client_id',
         'reference',
+        'gross_amount',
+        'tax_rate',
+        'tax_amount',
+        'discount_type',
+        'discount_value',
+        'discount_amount',
         'total_amount',
         'note',
     ];
@@ -27,7 +33,12 @@ class Sale extends Model
     protected function casts(): array
     {
         return [
-            'total_amount' => 'integer',
+            'gross_amount'    => 'integer',
+            'tax_rate'        => 'integer',
+            'tax_amount'      => 'integer',
+            'discount_value'  => 'integer',
+            'discount_amount' => 'integer',
+            'total_amount'    => 'integer',
         ];
     }
 
