@@ -91,7 +91,7 @@ class SaleService
 
             $this->deductStock($sale);
 
-            $this->creditBranchWallet($data['branch_id'], $grossAmount, $sale);
+            $this->creditBranchWallet($data['branch_id'], $totalAmount, $sale);
 
             return $sale->load(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
