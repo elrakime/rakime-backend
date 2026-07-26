@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureTokenMatchesClientType;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\SetLocaleFromHeader;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         $middleware->alias([
             'client.type' => EnsureTokenMatchesClientType::class,
+            'user.active' => EnsureUserIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
