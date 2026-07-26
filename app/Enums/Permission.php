@@ -129,6 +129,8 @@ enum Permission: string
     case UPDATE_INVENTORY_TRANSFERS  = 'inventory_transfers.update';
     case DELETE_INVENTORY_TRANSFERS  = 'inventory_transfers.delete';
     case RECEIVE_INVENTORY_TRANSFERS = 'inventory_transfers.receive';
+    case DISPATCH_INVENTORY_TRANSFERS = 'inventory_transfers.dispatch';
+    case CANCEL_INVENTORY_TRANSFERS   = 'inventory_transfers.cancel';
 
     // Restocks
     case VIEW_RESTOCKS    = 'restocks.view';

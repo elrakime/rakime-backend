@@ -50,6 +50,7 @@ class InventoryMovement extends Model
             InventoryMovementType::RECEIVE,
             InventoryMovementType::TRANSFER_IN,
             InventoryMovementType::RESTOCK_RECEIVED,
+            InventoryMovementType::TRANSFER_CANCEL,
         ]);
     }
 

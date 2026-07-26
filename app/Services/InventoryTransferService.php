@@ -96,7 +96,7 @@ class InventoryTransferService
         });
     }
 
-    public function receive(InventoryTransfer $transfer): InventoryTransfer
+    public function dispatch(InventoryTransfer $transfer): InventoryTransfer
     {
         return DB::transaction(function () use ($transfer) {
             $transfer->loadMissing('items.stock');
@@ -104,7 +104,6 @@ class InventoryTransferService
             foreach ($transfer->items as $transferItem) {
                 $fromStock = $transferItem->stock;
 
-                // Decrement stock in the source inventory
                 if ($fromStock) {
                     $fromBatch = $fromStock->batches()
                         ->where('current_quantity', '>', 0)
@@ -129,8 +128,20 @@ class InventoryTransferService
                         'quantity'      => $transferItem->quantity,
                     ]);
                 }
+            }
 
-                // Increment stock in the destination inventory
+            $transfer->update(['status' => InventoryTransferStatus::DISPATCHED]);
+
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
+        });
+    }
+
+    public function receive(InventoryTransfer $transfer): InventoryTransfer
+    {
+        return DB::transaction(function () use ($transfer) {
+            $transfer->loadMissing('items.stock');
+
+            foreach ($transfer->items as $transferItem) {
                 $toStock = Stock::firstOrCreate([
                     'inventory_id' => $transfer->to_inventory_id,
                     'product_id'   => $transferItem->stock->product_id,
@@ -160,6 +171,47 @@ class InventoryTransferService
             }
 
             $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);
+
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
+        });
+    }
+
+    public function cancel(InventoryTransfer $transfer): InventoryTransfer
+    {
+        return DB::transaction(function () use ($transfer) {
+            if ($transfer->status === InventoryTransferStatus::DISPATCHED) {
+                $transfer->loadMissing('items.stock');
+
+                foreach ($transfer->items as $transferItem) {
+                    $fromStock = $transferItem->stock;
+
+                    if ($fromStock) {
+                        $oldQuantity = $fromStock->batches()->sum('current_quantity');
+
+                        $fromStock->batches()->create([
+                            'source_id'        => $transferItem->id,
+                            'source_type'      => InventoryTransferItem::class,
+                            'purchase_price'   => 0,
+                            'initial_quantity' => $transferItem->quantity,
+                            'current_quantity' => $transferItem->quantity,
+                        ]);
+
+                        InventoryMovement::create([
+                            'stock_id'      => $fromStock->id,
+                            'inventory_id'  => $transfer->from_inventory_id,
+                            'product_id'    => $transferItem->stock->product_id,
+                            'source_id'     => $transfer->id,
+                            'source_type'   => InventoryTransfer::class,
+                            'movement_type' => InventoryMovementType::TRANSFER_CANCEL,
+                            'old_quantity'  => $oldQuantity,
+                            'new_quantity'  => $oldQuantity + $transferItem->quantity,
+                            'quantity'      => $transferItem->quantity,
+                        ]);
+                    }
+                }
+            }
+
+            $transfer->update(['status' => InventoryTransferStatus::CANCELED]);
 
             return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });

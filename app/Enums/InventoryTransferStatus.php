@@ -7,7 +7,7 @@ namespace App\Enums;
 enum InventoryTransferStatus: string
 {
     case PENDING     = 'pending';
-    case TRANSFERRED = 'transferred';
+    case DISPATCHED = 'dispatched';
     case RECEIVED    = 'received';
     case CANCELED    = 'canceled';
 
@@ -41,7 +41,7 @@ enum InventoryTransferStatus: string
     {
         return match ($this) {
             self::PENDING     => 'amber',
-            self::TRANSFERRED => 'blue',
+            self::DISPATCHED => 'blue',
             self::RECEIVED    => 'green',
             self::CANCELED    => 'red',
         };

@@ -73,7 +73,9 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web'])->group(func
     Route::apiResource('wallet-transfers', WalletTransferController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('inventory-transfers', InventoryTransferController::class);
+    Route::post('inventory-transfers/{inventory_transfer}/dispatch', [InventoryTransferController::class, 'dispatch']);
     Route::post('inventory-transfers/{inventory_transfer}/receive', [InventoryTransferController::class, 'receive']);
+    Route::post('inventory-transfers/{inventory_transfer}/cancel', [InventoryTransferController::class, 'cancel']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
     Route::apiResource('stocks', StockController::class)->except(['update']);

@@ -87,6 +87,21 @@ class InventoryTransferController extends Controller
         }
     }
 
+    public function dispatch(InventoryTransfer $inventory_transfer): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::DISPATCH_INVENTORY_TRANSFERS->value)) {
+            return $response;
+        }
+
+        try {
+            $inventory_transfer = $this->transferService->dispatch($inventory_transfer);
+
+            return $this->successResponse(new InventoryTransferResource($inventory_transfer));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
     public function receive(InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::RECEIVE_INVENTORY_TRANSFERS->value)) {
@@ -95,6 +110,21 @@ class InventoryTransferController extends Controller
 
         try {
             $inventory_transfer = $this->transferService->receive($inventory_transfer);
+
+            return $this->successResponse(new InventoryTransferResource($inventory_transfer));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
+    public function cancel(InventoryTransfer $inventory_transfer): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::CANCEL_INVENTORY_TRANSFERS->value)) {
+            return $response;
+        }
+
+        try {
+            $inventory_transfer = $this->transferService->cancel($inventory_transfer);
 
             return $this->successResponse(new InventoryTransferResource($inventory_transfer));
         } catch (\Exception $e) {
