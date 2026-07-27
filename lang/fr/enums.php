@@ -12,6 +12,8 @@ return [
         'SALE'             => 'Vente',
         'EXPIRED'          => 'Expiré',
         'RESTOCK_RECEIVED' => 'Réapprovisionnement reçu',
+        'TRANSFER_CANCEL'  => 'Transfert annulé',
+        'SALE_RETURN'      => 'Retour de vente',
     ],
 
     'wallet_movement_type' => [
@@ -19,11 +21,20 @@ return [
         'WITHDRAWAL'          => 'Retrait',
         'TRANSFER_IN'         => 'Transfert entrant',
         'TRANSFER_OUT'        => 'Transfert sortant',
+        'EXPENSE'             => 'Dépense',
+        'SALARY'              => 'Salaire',
         'INSTALLMENT_PAYMENT' => 'Paiement par échéance',
         'PURCHASE_PAYMENT'    => "Paiement d'achat",
+        'PURCHASE_RETURN'     => "Retour d'achat",
+        'SALE_RETURN'         => 'Retour de vente',
         'SALE_PAYMENT'        => 'Paiement de vente',
         'PAYMENT_CANCEL'      => 'Paiement annulé',
         'ADJUSTMENT'          => 'Ajustement',
+    ],
+
+    'sale_return_status' => [
+        'PENDING'   => 'En attente',
+        'COMPLETED' => 'Terminé',
     ],
 
     'purchase_status' => [

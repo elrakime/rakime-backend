@@ -264,6 +264,26 @@ class WalletService
     }
 
     /**
+     * Record a sale return deduction (outflow).
+     */
+    public function saleReturn(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::SALE_RETURN,
+            -abs((float) $amount),
+            $note,
+            $source,
+        );
+    }
+
+    /**
      * Record a payment cancellation credit (inflow).
      */
     public function paymentCancel(

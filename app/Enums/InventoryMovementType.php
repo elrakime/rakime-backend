@@ -14,6 +14,7 @@ enum InventoryMovementType: string
     case EXPIRED          = 'expired';
     case RESTOCK_RECEIVED = 'restock_received';
     case TRANSFER_CANCEL  = 'transfer_cancel';
+    case SALE_RETURN      = 'sale_return';
 
     public static function keys(): array
     {
@@ -52,6 +53,7 @@ enum InventoryMovementType: string
             self::EXPIRED          => 'red',
             self::RESTOCK_RECEIVED => 'teal',
             self::TRANSFER_CANCEL  => 'red',
+            self::SALE_RETURN      => 'blue',
         };
     }
 

@@ -21,6 +21,7 @@ use App\Http\Controllers\Web\PurchaseReturnController;
 use App\Http\Controllers\Web\RestockController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\SaleController;
+use App\Http\Controllers\Web\SaleReturnController;
 use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\InventoryTransferController;
@@ -90,6 +91,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('restocks/{restock}/fulfill', [RestockController::class, 'fulfill']);
 
     Route::apiResource('sales', SaleController::class);
+    Route::apiResource('sales.returns', SaleReturnController::class)->parameters(['returns' => 'sale_return']);
+    Route::post('sales/{sale}/returns/{sale_return}/approve', [SaleReturnController::class, 'approve']);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);

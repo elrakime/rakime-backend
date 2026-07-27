@@ -12,6 +12,8 @@ return [
         'SALE'             => 'بيع',
         'EXPIRED'          => 'منتهي الصلاحية',
         'RESTOCK_RECEIVED' => 'إعادة تخزين مستلمة',
+        'TRANSFER_CANCEL'  => 'إلغاء التحويل',
+        'SALE_RETURN'      => 'إرجاع مبيعات',
     ],
 
     'wallet_movement_type' => [
@@ -19,11 +21,20 @@ return [
         'WITHDRAWAL'          => 'سحب',
         'TRANSFER_IN'         => 'تحويل وارد',
         'TRANSFER_OUT'        => 'تحويل صادر',
+        'EXPENSE'             => 'مصروف',
+        'SALARY'              => 'راتب',
         'INSTALLMENT_PAYMENT' => 'دفع قسط',
         'PURCHASE_PAYMENT'    => 'دفع مشتريات',
+        'PURCHASE_RETURN'     => 'إرجاع مشتريات',
+        'SALE_RETURN'         => 'إرجاع مبيعات',
         'SALE_PAYMENT'        => 'دفع مبيعات',
         'PAYMENT_CANCEL'      => 'إلغاء الدفع',
         'ADJUSTMENT'          => 'تسوية',
+    ],
+
+    'sale_return_status' => [
+        'PENDING'   => 'قيد الانتظار',
+        'COMPLETED' => 'مكتمل',
     ],
 
     'purchase_status' => [

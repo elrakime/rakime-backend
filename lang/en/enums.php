@@ -12,6 +12,8 @@ return [
         'SALE'              => 'Sale',
         'EXPIRED'           => 'Expired',
         'RESTOCK_RECEIVED'  => 'Restock Received',
+        'TRANSFER_CANCEL'   => 'Transfer Cancel',
+        'SALE_RETURN'       => 'Sale Return',
     ],
 
     'wallet_movement_type' => [
@@ -19,17 +21,26 @@ return [
         'WITHDRAWAL'          => 'Withdrawal',
         'TRANSFER_IN'         => 'Transfer In',
         'TRANSFER_OUT'        => 'Transfer Out',
+        'EXPENSE'             => 'Expense',
+        'SALARY'              => 'Salary',
         'INSTALLMENT_PAYMENT' => 'Installment Payment',
         'PURCHASE_PAYMENT'    => 'Purchase Payment',
+        'PURCHASE_RETURN'     => 'Purchase Return',
+        'SALE_RETURN'         => 'Sale Return',
         'SALE_PAYMENT'        => 'Sale Payment',
         'PAYMENT_CANCEL'      => 'Payment Cancel',
         'ADJUSTMENT'          => 'Adjustment',
     ],
 
+    'sale_return_status' => [
+        'PENDING'   => 'Pending',
+        'COMPLETED' => 'Completed',
+    ],
+
     'purchase_status' => [
-        'DRAFT'         => 'Draft',
-        'RECEIVED'      => 'Received',
-        'PAID'          => 'Paid',
+        'DRAFT'          => 'Draft',
+        'RECEIVED'       => 'Received',
+        'PAID'           => 'Paid',
         'PARTIALLY_PAID' => 'Partially Paid',
     ],
 

@@ -123,6 +123,13 @@ enum Permission: string
     case UPDATE_SALES = 'sales.update';
     case DELETE_SALES = 'sales.delete';
 
+    // Sale Returns
+    case VIEW_SALE_RETURNS    = 'sale_returns.view';
+    case CREATE_SALE_RETURNS  = 'sale_returns.create';
+    case UPDATE_SALE_RETURNS  = 'sale_returns.update';
+    case DELETE_SALE_RETURNS  = 'sale_returns.delete';
+    case APPROVE_SALE_RETURNS = 'sale_returns.approve';
+
     // Inventory Transfers
     case VIEW_INVENTORY_TRANSFERS    = 'inventory_transfers.view';
     case CREATE_INVENTORY_TRANSFERS  = 'inventory_transfers.create';
@@ -205,7 +212,7 @@ enum Permission: string
             'clients'                         => 'teal',
             'inventory', 'inventory_movements', 'stocks', 'batches', 'prices' => 'orange',
             'purchases', 'purchase_payments', 'purchase_returns' => 'yellow',
-            'sales'                           => 'green',
+            'sales', 'sale_returns'                            => 'green',
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
             'roles', 'permissions'            => 'indigo',

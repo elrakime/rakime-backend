@@ -152,7 +152,7 @@ class SaleService
             ->where('owner_id', $branchId)
             ->first();
 
-        if (!$wallet) {
+        if (!$wallet || $amount <= 0) {
             return;
         }
 
