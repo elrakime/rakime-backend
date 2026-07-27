@@ -19,6 +19,12 @@ class WalletMovementService
                 AllowedFilter::exact('movement_type'),
                 AllowedFilter::scope('inflow'),
                 AllowedFilter::scope('outflow'),
+                AllowedFilter::callback('from_date', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('to_date', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('note', 'like', "%{$value}%");
                 }),
