@@ -17,6 +17,7 @@ enum WalletMovementType: string
     case PURCHASE_PAYMENT    = 'purchase_payment';
     case PURCHASE_RETURN     = 'purchase_return';
     case SALE_RETURN         = 'sale_return';
+    case SALE_UPDATE         = 'sale_update';
     case PAYMENT_CANCEL      = 'payment_cancel';
     case ADJUSTMENT          = 'adjustment';
 
@@ -60,6 +61,7 @@ enum WalletMovementType: string
             self::PURCHASE_RETURN     => 'green',
             self::SALE_PAYMENT        => 'emerald',
             self::SALE_RETURN         => 'red',
+            self::SALE_UPDATE         => 'amber',
             self::PAYMENT_CANCEL      => 'green',
             self::ADJUSTMENT          => 'gray',
         };

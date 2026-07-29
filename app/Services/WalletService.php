@@ -284,6 +284,30 @@ class WalletService
     }
 
     /**
+     * Record a sale update adjustment (positive = credit, negative = debit).
+     */
+    public function saleUpdate(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        $amount = (float) $amount;
+
+        if ($amount < 0) {
+            $this->guardSufficientBalance($wallet, abs($amount));
+        }
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::SALE_UPDATE,
+            $amount,
+            $note,
+            $source,
+        );
+    }
+
+    /**
      * Record a payment cancellation credit (inflow).
      */
     public function paymentCancel(

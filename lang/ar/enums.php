@@ -14,6 +14,7 @@ return [
         'RESTOCK_RECEIVED' => 'إعادة تخزين مستلمة',
         'TRANSFER_CANCEL'  => 'إلغاء التحويل',
         'SALE_RETURN'      => 'إرجاع مبيعات',
+        'SALE_UPDATE'      => 'تحديث مبيعات',
     ],
 
     'wallet_movement_type' => [
@@ -27,6 +28,7 @@ return [
         'PURCHASE_PAYMENT'    => 'دفع مشتريات',
         'PURCHASE_RETURN'     => 'إرجاع مشتريات',
         'SALE_RETURN'         => 'إرجاع مبيعات',
+        'SALE_UPDATE'         => 'تحديث مبيعات',
         'SALE_PAYMENT'        => 'دفع مبيعات',
         'PAYMENT_CANCEL'      => 'إلغاء الدفع',
         'ADJUSTMENT'          => 'تسوية',

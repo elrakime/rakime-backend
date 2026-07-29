@@ -57,11 +57,6 @@ class Contract extends Model
         $query->where('status', ContractStatus::PENDING);
     }
 
-    public function scopePending(Builder $query): void
-    {
-        $query->where('status', ContractStatus::PENDING);
-    }
-
     public function scopeApproved(Builder $query): void
     {
         $query->where('status', ContractStatus::APPROVED);

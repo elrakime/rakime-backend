@@ -16,7 +16,13 @@ class Branch extends Model
     use LogsActivity;
     use HasUserstamps;
 
-    protected $fillable = ['name', 'code', 'shop_name', 'address', 'phone'];
+    protected $fillable = [
+        'name',
+        'code',
+        'shop_name',
+        'address',
+        'phone'
+    ];
 
     public function getActivitylogOptions(): LogOptions
     {

@@ -104,37 +104,75 @@ class SaleService
 
     public function update(Sale $sale, array $data): Sale
     {
-        $updateData = [
-            'branch_id' => $data['branch_id'] ?? $sale->branch_id,
-            'client_id' => $data['client_id'] ?? $sale->client_id,
-            'note'      => $data['note'] ?? $sale->note,
-        ];
+        $sale->loadMissing('items');
 
-        if (array_key_exists('tax_rate', $data) || array_key_exists('discount_type', $data) || array_key_exists('discount_value', $data)) {
-            $taxRate       = $data['tax_rate'] ?? $sale->tax_rate;
-            $discountType  = $data['discount_type'] ?? $sale->discount_type;
-            $discountValue = $data['discount_value'] ?? $sale->discount_value;
+        return DB::transaction(function () use ($sale, $data) {
+            $updateData = [
+                'branch_id' => $data['branch_id'] ?? $sale->branch_id,
+                'client_id' => $data['client_id'] ?? $sale->client_id,
+                'note'      => $data['note'] ?? $sale->note,
+            ];
 
-            [$taxAmount, $discountAmount, $totalAmount] = $this->calculateTotals(
-                $sale->gross_amount,
-                [
-                    'tax_rate'       => $taxRate,
-                    'discount_type'  => $discountType,
-                    'discount_value' => $discountValue,
-                ],
-            );
+            $oldTotalAmount = $sale->total_amount;
+            $newGrossAmount = $sale->gross_amount;
+            $recalculateTotals = isset($data['items'])
+                || array_key_exists('tax_rate', $data)
+                || array_key_exists('discount_type', $data)
+                || array_key_exists('discount_value', $data);
 
-            $updateData['tax_rate']        = $taxRate;
-            $updateData['tax_amount']      = $taxAmount;
-            $updateData['discount_type']   = $discountType;
-            $updateData['discount_value']  = $discountValue;
-            $updateData['discount_amount'] = $discountAmount;
-            $updateData['total_amount']    = $totalAmount;
-        }
+            // Items changed — reconcile stock and replace items
+            if (isset($data['items'])) {
+                $inventory = $this->getBranchInventory($updateData['branch_id']);
+                $resolvedItems = $this->resolveItemsForUpdate($inventory->id, $data['items']);
+                $newGrossAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
 
-        $sale->update($updateData);
+                $this->reconcileStockForUpdate($sale, $resolvedItems);
 
-        return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
+                $sale->items()->delete();
+                foreach ($resolvedItems as $item) {
+                    SaleItem::create([
+                        'sale_id'    => $sale->id,
+                        'product_id' => $item['product_id'],
+                        'stock_id'   => $item['stock_id'],
+                        'quantity'   => $item['quantity'],
+                        'price'      => $item['price'],
+                    ]);
+                }
+            }
+
+            // Recalculate totals if anything affecting amounts changed
+            if ($recalculateTotals) {
+                $taxRate       = $data['tax_rate'] ?? $sale->tax_rate;
+                $discountType  = $data['discount_type'] ?? $sale->discount_type;
+                $discountValue = $data['discount_value'] ?? $sale->discount_value;
+
+                [$taxAmount, $discountAmount, $newTotalAmount] = $this->calculateTotals(
+                    $newGrossAmount,
+                    [
+                        'tax_rate'       => $taxRate,
+                        'discount_type'  => $discountType,
+                        'discount_value' => $discountValue,
+                    ],
+                );
+
+                $updateData['gross_amount']    = $newGrossAmount;
+                $updateData['tax_rate']        = $taxRate;
+                $updateData['tax_amount']      = $taxAmount;
+                $updateData['discount_type']   = $discountType;
+                $updateData['discount_value']  = $discountValue;
+                $updateData['discount_amount'] = $discountAmount;
+                $updateData['total_amount']    = $newTotalAmount;
+            }
+
+            // Reconcile wallet if total changed
+            if (isset($newTotalAmount) && $newTotalAmount !== $oldTotalAmount) {
+                $this->reconcileWalletForUpdate($sale, $oldTotalAmount, $newTotalAmount);
+            }
+
+            $sale->update($updateData);
+
+            return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
+        });
     }
 
     public function delete(Sale $sale): void
@@ -159,6 +197,126 @@ class SaleService
         $this->walletService->salePayment(
             wallet: $wallet,
             amount: $amount,
+            source: $sale,
+            note: $sale->note,
+        );
+    }
+
+    /**
+     * Reconcile stock quantities when sale items are updated.
+     * Classifies each stock into: added, increased, reduced, or removed.
+     * Creates a SALE_UPDATE inventory movement per affected stock.
+     *
+     * - Added / Increased: checks availability for the delta, then reduces stock (outflow).
+     * - Reduced / Removed: returns stock without availability check (inflow).
+     */
+    private function reconcileStockForUpdate(Sale $sale, array $resolvedItems): void
+    {
+        // Build old stock map: stock_id => total quantity
+        $oldStockMap = [];
+        foreach ($sale->items as $oldItem) {
+            $sid = $oldItem->stock_id;
+            $oldStockMap[$sid] = ($oldStockMap[$sid] ?? 0) + $oldItem->quantity;
+        }
+
+        // Build new stock map
+        $newStockMap = [];
+        foreach ($resolvedItems as $item) {
+            $sid = $item['stock_id'];
+            $newStockMap[$sid] = ($newStockMap[$sid] ?? 0) + $item['quantity'];
+        }
+
+        $allStockIds = array_unique(array_merge(array_keys($oldStockMap), array_keys($newStockMap)));
+
+        foreach ($allStockIds as $stockId) {
+            $oldQty = $oldStockMap[$stockId] ?? 0;
+            $newQty = $newStockMap[$stockId] ?? 0;
+
+            if ($oldQty === $newQty) {
+                continue; // unchanged
+            }
+
+            $batches = Batch::with('stock')
+                ->where('stock_id', $stockId)
+                ->orderBy('created_at')
+                ->get();
+
+            $oldTotal = $batches->sum('current_quantity');
+
+            if ($newQty > $oldQty) {
+                // ADDED or INCREASED: outflow, must check availability for the delta
+                $delta = $newQty - $oldQty;
+
+                $available = $batches->sum('current_quantity');
+                if ($available < $delta) {
+                    throw new Exception(
+                        __('sales.insufficient_stock', ['stock' => $stockId, 'available' => $available]), 422
+                    );
+                }
+
+                $remaining = $delta;
+                foreach ($batches as $batch) {
+                    $deduct = min($remaining, $batch->current_quantity);
+                    if ($deduct > 0) {
+                        $batch->decrement('current_quantity', $deduct);
+                        $remaining -= $deduct;
+                    }
+                    if ($remaining <= 0) {
+                        break;
+                    }
+                }
+
+                $newTotal = $oldTotal - $delta;
+            } else {
+                // REDUCED or REMOVED: inflow, no availability check needed
+                $delta = $oldQty - $newQty;
+
+                $batch = $batches->first();
+                if ($batch) {
+                    $batch->increment('current_quantity', $delta);
+                }
+
+                $newTotal = $oldTotal + $delta;
+            }
+
+            $firstBatch = $batches->first();
+            InventoryMovement::create([
+                'stock_id'      => $stockId,
+                'inventory_id'  => $firstBatch?->stock->inventory_id,
+                'product_id'    => $firstBatch?->stock->product_id,
+                'source_id'     => $sale->id,
+                'source_type'   => Sale::class,
+                'movement_type' => InventoryMovementType::SALE_UPDATE,
+                'old_quantity'  => $oldTotal,
+                'new_quantity'  => $newTotal,
+                'quantity'      => abs($newQty - $oldQty),
+            ]);
+        }
+    }
+
+    /**
+     * Reconcile branch wallet when sale total changes.
+     * Creates a SALE_UPDATE wallet movement for the difference.
+     */
+    private function reconcileWalletForUpdate(Sale $sale, int $oldTotal, int $newTotal): void
+    {
+        $netDiff = $newTotal - $oldTotal;
+
+        if ($netDiff === 0) {
+            return;
+        }
+
+        $wallet = Wallet::where('owner_type', Branch::class)
+            ->where('owner_id', $sale->branch_id)
+            ->first();
+
+        if (!$wallet) {
+            return;
+        }
+
+        $this->walletService->saleUpdate(
+            wallet: $wallet,
+            amount: $netDiff,
             source: $sale,
             note: $sale->note,
         );
@@ -283,6 +441,59 @@ class SaleService
                     __('sales.insufficient_stock', ['stock' => $stockId, 'available' => $stock->total_current ?? 0]), 422
                 );
             }
+
+            $price = isset($item['price_id'])
+                ? $prices[$item['price_id']]->amount ?? 0
+                : $stock->sellingPrice?->amount ?? 0;
+
+            $resolved[] = [
+                'stock_id'   => $stockId,
+                'product_id' => $stock->product_id,
+                'quantity'   => $item['quantity'],
+                'price'      => $price,
+            ];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Same as resolveItems() but without the quantity availability check.
+     * Used during sale updates where reduced/removed items don't need stock verification.
+     *
+     * Still validates that each stock belongs to the branch inventory and resolves
+     * product_id and price.
+     *
+     * @return array[] items enriched with product_id and price
+     */
+    private function resolveItemsForUpdate(int $inventoryId, array $items): array
+    {
+        $stockIds = array_column($items, 'stock_id');
+        $priceIds = array_filter(array_column($items, 'price_id'));
+
+        $stocks = Stock::where('inventory_id', $inventoryId)
+            ->whereIn('id', $stockIds)
+            ->with('sellingPrice')
+            ->get()
+            ->keyBy('id');
+
+        $prices = [];
+        if (!empty($priceIds)) {
+            $prices = Price::whereIn('id', $priceIds)->get()->keyBy('id');
+        }
+
+        $resolved = [];
+
+        foreach ($items as $item) {
+            $stockId = $item['stock_id'];
+
+            if (!isset($stocks[$stockId])) {
+                throw new Exception(
+                    __('sales.stock_not_in_branch_inventory', ['stock' => $stockId]), 422
+                );
+            }
+
+            $stock = $stocks[$stockId];
 
             $price = isset($item['price_id'])
                 ? $prices[$item['price_id']]->amount ?? 0

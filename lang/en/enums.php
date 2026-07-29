@@ -14,6 +14,7 @@ return [
         'RESTOCK_RECEIVED'  => 'Restock Received',
         'TRANSFER_CANCEL'   => 'Transfer Cancel',
         'SALE_RETURN'       => 'Sale Return',
+        'SALE_UPDATE'       => 'Sale Update',
     ],
 
     'wallet_movement_type' => [
@@ -27,6 +28,7 @@ return [
         'PURCHASE_PAYMENT'    => 'Purchase Payment',
         'PURCHASE_RETURN'     => 'Purchase Return',
         'SALE_RETURN'         => 'Sale Return',
+        'SALE_UPDATE'         => 'Sale Update',
         'SALE_PAYMENT'        => 'Sale Payment',
         'PAYMENT_CANCEL'      => 'Payment Cancel',
         'ADJUSTMENT'          => 'Adjustment',

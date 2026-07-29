@@ -14,6 +14,7 @@ return [
         'RESTOCK_RECEIVED' => 'Réapprovisionnement reçu',
         'TRANSFER_CANCEL'  => 'Transfert annulé',
         'SALE_RETURN'      => 'Retour de vente',
+        'SALE_UPDATE'      => 'Mise à jour vente',
     ],
 
     'wallet_movement_type' => [
@@ -27,6 +28,7 @@ return [
         'PURCHASE_PAYMENT'    => "Paiement d'achat",
         'PURCHASE_RETURN'     => "Retour d'achat",
         'SALE_RETURN'         => 'Retour de vente',
+        'SALE_UPDATE'         => 'Mise à jour vente',
         'SALE_PAYMENT'        => 'Paiement de vente',
         'PAYMENT_CANCEL'      => 'Paiement annulé',
         'ADJUSTMENT'          => 'Ajustement',
