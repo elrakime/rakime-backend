@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Enums\ExpirationStatus;
-use App\Enums\InventoryMovementType;
 use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
-use App\Models\InventoryMovement;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -18,6 +16,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ExpirationService
 {
+    public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Expiration::class, $request)
@@ -118,17 +117,14 @@ class ExpirationService
                     }
                 }
 
-                InventoryMovement::create([
-                    'stock_id'      => $item->stock_id,
-                    'inventory_id'  => $expiration->inventory_id,
-                    'product_id'    => $item->stock->product_id,
-                    'source_id'     => $expiration->id,
-                    'source_type'   => Expiration::class,
-                    'movement_type' => InventoryMovementType::EXPIRED,
-                    'old_quantity'  => $oldQuantity,
-                    'new_quantity'  => $oldQuantity - $item->quantity,
-                    'quantity'      => $item->quantity,
-                ]);
+                $this->inventoryService->expired(
+                    stockId: $item->stock_id,
+                    inventoryId: $expiration->inventory_id,
+                    productId: $item->stock->product_id,
+                    oldQuantity: $oldQuantity,
+                    quantity: $item->quantity,
+                    source: $expiration,
+                );
             }
 
             $expiration->update(['status' => ExpirationStatus::APPROVED]);

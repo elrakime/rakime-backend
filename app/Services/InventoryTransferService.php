@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryMovementType;
 use App\Enums\InventoryTransferStatus;
-use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Stock;
@@ -18,6 +16,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class InventoryTransferService
 {
+    public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(InventoryTransfer::class, $request)
@@ -116,17 +115,14 @@ class InventoryTransferService
                         $fromBatch->decrement('current_quantity', $transferItem->quantity);
                     }
 
-                    InventoryMovement::create([
-                        'stock_id'      => $fromStock->id,
-                        'inventory_id'  => $transfer->from_inventory_id,
-                        'product_id'    => $transferItem->stock->product_id,
-                        'source_id'     => $transfer->id,
-                        'source_type'   => InventoryTransfer::class,
-                        'movement_type' => InventoryMovementType::TRANSFER_OUT,
-                        'old_quantity'  => $oldQuantity,
-                        'new_quantity'  => $oldQuantity - $transferItem->quantity,
-                        'quantity'      => $transferItem->quantity,
-                    ]);
+                    $this->inventoryService->transferOut(
+                        stockId: $fromStock->id,
+                        inventoryId: $transfer->from_inventory_id,
+                        productId: $transferItem->stock->product_id,
+                        oldQuantity: $oldQuantity,
+                        quantity: $transferItem->quantity,
+                        source: $transfer,
+                    );
                 }
             }
 
@@ -157,17 +153,14 @@ class InventoryTransferService
                     'current_quantity' => $transferItem->quantity,
                 ]);
 
-                InventoryMovement::create([
-                    'stock_id'      => $toStock->id,
-                    'inventory_id'  => $transfer->to_inventory_id,
-                    'product_id'    => $transferItem->stock->product_id,
-                    'source_id'     => $transfer->id,
-                    'source_type'   => InventoryTransfer::class,
-                    'movement_type' => InventoryMovementType::TRANSFER_IN,
-                    'old_quantity'  => $oldQuantity,
-                    'new_quantity'  => $oldQuantity + $transferItem->quantity,
-                    'quantity'      => $transferItem->quantity,
-                ]);
+                $this->inventoryService->transferIn(
+                    stockId: $toStock->id,
+                    inventoryId: $transfer->to_inventory_id,
+                    productId: $transferItem->stock->product_id,
+                    oldQuantity: $oldQuantity,
+                    quantity: $transferItem->quantity,
+                    source: $transfer,
+                );
             }
 
             $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);
@@ -196,17 +189,14 @@ class InventoryTransferService
                             'current_quantity' => $transferItem->quantity,
                         ]);
 
-                        InventoryMovement::create([
-                            'stock_id'      => $fromStock->id,
-                            'inventory_id'  => $transfer->from_inventory_id,
-                            'product_id'    => $transferItem->stock->product_id,
-                            'source_id'     => $transfer->id,
-                            'source_type'   => InventoryTransfer::class,
-                            'movement_type' => InventoryMovementType::TRANSFER_CANCEL,
-                            'old_quantity'  => $oldQuantity,
-                            'new_quantity'  => $oldQuantity + $transferItem->quantity,
-                            'quantity'      => $transferItem->quantity,
-                        ]);
+                        $this->inventoryService->transferCancel(
+                            stockId: $fromStock->id,
+                            inventoryId: $transfer->from_inventory_id,
+                            productId: $transferItem->stock->product_id,
+                            oldQuantity: $oldQuantity,
+                            quantity: $transferItem->quantity,
+                            source: $transfer,
+                        );
                     }
                 }
             }

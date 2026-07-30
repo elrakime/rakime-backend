@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryMovementType;
 use App\Enums\PriceType;
 use App\Enums\PurchaseStatus;
-use App\Models\InventoryMovement;
+use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Stock;
@@ -20,6 +19,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseService
 {
+    public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Purchase::class, $request)
@@ -155,27 +155,24 @@ class PurchaseService
 
                 $prices = collect();
                 foreach ($pricing['selling_prices'] ?? [] as $amount) {
-                    $prices->push(new \App\Models\Price(['type' => PriceType::SELLING, 'amount' => $amount]));
+                    $prices->push(new Price(['type' => PriceType::SELLING, 'amount' => $amount]));
                 }
                 foreach ($pricing['installment_prices'] ?? [] as $amount) {
-                    $prices->push(new \App\Models\Price(['type' => PriceType::INSTALLMENT, 'amount' => $amount]));
+                    $prices->push(new Price(['type' => PriceType::INSTALLMENT, 'amount' => $amount]));
                 }
 
                 if ($prices->isNotEmpty()) {
                     $stock->prices()->saveMany($prices);
                 }
 
-                InventoryMovement::create([
-                    'stock_id'      => $stock->id,
-                    'inventory_id'  => $inventoryId,
-                    'product_id'    => $item->product_id,
-                    'source_id'     => $purchase->id,
-                    'source_type'   => Purchase::class,
-                    'movement_type' => InventoryMovementType::RECEIVE,
-                    'old_quantity'  => $oldQuantity,
-                    'new_quantity'  => $oldQuantity + $item->quantity,
-                    'quantity'      => $item->quantity,
-                ]);
+                $this->inventoryService->receive(
+                    stockId: $stock->id,
+                    inventoryId: $inventoryId,
+                    productId: $item->product_id,
+                    oldQuantity: $oldQuantity,
+                    quantity: $item->quantity,
+                    source: $purchase,
+                );
             }
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);

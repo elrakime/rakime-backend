@@ -2,11 +2,8 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryMovementType;
 use App\Enums\SaleReturnStatus;
-use App\Enums\WalletMovementType;
 use App\Models\Batch;
-use App\Models\InventoryMovement;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SaleReturn;
@@ -22,7 +19,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class SaleReturnService
 {
-    public function __construct(private readonly WalletService $walletService) {}
+    public function __construct(
+        private readonly InventoryService $inventoryService,
+        private readonly WalletService $walletService,
+    ) {}
 
     public function list(Request $request, Sale $sale): LengthAwarePaginator
     {
@@ -130,17 +130,14 @@ class SaleReturnService
                     $oldQuantity = $stock->batches()->sum('current_quantity');
                     $batch->increment('current_quantity', $returnItem->quantity);
 
-                    InventoryMovement::create([
-                        'stock_id'      => $batch->stock_id,
-                        'inventory_id'  => $stock->inventory_id,
-                        'product_id'    => $saleItem->product_id,
-                        'source_id'     => $saleReturn->id,
-                        'source_type'   => SaleReturn::class,
-                        'movement_type' => InventoryMovementType::SALE_RETURN,
-                        'old_quantity'  => $oldQuantity,
-                        'new_quantity'  => $oldQuantity + $returnItem->quantity,
-                        'quantity'      => $returnItem->quantity,
-                    ]);
+                    $this->inventoryService->saleReturn(
+                        stockId: $batch->stock_id,
+                        inventoryId: $stock->inventory_id,
+                        productId: $saleItem->product_id,
+                        oldQuantity: $oldQuantity,
+                        quantity: $returnItem->quantity,
+                        source: $saleReturn,
+                    );
                 }
             }
 

@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryMovementType;
 use App\Enums\PurchaseReturnStatus;
 use App\Models\Batch;
-use App\Models\InventoryMovement;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
@@ -21,7 +19,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseReturnService
 {
-    public function __construct(private readonly WalletService $walletService) {}
+    public function __construct(
+        private readonly InventoryService $inventoryService,
+        private readonly WalletService $walletService,
+    ) {}
     public function list(Request $request, Purchase $purchase): LengthAwarePaginator
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
@@ -123,17 +124,14 @@ class PurchaseReturnService
                     $oldQuantity = $batch->stock->batches()->sum('current_quantity');
                     $batch->decrement('current_quantity', $returnItem->quantity);
 
-                    InventoryMovement::create([
-                        'stock_id'      => $batch->stock_id,
-                        'inventory_id'  => $batch->stock->inventory_id,
-                        'product_id'    => $purchaseItem->product_id,
-                        'source_id'     => $purchaseReturn->id,
-                        'source_type'   => PurchaseReturn::class,
-                        'movement_type' => InventoryMovementType::RETURN,
-                        'old_quantity'  => $oldQuantity,
-                        'new_quantity'  => $oldQuantity - $returnItem->quantity,
-                        'quantity'      => $returnItem->quantity,
-                    ]);
+                    $this->inventoryService->returnOut(
+                        stockId: $batch->stock_id,
+                        inventoryId: $batch->stock->inventory_id,
+                        productId: $purchaseItem->product_id,
+                        oldQuantity: $oldQuantity,
+                        quantity: $returnItem->quantity,
+                        source: $purchaseReturn,
+                    );
                 }
             }
 

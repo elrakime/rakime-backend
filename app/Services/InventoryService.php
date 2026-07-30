@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\InventoryMovementType;
 use App\Models\Inventory;
+use App\Models\InventoryMovement;
 use App\Traits\ScopesByUserBranches;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -64,5 +67,258 @@ class InventoryService
     public function delete(Inventory $inventory): void
     {
         $inventory->delete();
+    }
+
+    // ============================================================
+    // MOVEMENT METHODS
+    // ============================================================
+
+    /**
+     * Record a stock receive (inflow), e.g. from a purchase.
+     */
+    public function receive(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::RECEIVE,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    /**
+     * Record a stock return (outflow), e.g. a purchase return.
+     */
+    public function returnOut(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::RETURN,
+            $oldQuantity,
+            -abs($quantity),
+            $source,
+        );
+    }
+
+    /**
+     * Record a transfer out (outflow).
+     */
+    public function transferOut(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::TRANSFER_OUT,
+            $oldQuantity,
+            -abs($quantity),
+            $source,
+        );
+    }
+
+    /**
+     * Record a transfer in (inflow).
+     */
+    public function transferIn(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::TRANSFER_IN,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    /**
+     * Record a sale deduction (outflow).
+     */
+    public function sale(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::SALE,
+            $oldQuantity,
+            -abs($quantity),
+            $source,
+        );
+    }
+
+    /**
+     * Record an expired stock deduction (outflow).
+     */
+    public function expired(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::EXPIRED,
+            $oldQuantity,
+            -abs($quantity),
+            $source,
+        );
+    }
+
+    /**
+     * Record a restock receive (inflow).
+     */
+    public function restockReceived(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::RESTOCK_RECEIVED,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    /**
+     * Record a transfer cancel reversal (inflow back to source).
+     */
+    public function transferCancel(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::TRANSFER_CANCEL,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    /**
+     * Record a sale return credit (inflow).
+     */
+    public function saleReturn(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::SALE_RETURN,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    /**
+     * Record a sale update adjustment (positive or negative).
+     */
+    public function saleUpdate(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::SALE_UPDATE,
+            $oldQuantity,
+            $quantity,
+            $source,
+        );
+    }
+
+    // ============================================================
+    // INTERNAL
+    // ============================================================
+
+    /**
+     * Core: create an inventory movement record.
+     */
+    private function recordMovement(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        InventoryMovementType $type,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+    ): InventoryMovement {
+        return InventoryMovement::create([
+            'stock_id'      => $stockId,
+            'inventory_id'  => $inventoryId,
+            'product_id'    => $productId,
+            'source_type'   => $source ? get_class($source) : null,
+            'source_id'     => $source?->id,
+            'movement_type' => $type,
+            'old_quantity'  => $oldQuantity,
+            'new_quantity'  => $oldQuantity + $quantity,
+            'quantity'      => $quantity,
+        ]);
     }
 }

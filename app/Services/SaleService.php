@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Enums\DiscountType;
-use App\Enums\InventoryMovementType;
 use App\Models\Batch;
 use App\Models\Branch;
 use App\Models\Inventory;
-use App\Models\InventoryMovement;
 use App\Models\Price;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -26,7 +24,10 @@ class SaleService
 {
     use ScopesByUserBranches;
 
-    public function __construct(private readonly WalletService $walletService) {}
+    public function __construct(
+        private readonly InventoryService $inventoryService,
+        private readonly WalletService $walletService,
+    ) {}
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Sale::query();
@@ -280,17 +281,14 @@ class SaleService
             }
 
             $firstBatch = $batches->first();
-            InventoryMovement::create([
-                'stock_id'      => $stockId,
-                'inventory_id'  => $firstBatch?->stock->inventory_id,
-                'product_id'    => $firstBatch?->stock->product_id,
-                'source_id'     => $sale->id,
-                'source_type'   => Sale::class,
-                'movement_type' => InventoryMovementType::SALE_UPDATE,
-                'old_quantity'  => $oldTotal,
-                'new_quantity'  => $newTotal,
-                'quantity'      => abs($newQty - $oldQty),
-            ]);
+            $this->inventoryService->saleUpdate(
+                stockId: $stockId,
+                inventoryId: $firstBatch?->stock->inventory_id,
+                productId: $firstBatch?->stock->product_id,
+                oldQuantity: $oldTotal,
+                quantity: $newQty - $oldQty,
+                source: $sale,
+            );
         }
     }
 
@@ -348,17 +346,14 @@ class SaleService
             }
 
             $firstBatch = $batches->first();
-            InventoryMovement::create([
-                'stock_id'      => $item->stock_id,
-                'inventory_id'  => $firstBatch?->stock->inventory_id,
-                'product_id'    => $item->product_id,
-                'source_id'     => $sale->id,
-                'source_type'   => Sale::class,
-                'movement_type' => InventoryMovementType::SALE,
-                'old_quantity'  => $oldQuantity,
-                'new_quantity'  => $oldQuantity - $item->quantity,
-                'quantity'      => $item->quantity,
-            ]);
+            $this->inventoryService->sale(
+                stockId: $item->stock_id,
+                inventoryId: $firstBatch?->stock->inventory_id,
+                productId: $item->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $item->quantity,
+                source: $sale,
+            );
         }
     }
 

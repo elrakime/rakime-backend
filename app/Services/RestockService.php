@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Enums\InventoryMovementType;
 use App\Enums\PurchaseStatus;
 use App\Enums\RestockStatus;
-use App\Models\InventoryMovement;
+use App\Models\Inventory;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Purchase;
@@ -25,6 +24,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 class RestockService
 {
     use ScopesByUserBranches;
+
+    public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Restock::query();
@@ -186,7 +187,7 @@ class RestockService
         $restock->loadMissing('branch');
 
         // Find the inventory belonging to the restock's branch
-        $inventory = \App\Models\Inventory::where('branch_id', $restock->branch_id)->first();
+        $inventory = Inventory::where('branch_id', $restock->branch_id)->first();
 
         if (!$inventory) {
             throw new Exception(__('restocks.no_inventory_for_branch'), 422);
@@ -229,30 +230,24 @@ class RestockService
             ]);
 
             // Record inventory movement for receiving the purchase
-            InventoryMovement::create([
-                'stock_id'      => $stock->id,
-                'inventory_id'  => $inventory->id,
-                'product_id'    => $restockItem->product_id,
-                'source_id'     => $purchase->id,
-                'source_type'   => Purchase::class,
-                'movement_type' => InventoryMovementType::RECEIVE,
-                'old_quantity'  => $oldQuantity,
-                'new_quantity'  => $oldQuantity + $quantity,
-                'quantity'      => $quantity,
-            ]);
+            $this->inventoryService->receive(
+                stockId: $stock->id,
+                inventoryId: $inventory->id,
+                productId: $restockItem->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $quantity,
+                source: $purchase,
+            );
 
             // Record inventory movement for the restock fulfillment
-            InventoryMovement::create([
-                'stock_id'      => $stock->id,
-                'inventory_id'  => $inventory->id,
-                'product_id'    => $restockItem->product_id,
-                'source_id'     => $restock->id,
-                'source_type'   => Restock::class,
-                'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
-                'old_quantity'  => $oldQuantity,
-                'new_quantity'  => $oldQuantity + $quantity,
-                'quantity'      => $quantity,
-            ]);
+            $this->inventoryService->restockReceived(
+                stockId: $stock->id,
+                inventoryId: $inventory->id,
+                productId: $restockItem->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $quantity,
+                source: $restock,
+            );
 
             $restockItem->update([
                 'fulfilled_quantity' => $quantity,
@@ -267,7 +262,7 @@ class RestockService
         $restock->loadMissing('branch');
 
         // Find the inventory belonging to the restock's branch (destination)
-        $toInventory = \App\Models\Inventory::where('branch_id', $restock->branch_id)->first();
+        $toInventory = Inventory::where('branch_id', $restock->branch_id)->first();
 
         if (!$toInventory) {
             throw new Exception(__('restocks.no_inventory_for_branch'), 422);
@@ -309,17 +304,14 @@ class RestockService
                     $fromBatch->decrement('current_quantity', $quantity);
                 }
 
-                InventoryMovement::create([
-                    'stock_id'      => $fromStock->id,
-                    'inventory_id'  => $fromInventoryId,
-                    'product_id'    => $restockItem->product_id,
-                    'source_id'     => $transfer->id,
-                    'source_type'   => InventoryTransfer::class,
-                    'movement_type' => InventoryMovementType::TRANSFER_OUT,
-                    'old_quantity'  => $oldQuantity,
-                    'new_quantity'  => $oldQuantity - $quantity,
-                    'quantity'      => $quantity,
-                ]);
+                $this->inventoryService->transferOut(
+                    stockId: $fromStock->id,
+                    inventoryId: $fromInventoryId,
+                    productId: $restockItem->product_id,
+                    oldQuantity: $oldQuantity,
+                    quantity: $quantity,
+                    source: $transfer,
+                );
             }
 
             // Create/reuse stock in the destination (branch) inventory
@@ -340,30 +332,24 @@ class RestockService
             ]);
 
             // Record transfer-in movement
-            InventoryMovement::create([
-                'stock_id'      => $toStock->id,
-                'inventory_id'  => $toInventory->id,
-                'product_id'    => $restockItem->product_id,
-                'source_id'     => $transfer->id,
-                'source_type'   => InventoryTransfer::class,
-                'movement_type' => InventoryMovementType::TRANSFER_IN,
-                'old_quantity'  => $oldQuantity,
-                'new_quantity'  => $oldQuantity + $quantity,
-                'quantity'      => $quantity,
-            ]);
+            $this->inventoryService->transferIn(
+                stockId: $toStock->id,
+                inventoryId: $toInventory->id,
+                productId: $restockItem->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $quantity,
+                source: $transfer,
+            );
 
             // Record restock fulfillment movement
-            InventoryMovement::create([
-                'stock_id'      => $toStock->id,
-                'inventory_id'  => $toInventory->id,
-                'product_id'    => $restockItem->product_id,
-                'source_id'     => $restock->id,
-                'source_type'   => Restock::class,
-                'movement_type' => InventoryMovementType::RESTOCK_RECEIVED,
-                'old_quantity'  => $oldQuantity,
-                'new_quantity'  => $oldQuantity + $quantity,
-                'quantity'      => $quantity,
-            ]);
+            $this->inventoryService->restockReceived(
+                stockId: $toStock->id,
+                inventoryId: $toInventory->id,
+                productId: $restockItem->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $quantity,
+                source: $restock,
+            );
 
             $restockItem->update([
                 'fulfilled_quantity' => $quantity,
