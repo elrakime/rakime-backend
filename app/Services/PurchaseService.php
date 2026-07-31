@@ -7,6 +7,7 @@ use App\Enums\PurchaseStatus;
 use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
+use App\Models\Restock;
 use App\Models\Stock;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -135,6 +136,11 @@ class PurchaseService
             // Index optional per-item pricing overrides by product_id
             $pricingByProduct = collect($data['items'] ?? [])->keyBy('product_id');
 
+            // If this purchase was created from a restock, load the restock to update fulfilled quantities
+            $restock = Restock::where('fulfilled_with_id', $purchase->id)
+                ->where('fulfilled_with_type', Purchase::class)
+                ->first();
+
             foreach ($purchase->items as $item) {
                 $pricing = $pricingByProduct->get($item->product_id, []);
 
@@ -173,6 +179,14 @@ class PurchaseService
                     quantity: $item->quantity,
                     source: $purchase,
                 );
+
+                // Update restock fulfilled_quantity if linked
+                if ($restock) {
+                    $restockItem = $restock->items()->where('product_id', $item->product_id)->first();
+                    if ($restockItem) {
+                        $restockItem->increment('fulfilled_quantity', $item->quantity);
+                    }
+                }
             }
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);

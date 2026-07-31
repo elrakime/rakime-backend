@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\InventoryTransferStatus;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
+use App\Models\Restock;
 use App\Models\Stock;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -137,6 +138,11 @@ class InventoryTransferService
         return DB::transaction(function () use ($transfer) {
             $transfer->loadMissing('items.stock');
 
+            // If this transfer was created from a restock, load the restock to update fulfilled quantities
+            $restock = Restock::where('fulfilled_with_id', $transfer->id)
+                ->where('fulfilled_with_type', InventoryTransfer::class)
+                ->first();
+
             foreach ($transfer->items as $transferItem) {
                 $toStock = Stock::firstOrCreate([
                     'inventory_id' => $transfer->to_inventory_id,
@@ -161,6 +167,14 @@ class InventoryTransferService
                     quantity: $transferItem->quantity,
                     source: $transfer,
                 );
+
+                // Update restock fulfilled_quantity if linked
+                if ($restock) {
+                    $restockItem = $restock->items()->where('product_id', $transferItem->stock->product_id)->first();
+                    if ($restockItem) {
+                        $restockItem->increment('fulfilled_quantity', $transferItem->quantity);
+                    }
+                }
             }
 
             $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);

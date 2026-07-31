@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\InventoryTransferStatus;
 use App\Enums\PurchaseStatus;
 use App\Enums\RestockStatus;
 use App\Models\Inventory;
@@ -186,17 +187,15 @@ class RestockService
     {
         $restock->loadMissing('branch');
 
-        // Find the inventory belonging to the restock's branch
-        $inventory = Inventory::where('branch_id', $restock->branch_id)->first();
+        // Build per-product pricing map from request
+        $pricing = collect($data['items'] ?? [])->keyBy('product_id');
 
-        if (!$inventory) {
-            throw new Exception(__('restocks.no_inventory_for_branch'), 422);
-        }
+        $totalAmount = 0;
 
-        // Create a new purchase from the supplier (prices default to 0 for restock fulfillment)
+        // Create purchase as PENDING — no stock changes yet
         $purchase = Purchase::create([
             'supplier_id'  => $data['supplier_id'],
-            'status'       => PurchaseStatus::RECEIVED,
+            'status'       => PurchaseStatus::PENDING,
             'total_amount' => 0,
             'paid_amount'  => 0,
             'note'         => $data['note'] ?? null,
@@ -204,55 +203,22 @@ class RestockService
 
         foreach ($restock->items as $restockItem) {
             $quantity = $restockItem->requested_quantity;
-            $price = 0;
+            $price = (int) ($pricing[$restockItem->product_id]['price'] ?? 0);
 
-            $purchaseItem = $purchase->items()->create([
+            $totalAmount += $quantity * $price;
+
+            $purchase->items()->create([
                 'product_id' => $restockItem->product_id,
                 'quantity'   => $quantity,
                 'price'      => $price,
             ]);
 
-            // Create/reuse stock in the branch inventory
-            $stock = Stock::firstOrCreate([
-                'inventory_id' => $inventory->id,
-                'product_id'   => $restockItem->product_id,
-            ]);
-
-            $oldQuantity = $stock->batches()->sum('current_quantity');
-
-            // Create batch for this purchase item
-            $batch = $stock->batches()->create([
-                'source_id'        => $purchaseItem->id,
-                'source_type'      => PurchaseItem::class,
-                'purchase_price'   => $price,
-                'initial_quantity' => $quantity,
-                'current_quantity' => $quantity,
-            ]);
-
-            // Record inventory movement for receiving the purchase
-            $this->inventoryService->receive(
-                stockId: $stock->id,
-                inventoryId: $inventory->id,
-                productId: $restockItem->product_id,
-                oldQuantity: $oldQuantity,
-                quantity: $quantity,
-                source: $purchase,
-            );
-
-            // Record inventory movement for the restock fulfillment
-            $this->inventoryService->restockReceived(
-                stockId: $stock->id,
-                inventoryId: $inventory->id,
-                productId: $restockItem->product_id,
-                oldQuantity: $oldQuantity,
-                quantity: $quantity,
-                source: $restock,
-            );
-
             $restockItem->update([
-                'fulfilled_quantity' => $quantity,
+                'fulfilled_quantity' => 0,
             ]);
         }
+
+        $purchase->update(['total_amount' => $totalAmount]);
 
         return $purchase;
     }
@@ -270,89 +236,50 @@ class RestockService
 
         $fromInventoryId = $data['from_inventory_id'];
 
-        // Create a new transfer from the source inventory to the branch's inventory
+        // Validate that source inventory has enough stock for all requested items
+        foreach ($restock->items as $restockItem) {
+            $quantity = $restockItem->requested_quantity;
+
+            $fromStock = Stock::where('inventory_id', $fromInventoryId)
+                ->where('product_id', $restockItem->product_id)
+                ->first();
+
+            $available = $fromStock ? $fromStock->batches()->sum('current_quantity') : 0;
+
+            if ($available < $quantity) {
+                throw new Exception(
+                    __('restocks.insufficient_stock_in_source', [
+                        'product' => $restockItem->product_id,
+                        'available' => $available,
+                        'requested' => $quantity,
+                    ]), 422,
+                );
+            }
+        }
+
+        // Create transfer as PENDING — no stock changes yet
         $transfer = InventoryTransfer::create([
             'from_inventory_id' => $fromInventoryId,
             'to_inventory_id'   => $toInventory->id,
+            'status'            => InventoryTransferStatus::PENDING,
             'note'              => $data['note'] ?? null,
         ]);
 
         foreach ($restock->items as $restockItem) {
             $quantity = $restockItem->requested_quantity;
 
-            // Find stock in the source inventory to deduct from
             $fromStock = Stock::where('inventory_id', $fromInventoryId)
                 ->where('product_id', $restockItem->product_id)
                 ->first();
 
-            // Create transfer item (stock_id references the source stock)
-            $transferItem = $transfer->items()->create([
+            // Create transfer item referencing the source stock
+            $transfer->items()->create([
                 'stock_id' => $fromStock?->id,
                 'quantity' => $quantity,
             ]);
 
-            // Decrement from source inventory if stock exists
-            if ($fromStock) {
-                $fromBatch = $fromStock->batches()
-                    ->where('current_quantity', '>', 0)
-                    ->orderBy('created_at')
-                    ->first();
-
-                $oldQuantity = $fromStock->batches()->sum('current_quantity');
-
-                if ($fromBatch) {
-                    $fromBatch->decrement('current_quantity', $quantity);
-                }
-
-                $this->inventoryService->transferOut(
-                    stockId: $fromStock->id,
-                    inventoryId: $fromInventoryId,
-                    productId: $restockItem->product_id,
-                    oldQuantity: $oldQuantity,
-                    quantity: $quantity,
-                    source: $transfer,
-                );
-            }
-
-            // Create/reuse stock in the destination (branch) inventory
-            $toStock = Stock::firstOrCreate([
-                'inventory_id' => $toInventory->id,
-                'product_id'   => $restockItem->product_id,
-            ]);
-
-            $oldQuantity = $toStock->batches()->sum('current_quantity');
-
-            // Create batch for the received transfer item
-            $toBatch = $toStock->batches()->create([
-                'source_id'        => $transferItem->id,
-                'source_type'      => InventoryTransferItem::class,
-                'purchase_price'   => 0,
-                'initial_quantity' => $quantity,
-                'current_quantity' => $quantity,
-            ]);
-
-            // Record transfer-in movement
-            $this->inventoryService->transferIn(
-                stockId: $toStock->id,
-                inventoryId: $toInventory->id,
-                productId: $restockItem->product_id,
-                oldQuantity: $oldQuantity,
-                quantity: $quantity,
-                source: $transfer,
-            );
-
-            // Record restock fulfillment movement
-            $this->inventoryService->restockReceived(
-                stockId: $toStock->id,
-                inventoryId: $toInventory->id,
-                productId: $restockItem->product_id,
-                oldQuantity: $oldQuantity,
-                quantity: $quantity,
-                source: $restock,
-            );
-
             $restockItem->update([
-                'fulfilled_quantity' => $quantity,
+                'fulfilled_quantity' => 0,
             ]);
         }
 
