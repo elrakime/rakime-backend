@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\ContractStatus;
 use App\Models\Contract;
 use App\Traits\ScopesByUserBranches;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -57,5 +58,32 @@ class ContractService
         ]);
 
         return $contract->load(['client', 'account', 'branch']);
+    }
+
+    public function approve(Contract $contract, int $maxAmount): Contract
+    {
+        if ($contract->status !== ContractStatus::PENDING) {
+            throw new Exception(__('contracts.not_pending'), 422);
+        }
+
+        $contract->update([
+            'status'     => ContractStatus::APPROVED,
+            'max_amount' => $maxAmount,
+        ]);
+
+        return $contract->fresh(['client', 'account', 'branch']);
+    }
+
+    public function reject(Contract $contract): Contract
+    {
+        if ($contract->status !== ContractStatus::PENDING) {
+            throw new Exception(__('contracts.not_pending'), 422);
+        }
+
+        $contract->update([
+            'status' => ContractStatus::REJECTED,
+        ]);
+
+        return $contract->fresh(['client', 'account', 'branch']);
     }
 }

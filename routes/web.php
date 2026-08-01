@@ -101,6 +101,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
 
     Route::apiResource('contracts', ContractController::class)->only(['index', 'store']);
+    Route::post('contracts/{contract}/approve', [ContractController::class, 'approve']);
+    Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
 
     Route::post('ccp/info', [CcpController::class, 'info']);
 

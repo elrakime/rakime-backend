@@ -178,6 +178,8 @@ enum Permission: string
     // Contracts
     case VIEW_CONTRACTS   = 'contracts.view';
     case CREATE_CONTRACTS = 'contracts.create';
+    case APPROVE_CONTRACTS = 'contracts.approve';
+    case REJECT_CONTRACTS  = 'contracts.reject';
 
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';

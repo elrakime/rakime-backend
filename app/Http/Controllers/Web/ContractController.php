@@ -6,8 +6,11 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Contract\ApproveContractRequest;
+use App\Http\Requests\Web\Contract\RejectContractRequest;
 use App\Http\Requests\Web\Contract\StoreContractRequest;
 use App\Http\Resources\Web\ContractResource;
+use App\Models\Contract;
 use App\Services\ContractService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,6 +46,48 @@ class ContractController extends Controller
             $contract = $this->contractService->create($data);
 
             return $this->successResponse(new ContractResource($contract), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function approve(ApproveContractRequest $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::APPROVE_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $data = $this->validateRequest($request);
+
+        try {
+            $contract = $this->contractService->approve($contract, $data['max_amount']);
+
+            return $this->successResponse(new ContractResource($contract));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function reject(RejectContractRequest $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::REJECT_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $this->validateRequest($request);
+
+        try {
+            $contract = $this->contractService->reject($contract);
+
+            return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }
