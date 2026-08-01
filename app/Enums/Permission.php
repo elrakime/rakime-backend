@@ -175,6 +175,10 @@ enum Permission: string
     case UPDATE_ROLES = 'roles.update';
     case DELETE_ROLES = 'roles.delete';
 
+    // Contracts
+    case VIEW_CONTRACTS   = 'contracts.view';
+    case CREATE_CONTRACTS = 'contracts.create';
+
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';
 
@@ -215,6 +219,7 @@ enum Permission: string
             'sales', 'sale_returns'                            => 'green',
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
+            'contracts'                       => 'amber',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

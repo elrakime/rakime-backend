@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CcpController;
 use App\Http\Controllers\Web\ClientController;
+use App\Http\Controllers\Web\ContractController;
 use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\InventoryController;
@@ -98,6 +99,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::apiResource('stocks.batches', BatchController::class);
     Route::apiResource('expirations', ExpirationController::class);
     Route::post('expirations/{expiration}/approve', [ExpirationController::class, 'approve']);
+
+    Route::apiResource('contracts', ContractController::class)->only(['index', 'store']);
 
     Route::post('ccp/info', [CcpController::class, 'info']);
 
