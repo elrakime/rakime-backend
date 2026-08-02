@@ -6,10 +6,12 @@ namespace App\Services;
 
 use App\Enums\ContractStatus;
 use App\Models\Contract;
+use App\Models\ContractItem;
 use App\Traits\ScopesByUserBranches;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -85,5 +87,48 @@ class ContractService
         ]);
 
         return $contract->fresh(['client', 'account', 'branch']);
+    }
+
+    public function confirm(Contract $contract, array $data): Contract
+    {
+        if ($contract->status !== ContractStatus::APPROVED) {
+            throw new Exception(__('contracts.not_approved'), 422);
+        }
+
+        return DB::transaction(function () use ($contract, $data) {
+            $contract->items()->delete();
+
+            $totalAmount = 0;
+            foreach ($data['items'] as $item) {
+                ContractItem::create([
+                    'contract_id' => $contract->id,
+                    'product_id'  => $item['product_id'],
+                    'stock_id'    => $item['stock_id'],
+                    'quantity'    => $item['quantity'],
+                    'price'       => $item['price'],
+                ]);
+                $totalAmount += $item['quantity'] * $item['price'];
+            }
+
+            $advanceAmount = $data['advance_amount'];
+            $monthsCount   = $data['months_count'];
+            $monthlyAmount = $monthsCount > 0
+                ? (int) ceil(($totalAmount - $advanceAmount) / $monthsCount)
+                : 0;
+
+            $reference = $contract->reference
+                ?? 'CTR-' . now()->format('Ym') . '-' . str_pad((string) $contract->id, 5, '0', STR_PAD_LEFT);
+
+            $contract->update([
+                'reference'      => $reference,
+                'advance_amount' => $advanceAmount,
+                'months_count'   => $monthsCount,
+                'total_amount'   => $totalAmount,
+                'monthly_amount' => $monthlyAmount,
+                'status'         => ContractStatus::CONFIRMED,
+            ]);
+
+            return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
+        });
     }
 }
