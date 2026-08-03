@@ -67,7 +67,8 @@ return [
         'ACTIVE'    => 'Actif',
         'COMPLETED' => 'Terminé',
         'CLOSED'    => 'Clôturé',
-        'CANCELLED' => 'Annulé',
+        'CANCELLED'  => 'Annulé',
+        'CONFIGURED' => 'Configuré',
     ],
 
     'installment_status' => [

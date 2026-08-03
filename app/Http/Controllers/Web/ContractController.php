@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Web;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Contract\ApproveContractRequest;
+use App\Http\Requests\Web\Contract\ConfigureContractRequest;
 use App\Http\Requests\Web\Contract\ConfirmContractRequest;
 use App\Http\Requests\Web\Contract\RejectContractRequest;
 use App\Http\Requests\Web\Contract\StoreContractRequest;
@@ -108,6 +109,27 @@ class ContractController extends Controller
 
         try {
             $contract = $this->contractService->confirm($contract, $data);
+
+            return $this->successResponse(new ContractResource($contract));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function configure(ConfigureContractRequest $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::CONFIGURE_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $data = $this->validateRequest($request);
+
+        try {
+            $contract = $this->contractService->configure($contract, $data['subscription_count']);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {

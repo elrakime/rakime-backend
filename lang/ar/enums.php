@@ -67,7 +67,8 @@ return [
         'ACTIVE'    => 'نشط',
         'COMPLETED' => 'مكتمل',
         'CLOSED'    => 'مغلق',
-        'CANCELLED' => 'ملغى',
+        'CANCELLED'  => 'ملغى',
+        'CONFIGURED' => 'مُهيأ',
     ],
 
     'installment_status' => [

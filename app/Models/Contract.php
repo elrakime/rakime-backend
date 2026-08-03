@@ -82,6 +82,11 @@ class Contract extends Model
         $query->where('status', ContractStatus::CANCELLED);
     }
 
+    public function scopeConfigured(Builder $query): void
+    {
+        $query->where('status', ContractStatus::CONFIGURED);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

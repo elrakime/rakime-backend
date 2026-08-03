@@ -10,10 +10,11 @@ enum ContractStatus: string
     case APPROVED  = 'approved';
     case REJECTED  = 'rejected';
     case CONFIRMED = 'confirmed';
+    case CONFIGURED = 'configured';
     case ACTIVE    = 'active';
     case COMPLETED = 'completed';
     case CLOSED    = 'closed';
-    case CANCELLED = 'cancelled';
+    case CANCELLED  = 'cancelled';
 
     public static function keys(): array
     {
@@ -51,7 +52,8 @@ enum ContractStatus: string
             self::ACTIVE    => 'green',
             self::COMPLETED => 'emerald',
             self::CLOSED    => 'slate',
-            self::CANCELLED => 'rose',
+            self::CANCELLED  => 'rose',
+            self::CONFIGURED => 'teal',
         };
     }
 
