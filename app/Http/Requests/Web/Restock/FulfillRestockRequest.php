@@ -18,6 +18,9 @@ class FulfillRestockRequest extends FormRequest
             'supplier_id'       => ['required_if:type,purchase', 'integer', 'exists:suppliers,id'],
             'from_inventory_id' => ['required_if:type,transfer', 'integer', 'exists:inventories,id'],
             'note'              => ['nullable', 'string', 'max:65535'],
+            'items'             => ['required_if:type,purchase', 'array', 'min:1'],
+            'items.*.product_id' => ['required_if:type,purchase', 'integer', 'exists:products,id'],
+            'items.*.price'      => ['required_if:type,purchase', 'integer', 'min:0'],
         ];
     }
 }
