@@ -183,6 +183,12 @@ enum Permission: string
     case CONFIRM_CONTRACTS    = 'contracts.confirm';
     case CONFIGURE_CONTRACTS = 'contracts.configure';
 
+    // Installments
+    case VIEW_INSTALLMENTS = 'installments.view';
+
+    // Subscriptions
+    case VIEW_SUBSCRIPTIONS = 'subscriptions.view';
+
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';
 
@@ -223,7 +229,7 @@ enum Permission: string
             'sales', 'sale_returns'                            => 'green',
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
-            'contracts'                       => 'amber',
+            'contracts', 'installments', 'subscriptions' => 'amber',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

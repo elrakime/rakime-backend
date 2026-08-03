@@ -9,6 +9,8 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CcpController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ContractController;
+use App\Http\Controllers\Web\InstallmentController;
+use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\InventoryController;
@@ -105,6 +107,9 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
     Route::post('contracts/{contract}/confirm', [ContractController::class, 'confirm']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
+
+    Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
+    Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);
 
     Route::post('ccp/info', [CcpController::class, 'info']);
 
