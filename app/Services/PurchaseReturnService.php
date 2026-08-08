@@ -51,6 +51,7 @@ class PurchaseReturnService
     public function create(Purchase $purchase, array $data): PurchaseReturn
     {
         $this->validateItemsBelongToPurchase($purchase->id, $data['items']);
+        $this->validateReturnQuantities($data['items']);
 
         return DB::transaction(function () use ($purchase, $data) {
             $purchaseReturn = PurchaseReturn::create([
@@ -73,9 +74,14 @@ class PurchaseReturnService
 
     public function update(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
     {
+        if ($purchaseReturn->status === PurchaseReturnStatus::COMPLETED) {
+            throw new Exception(__('purchase_returns.cannot_update_approved'), 422);
+        }
+
         if (isset($data['items'])) {
-            $purchaseReturn->load('purchase');
+            $purchaseReturn->load(['purchase', 'items']);
             $this->validateItemsBelongToPurchase($purchaseReturn->purchase_id, $data['items']);
+            $this->validateReturnQuantities($data['items']);
         }
 
         return DB::transaction(function () use ($purchaseReturn, $data) {
@@ -107,6 +113,14 @@ class PurchaseReturnService
 
     public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
     {
+        $purchaseReturn->load('items.purchaseItem');
+
+        foreach ($purchaseReturn->items as $returnItem) {
+            if ($returnItem->quantity > $returnItem->purchaseItem->net_quantity) {
+                throw new Exception(__('purchase_returns.quantity_exceeds_available'), 422);
+            }
+        }
+
         return DB::transaction(function () use ($purchaseReturn, $walletId) {
             $purchaseReturn->load('items.purchaseItem');
 
@@ -174,6 +188,23 @@ class PurchaseReturnService
 
         if ($validCount !== count($itemIds)) {
             throw new Exception(__('purchase_returns.invalid_purchase_items'), 422);
+        }
+    }
+
+    private function validateReturnQuantities(array $items): void
+    {
+        $purchaseItems = PurchaseItem::with(['returnItems' => function ($q) {
+            $q->whereHas('purchaseReturn', fn ($q2) => $q2->where('status', 'completed'));
+        }])->findMany(collect($items)->pluck('purchase_item_id'));
+
+        foreach ($items as $item) {
+            $purchaseItem = $purchaseItems->find($item['purchase_item_id']);
+
+            $available = $purchaseItem->quantity - $purchaseItem->returnItems->sum('quantity');
+
+            if ($item['quantity'] > $available) {
+                throw new Exception(__('purchase_returns.quantity_exceeds_available'), 422);
+            }
         }
     }
 

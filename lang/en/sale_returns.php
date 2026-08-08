@@ -6,4 +6,5 @@ return [
     'already_approved'         => 'This sale return has already been approved.',
     'invalid_sale_items'       => 'Some of the selected items do not belong to this sale.',
     'no_items'                 => 'At least one item must be added to the sale return.',
+    'quantity_exceeds_available' => 'The return quantity exceeds the available quantity for this item.',
 ];

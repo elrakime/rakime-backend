@@ -52,6 +52,7 @@ class SaleReturnService
     public function create(Sale $sale, array $data): SaleReturn
     {
         $this->validateItemsBelongToSale($sale->id, $data['items']);
+        $this->validateReturnQuantities($data['items']);
 
         return DB::transaction(function () use ($sale, $data) {
             $saleReturn = SaleReturn::create([
@@ -74,9 +75,14 @@ class SaleReturnService
 
     public function update(SaleReturn $saleReturn, array $data): SaleReturn
     {
+        if ($saleReturn->status === SaleReturnStatus::COMPLETED) {
+            throw new Exception(__('sale_returns.cannot_update_approved'), 422);
+        }
+
         if (isset($data['items'])) {
-            $saleReturn->load('sale');
+            $saleReturn->load(['sale', 'items']);
             $this->validateItemsBelongToSale($saleReturn->sale_id, $data['items']);
+            $this->validateReturnQuantities($data['items']);
         }
 
         return DB::transaction(function () use ($saleReturn, $data) {
@@ -110,6 +116,14 @@ class SaleReturnService
     {
         if ($saleReturn->status === SaleReturnStatus::COMPLETED) {
             throw new Exception(__('sale_returns.already_approved'), 422);
+        }
+
+        $saleReturn->load('items.saleItem');
+
+        foreach ($saleReturn->items as $returnItem) {
+            if ($returnItem->quantity > $returnItem->saleItem->net_quantity) {
+                throw new Exception(__('sale_returns.quantity_exceeds_available'), 422);
+            }
         }
 
         return DB::transaction(function () use ($saleReturn, $walletId) {
@@ -180,6 +194,23 @@ class SaleReturnService
 
         if ($validCount !== count($itemIds)) {
             throw new Exception(__('sale_returns.invalid_sale_items'), 422);
+        }
+    }
+
+    private function validateReturnQuantities(array $items): void
+    {
+        $saleItems = SaleItem::with(['returnItems' => function ($q) {
+            $q->whereHas('saleReturn', fn ($q2) => $q2->where('status', 'completed'));
+        }])->findMany(collect($items)->pluck('sale_item_id'));
+
+        foreach ($items as $item) {
+            $saleItem = $saleItems->find($item['sale_item_id']);
+
+            $available = $saleItem->quantity - $saleItem->returnItems->sum('quantity');
+
+            if ($item['quantity'] > $available) {
+                throw new Exception(__('sale_returns.quantity_exceeds_available'), 422);
+            }
         }
     }
 }
