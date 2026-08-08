@@ -16,7 +16,7 @@ class ReceivePurchaseRequest extends FormRequest
         return [
             'inventory_id'                   => ['required', 'integer', 'exists:inventories,id'],
             'items'                          => ['nullable', 'array'],
-            'items.*.product_id'             => ['required_with:items', 'integer', 'exists:products,id'],
+            'items.*.product_id'             => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.selling_prices'          => ['nullable', 'array'],
             'items.*.selling_prices.*'        => ['integer', 'min:0'],
             'items.*.installment_prices'      => ['nullable', 'array'],

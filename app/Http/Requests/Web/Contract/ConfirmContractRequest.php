@@ -19,8 +19,8 @@ class ConfirmContractRequest extends FormRequest
             'advance_amount'      => ['required', 'integer', 'min:0'],
             'months_count'        => ['required', 'integer', 'min:1'],
             'items'               => ['required', 'array', 'min:1'],
-            'items.*.product_id'  => ['required', 'integer', 'exists:products,id'],
-            'items.*.stock_id'    => ['required', 'integer', 'exists:stocks,id'],
+            'items.*.product_id'  => ['required', 'integer', 'exists:products,id', 'distinct:strict'],
+            'items.*.stock_id'    => ['required', 'integer', 'exists:stocks,id', 'distinct:strict'],
             'items.*.quantity'    => ['required', 'integer', 'min:1'],
             'items.*.price'       => ['required', 'integer', 'min:0'],
         ];

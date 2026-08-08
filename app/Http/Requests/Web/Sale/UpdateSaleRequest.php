@@ -22,9 +22,9 @@ class UpdateSaleRequest extends FormRequest
             'discount_type'   => ['nullable', 'string', 'in:' . implode(',', DiscountType::keys())],
             'discount_value'  => ['nullable', 'integer', 'min:0'],
             'items'           => ['nullable', 'array', 'min:1'],
-            'items.*.stock_id' => ['required_with:items', 'integer', 'exists:stocks,id'],
+            'items.*.stock_id' => ['required_with:items', 'integer', 'exists:stocks,id', 'distinct:strict'],
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
-            'items.*.price_id' => ['nullable', 'integer', 'exists:prices,id'],
+            'items.*.price_id' => ['nullable', 'integer', 'exists:prices,id', 'distinct:strict'],
         ];
     }
 }

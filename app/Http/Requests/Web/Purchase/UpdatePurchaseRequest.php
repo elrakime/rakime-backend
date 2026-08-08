@@ -17,7 +17,7 @@ class UpdatePurchaseRequest extends FormRequest
             'supplier_id'          => ['sometimes', 'required', 'integer', 'exists:suppliers,id'],
             'note'                 => ['sometimes', 'nullable', 'string'],
             'items'                => ['sometimes', 'required', 'array', 'min:1'],
-            'items.*.product_id'   => ['required_with:items', 'integer', 'exists:products,id'],
+            'items.*.product_id'   => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.quantity'     => ['required_with:items', 'integer', 'min:1'],
             'items.*.price'        => ['required_with:items', 'integer', 'min:0'],
         ];

@@ -17,7 +17,7 @@ class StoreRestockRequest extends FormRequest
             'branch_id'                    => ['required', 'integer', 'exists:branches,id'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'items'                        => ['required', 'array', 'min:1'],
-            'items.*.product_id'           => ['required', 'integer', 'exists:products,id'],
+            'items.*.product_id'           => ['required', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.requested_quantity'   => ['required', 'integer', 'min:1'],
         ];
     }

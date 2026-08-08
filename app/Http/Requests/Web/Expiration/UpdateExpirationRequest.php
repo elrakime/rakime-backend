@@ -17,7 +17,7 @@ class UpdateExpirationRequest extends FormRequest
             'inventory_id'              => ['sometimes', 'integer', 'exists:inventories,id'],
             'note'                      => ['nullable', 'string'],
             'items'                     => ['nullable', 'array'],
-            'items.*.stock_id'          => ['required_with:items', 'integer', 'exists:stocks,id'],
+            'items.*.stock_id'          => ['required_with:items', 'integer', 'exists:stocks,id', 'distinct:strict'],
             'items.*.quantity'          => ['required_with:items', 'integer', 'min:1'],
             'items.*.reason'            => ['nullable', 'string'],
         ];

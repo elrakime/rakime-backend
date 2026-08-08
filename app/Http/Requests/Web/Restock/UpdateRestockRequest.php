@@ -17,7 +17,7 @@ class UpdateRestockRequest extends FormRequest
             'branch_id'                    => ['nullable', 'integer', 'exists:branches,id'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'items'                        => ['nullable', 'array', 'min:1'],
-            'items.*.product_id'           => ['required_with:items', 'integer', 'exists:products,id'],
+            'items.*.product_id'           => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.requested_quantity'   => ['required_with:items', 'integer', 'min:1'],
         ];
     }
