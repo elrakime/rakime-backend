@@ -36,11 +36,16 @@ class SaleItem extends Model
     protected function netQuantity(): Attribute
     {
         return Attribute::get(function () {
-            $completedReturns = (int) $this->returnItems()
+            if ($this->relationLoaded('returnItems')) {
+                return $this->quantity - $this->returnItems
+                    ->filter(fn ($ri) => $ri->relationLoaded('saleReturn')
+                        && $ri->saleReturn->status === SaleReturnStatus::COMPLETED->value)
+                    ->sum('quantity');
+            }
+
+            return $this->quantity - (int) $this->returnItems()
                 ->whereHas('saleReturn', fn ($q) => $q->where('status', SaleReturnStatus::COMPLETED))
                 ->sum('quantity');
-
-            return $this->quantity - $completedReturns;
         });
     }
 

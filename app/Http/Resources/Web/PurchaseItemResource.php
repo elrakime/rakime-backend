@@ -10,11 +10,12 @@ class PurchaseItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'purchase_id' => $this->purchase_id,
-            'product_id'  => $this->product_id,
-            'quantity'    => $this->quantity,
-            'price'       => $this->price,
+            'id'           => $this->id,
+            'purchase_id'  => $this->purchase_id,
+            'product_id'   => $this->product_id,
+            'quantity'     => $this->quantity,
+            'net_quantity' => $this->net_quantity,
+            'price'        => $this->price,
             'subtotal'    => $this->quantity * $this->price,
 
             'product' => $this->whenLoaded('product', fn () => [

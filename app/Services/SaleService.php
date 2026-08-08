@@ -35,7 +35,7 @@ class SaleService
         $this->scopeByUserBranches($query);
 
         return QueryBuilder::for($query, $request)
-            ->with(['user', 'branch', 'client', 'items.product', 'items.stock'])
+            ->with(['user', 'branch', 'client', 'items.product', 'items.stock', 'items.returnItems.saleReturn'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),

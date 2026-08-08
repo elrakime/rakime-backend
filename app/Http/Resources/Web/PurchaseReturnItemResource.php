@@ -17,9 +17,10 @@ class PurchaseReturnItemResource extends JsonResource
             'reason'             => $this->reason,
 
             'purchase_item' => $this->whenLoaded('purchaseItem', fn () => [
-                'id'       => $this->purchaseItem->id,
-                'quantity' => $this->purchaseItem->quantity,
-                'price'    => $this->purchaseItem->price,
+                'id'           => $this->purchaseItem->id,
+                'quantity'     => $this->purchaseItem->quantity,
+                'net_quantity' => $this->purchaseItem->net_quantity,
+                'price'        => $this->purchaseItem->price,
                 'product'  => $this->purchaseItem->relationLoaded('product') ? [
                     'id'   => $this->purchaseItem->product->id,
                     'name' => $this->purchaseItem->product->name,

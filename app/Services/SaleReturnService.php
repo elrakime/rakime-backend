@@ -28,7 +28,7 @@ class SaleReturnService
     {
         return QueryBuilder::for(SaleReturn::class, $request)
             ->where('sale_id', $sale->id)
-            ->with(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock'])
+            ->with(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::callback('branch_id', function ($query, $value) {
@@ -69,7 +69,7 @@ class SaleReturnService
                 ]);
             }
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock']);
+            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
     }
 
@@ -103,13 +103,13 @@ class SaleReturnService
                 }
             }
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock']);
+            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
     }
 
     public function show(SaleReturn $saleReturn): SaleReturn
     {
-        return $saleReturn->loadMissing(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock']);
+        return $saleReturn->loadMissing(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
     }
 
     public function approve(SaleReturn $saleReturn, int $walletId): SaleReturn
@@ -168,7 +168,7 @@ class SaleReturnService
 
             $saleReturn->update(['status' => SaleReturnStatus::COMPLETED]);
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock']);
+            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
     }
 

@@ -24,7 +24,7 @@ class PurchaseService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Purchase::class, $request)
-            ->with(['supplier', 'items.product', 'inventory'])
+            ->with(['supplier', 'items.product', 'items.returnItems.purchaseReturn', 'inventory'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),

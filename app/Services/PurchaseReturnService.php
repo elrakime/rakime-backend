@@ -27,7 +27,7 @@ class PurchaseReturnService
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
             ->where('purchase_id', $purchase->id)
-            ->with(['purchase.inventory', 'items.purchaseItem.product'])
+            ->with(['purchase.inventory', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::callback('inventory_id', function ($query, $value) {
@@ -68,7 +68,7 @@ class PurchaseReturnService
                 ]);
             }
 
-            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });
     }
 
@@ -102,13 +102,13 @@ class PurchaseReturnService
                 }
             }
 
-            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });
     }
 
     public function show(PurchaseReturn $purchaseReturn): PurchaseReturn
     {
-        return $purchaseReturn->loadMissing(['purchase.inventory', 'items.purchaseItem.product']);
+        return $purchaseReturn->loadMissing(['purchase.inventory', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
     }
 
     public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
@@ -162,7 +162,7 @@ class PurchaseReturnService
 
             $purchaseReturn->update(['status' => PurchaseReturnStatus::COMPLETED]);
 
-            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product']);
+            return $purchaseReturn->fresh()->loadMissing(['purchase', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });
     }
 

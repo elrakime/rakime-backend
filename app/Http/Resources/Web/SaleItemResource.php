@@ -14,7 +14,8 @@ class SaleItemResource extends JsonResource
             'sale_id'    => $this->sale_id,
             'product_id' => $this->product_id,
             'stock_id'   => $this->stock_id,
-            'quantity'   => $this->quantity,
+            'quantity'    => $this->quantity,
+            'net_quantity' => $this->net_quantity,
             'price'      => $this->price,
 
             'product' => $this->whenLoaded('product', fn () => [

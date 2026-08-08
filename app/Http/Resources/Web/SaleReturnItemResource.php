@@ -17,9 +17,10 @@ class SaleReturnItemResource extends JsonResource
             'reason'          => $this->reason,
 
             'sale_item' => $this->whenLoaded('saleItem', fn () => [
-                'id'       => $this->saleItem->id,
-                'quantity' => $this->saleItem->quantity,
-                'price'    => $this->saleItem->price,
+                'id'           => $this->saleItem->id,
+                'quantity'     => $this->saleItem->quantity,
+                'net_quantity' => $this->saleItem->net_quantity,
+                'price'        => $this->saleItem->price,
                 'product'  => $this->saleItem->relationLoaded('product') ? [
                     'id'   => $this->saleItem->product->id,
                     'name' => $this->saleItem->product->name,
