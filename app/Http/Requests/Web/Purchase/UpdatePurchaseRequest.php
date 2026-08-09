@@ -14,6 +14,7 @@ class UpdatePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'branch_id'            => ['sometimes', 'required', 'integer', 'exists:branches,id'],
             'supplier_id'          => ['sometimes', 'required', 'integer', 'exists:suppliers,id'],
             'note'                 => ['sometimes', 'nullable', 'string'],
             'items'                => ['sometimes', 'required', 'array', 'min:1'],

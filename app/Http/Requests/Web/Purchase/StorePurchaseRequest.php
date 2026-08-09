@@ -14,6 +14,7 @@ class StorePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'branch_id'            => ['required', 'integer', 'exists:branches,id'],
             'supplier_id'          => ['required', 'integer', 'exists:suppliers,id'],
             'note'                 => ['nullable', 'string'],
             'items'                => ['required', 'array', 'min:1'],

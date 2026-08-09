@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\PriceType;
 use App\Enums\PurchaseStatus;
+use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
@@ -24,10 +25,11 @@ class PurchaseService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Purchase::class, $request)
-            ->with(['supplier', 'items.product', 'items.returnItems.purchaseReturn', 'inventory'])
+            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),
+                AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('search', function ($query, string $value) {
@@ -54,6 +56,7 @@ class PurchaseService
 
             $purchase = Purchase::create([
                 'supplier_id'  => $data['supplier_id'],
+                'branch_id'    => $data['branch_id'],
                 'status'       => PurchaseStatus::PENDING,
                 'total_amount' => $totalAmount,
                 'paid_amount'  => 0,
@@ -86,6 +89,7 @@ class PurchaseService
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update(array_filter([
                 'supplier_id'  => $data['supplier_id'] ?? null,
+                'branch_id'    => $data['branch_id'] ?? null,
                 'note'         => $data['note'] ?? null,
             ], fn ($v) => $v !== null));
 
@@ -126,12 +130,12 @@ class PurchaseService
         }
 
         return DB::transaction(function () use ($purchase, $data) {
+            $inventoryId = $this->resolveInventoryId($purchase, $data['inventory_id'] ?? null);
+
             $purchase->update([
                 'status'       => PurchaseStatus::RECEIVED,
-                'inventory_id' => $data['inventory_id'],
+                'inventory_id' => $inventoryId,
             ]);
-
-            $inventoryId = $data['inventory_id'];
 
             // Index optional per-item pricing overrides by product_id
             $pricingByProduct = collect($data['items'] ?? [])->keyBy('product_id');
@@ -191,6 +195,31 @@ class PurchaseService
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
         });
+    }
+
+    private function resolveInventoryId(Purchase $purchase, ?int $inventoryId): int
+    {
+        if ($inventoryId) {
+            $inventory = Inventory::findOrFail($inventoryId);
+
+            if ($purchase->branch_id && $inventory->branch_id !== $purchase->branch_id) {
+                throw new Exception(__('purchases.inventory_branch_mismatch'), 422);
+            }
+
+            return $inventoryId;
+        }
+
+        $branchInventories = Inventory::where('branch_id', $purchase->branch_id)->get();
+
+        if ($branchInventories->isEmpty()) {
+            throw new Exception(__('purchases.no_branch_inventories'), 422);
+        }
+
+        if ($branchInventories->count() > 1) {
+            throw new Exception(__('purchases.multiple_branch_inventories'), 422);
+        }
+
+        return $branchInventories->first()->id;
     }
 
 }

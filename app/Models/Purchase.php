@@ -24,6 +24,7 @@ class Purchase extends Model
 
     protected $fillable = [
         'supplier_id',
+        'branch_id',
         'inventory_id',
         'reference',
         'status',
@@ -39,6 +40,7 @@ class Purchase extends Model
             'total_amount'  => 'integer',
             'paid_amount'   => 'integer',
             'inventory_id'  => 'integer',
+            'branch_id'     => 'integer',
         ];
     }
 
@@ -65,6 +67,11 @@ class Purchase extends Model
     public function scopePartiallyPaid(Builder $query): void
     {
         $query->where('status', PurchaseStatus::PARTIALLY_PAID);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function inventory(): BelongsTo

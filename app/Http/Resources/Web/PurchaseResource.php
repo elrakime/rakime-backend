@@ -18,6 +18,7 @@ class PurchaseResource extends JsonResource
                 'color' => $this->status->get_color(),
             ],
             'supplier'         => new SupplierResource($this->whenLoaded('supplier')),
+            'branch'           => new BranchResource($this->whenLoaded('branch')),
             'inventory'        => new InventoryResource($this->whenLoaded('inventory')),
             'items'            => PurchaseItemResource::collection($this->whenLoaded('items')),
             'payments'         => PurchasePaymentResource::collection($this->whenLoaded('payments')),

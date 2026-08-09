@@ -14,7 +14,7 @@ class ReceivePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'inventory_id'                   => ['required', 'integer', 'exists:inventories,id'],
+            'inventory_id'                   => ['nullable', 'integer', 'exists:inventories,id'],
             'items'                          => ['nullable', 'array'],
             'items.*.product_id'             => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.selling_prices'          => ['nullable', 'array'],

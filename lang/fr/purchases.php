@@ -8,4 +8,8 @@ return [
     'invalid_supplier' => 'Le fournisseur spécifié est indisponible ou n\'est plus actif.',
     'payment_already_canceled' => 'Ce paiement a déjà été annulé.',
     'payment_canceled_note' => 'Paiement de :amount annulé. Fonds retournés au portefeuille.',
+    'inventory_branch_mismatch' => 'L\'inventaire sélectionné n\'appartient pas à la branche de cet achat.',
+    'missing_branch' => 'Aucune branche assignée à cet achat. Veuillez fournir un inventory_id.',
+    'no_branch_inventories' => 'Aucun inventaire trouvé pour la branche de cet achat.',
+    'multiple_branch_inventories' => 'Cette branche a plusieurs inventaires. Veuillez spécifier lequel utiliser.',
 ];
