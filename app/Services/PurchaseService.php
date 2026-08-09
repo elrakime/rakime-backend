@@ -10,6 +10,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Restock;
 use App\Models\Stock;
+use App\Traits\ScopesByUserBranches;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -21,10 +22,16 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseService
 {
+    use ScopesByUserBranches;
+
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Purchase::class, $request)
+        $query = Purchase::query();
+
+        $this->scopeByUserBranches($query);
+
+        return QueryBuilder::for($query, $request)
             ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
