@@ -32,7 +32,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branchService->create($this->validateRequest($request));
+            $branch = $this->branchService->create($this->validateRequest($request), $request);
 
             return $this->successResponse(new BranchResource($branch), statusCode: 201);
         } catch (\Exception $e) {
@@ -60,7 +60,7 @@ class BranchController extends Controller
         }
 
         try {
-            $branch = $this->branchService->update($branch, $this->validateRequest($request));
+            $branch = $this->branchService->update($branch, $this->validateRequest($request), $request);
 
             return $this->successResponse(new BranchResource($branch));
         } catch (\Exception $e) {

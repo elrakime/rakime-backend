@@ -14,6 +14,9 @@ class StoreBranchRequest extends FormRequest
             'shop_name'  => ['required', 'string', 'max:255'],
             'address'    => ['nullable', 'string'],
             'phone'      => ['nullable', 'string', 'max:255'],
+            'wilaya_id'  => ['nullable', 'integer', 'exists:wilayas,id'],
+            'image'      => ['nullable', 'image', 'max:2048'],
+            'metadata'   => ['nullable', 'json'],
             'accounts'   => ['nullable', 'array'],
             'accounts.*' => ['integer', 'exists:accounts,id'],
         ];

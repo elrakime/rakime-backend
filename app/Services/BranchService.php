@@ -16,12 +16,13 @@ class BranchService
     public function list(Request $request): Collection
     {
         return QueryBuilder::for(Branch::class, $request)
-            ->with('accounts', 'managers')
+            ->with('accounts', 'managers', 'wilaya')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('code'),
                 AllowedFilter::partial('shop_name'),
                 AllowedFilter::partial('phone'),
+                AllowedFilter::exact('wilaya_id'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")
@@ -42,7 +43,7 @@ class BranchService
             ->get();
     }
 
-    public function create(array $data): Branch
+    public function create(array $data, Request $request): Branch
     {
         $accounts = $data['accounts'] ?? [];
 
@@ -52,10 +53,16 @@ class BranchService
             'shop_name' => $data['shop_name'],
             'address'   => $data['address'] ?? null,
             'phone'     => $data['phone'] ?? null,
+            'wilaya_id' => $data['wilaya_id'] ?? null,
+            'metadata'  => $data['metadata'] ?? null,
         ]);
 
         if ($accounts) {
             $branch->accounts()->sync($accounts);
+        }
+
+        if ($request->hasFile('image')) {
+            $branch->addMediaFromRequest('image')->toMediaCollection('image');
         }
 
         Inventory::firstOrCreate(
@@ -73,10 +80,10 @@ class BranchService
 
     public function show(Branch $branch): Branch
     {
-        return $branch->loadMissing('accounts');
+        return $branch->loadMissing(['accounts', 'wilaya']);
     }
 
-    public function update(Branch $branch, array $data): Branch
+    public function update(Branch $branch, array $data, Request $request): Branch
     {
         $branch->update(array_filter([
             'name'      => $data['name'] ?? null,
@@ -84,10 +91,17 @@ class BranchService
             'shop_name' => $data['shop_name'] ?? null,
             'address'   => $data['address'] ?? null,
             'phone'     => $data['phone'] ?? null,
+            'wilaya_id' => $data['wilaya_id'] ?? null,
+            'metadata'  => $data['metadata'] ?? null,
         ], fn ($v) => $v !== null));
 
         if (array_key_exists('accounts', $data)) {
             $branch->accounts()->sync($data['accounts'] ?? []);
+        }
+
+        if ($request->hasFile('image')) {
+            $branch->clearMediaCollection('image');
+            $branch->addMediaFromRequest('image')->toMediaCollection('image');
         }
 
         Inventory::firstOrCreate(

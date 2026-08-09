@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use App\Traits\HasUserstamps;
 
-class Branch extends Model
+class Branch extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     use LogsActivity;
     use HasUserstamps;
 
@@ -21,8 +25,17 @@ class Branch extends Model
         'code',
         'shop_name',
         'address',
-        'phone'
+        'phone',
+        'wilaya_id',
+        'metadata',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'json',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -60,8 +73,18 @@ class Branch extends Model
         return $this->hasMany(Contract::class);
     }
 
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class);
+    }
+
     public function accounts(): BelongsToMany
     {
         return $this->belongsToMany(Account::class, 'branch_accounts');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 }

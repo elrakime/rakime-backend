@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use App\Traits\HasUserstamps;
 
-class Client extends Model
+class Client extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     use LogsActivity;
     use HasUserstamps;
-
 
     protected $fillable = [
         'branch_id',
@@ -32,6 +34,7 @@ class Client extends Model
         'ccp_number',
         'ccp_key',
         'eccp',
+        'metadata',
     ];
 
     protected function casts(): array
@@ -39,6 +42,7 @@ class Client extends Model
         return [
             'birthdate' => 'date',
             'salary'    => 'decimal:2',
+            'metadata'  => 'json',
         ];
     }
 
@@ -65,5 +69,10 @@ class Client extends Model
     public function installmentContracts(): HasMany
     {
         return $this->hasMany(Contract::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 }

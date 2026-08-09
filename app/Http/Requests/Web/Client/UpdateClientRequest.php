@@ -27,6 +27,8 @@ class UpdateClientRequest extends FormRequest
             'ccp_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('clients', 'ccp_number')->ignore($id)],
             'ccp_key'    => ['sometimes', 'required', 'string', 'max:10', new CcpKey],
             'eccp'       => ['sometimes', 'nullable', 'string', 'max:255'],
+            'image'      => ['nullable', 'image', 'max:2048'],
+            'metadata'   => ['nullable', 'json'],
         ];
     }
 }

@@ -32,7 +32,7 @@ class SupplierController extends Controller
         }
 
         try {
-            $supplier = $this->supplierService->create($this->validateRequest($request));
+            $supplier = $this->supplierService->create($this->validateRequest($request), $request);
 
             return $this->successResponse(new SupplierResource($supplier), statusCode: 201);
         } catch (\Exception $e) {
@@ -60,7 +60,7 @@ class SupplierController extends Controller
         }
 
         try {
-            $supplier = $this->supplierService->update($supplier, $this->validateRequest($request));
+            $supplier = $this->supplierService->update($supplier, $this->validateRequest($request), $request);
 
             return $this->successResponse(new SupplierResource($supplier));
         } catch (\Exception $e) {

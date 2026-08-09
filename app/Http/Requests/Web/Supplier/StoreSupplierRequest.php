@@ -19,6 +19,9 @@ class StoreSupplierRequest extends FormRequest
             'email'     => ['nullable', 'email', 'max:255'],
             'address'   => ['required', 'string', 'max:500'],
             'is_active' => ['nullable', 'boolean'],
+            'wilaya_id' => ['nullable', 'integer', 'exists:wilayas,id'],
+            'image'     => ['nullable', 'image', 'max:2048'],
+            'metadata'  => ['nullable', 'json'],
         ];
     }
 }

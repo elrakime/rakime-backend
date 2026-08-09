@@ -16,6 +16,12 @@ class BranchResource extends JsonResource
             'shop_name' => $this->shop_name,
             'address'   => $this->address,
             'phone'     => $this->phone,
+            'wilaya'    => $this->whenLoaded('wilaya', fn () => [
+                'id'   => $this->wilaya->id,
+                'name' => $this->wilaya->name,
+            ]),
+            'image'     => $this->getFirstMediaUrl('image') ?: null,
+            'metadata'  => $this->metadata,
             'accounts' => $this->whenLoaded('accounts', fn () => $this->accounts->map(fn ($a) => [
                 'id'         => $a->id,
                 'name'       => $a->name,

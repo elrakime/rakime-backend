@@ -19,6 +19,9 @@ class UpdateSupplierRequest extends FormRequest
             'email'     => ['sometimes', 'nullable', 'email', 'max:255'],
             'address'   => ['sometimes', 'required', 'string', 'max:500'],
             'is_active' => ['sometimes', 'boolean'],
+            'wilaya_id' => ['nullable', 'integer', 'exists:wilayas,id'],
+            'image'     => ['nullable', 'image', 'max:2048'],
+            'metadata'  => ['nullable', 'json'],
         ];
     }
 }

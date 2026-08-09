@@ -38,7 +38,7 @@ class ClientController extends Controller
         $data = $this->validateRequest($request);
 
         try {
-            $client = $this->clientService->create($data);
+            $client = $this->clientService->create($data, $request);
 
             return $this->successResponse(new ClientResource($client), statusCode: 201);
         } catch (\Exception $e) {
@@ -76,7 +76,7 @@ class ClientController extends Controller
         $data = $this->validateRequest($request);
 
         try {
-            $client = $this->clientService->update($client, $data);
+            $client = $this->clientService->update($client, $data, $request);
 
             return $this->successResponse(new ClientResource($client));
         } catch (\Exception $e) {

@@ -50,9 +50,15 @@ class ClientService
             ->appends($request->query());
     }
 
-    public function create(array $data): Client
+    public function create(array $data, Request $request): Client
     {
-        return Client::create($data);
+        $client = Client::create(collect($data)->except('image')->toArray());
+
+        if ($request->hasFile('image')) {
+            $client->addMediaFromRequest('image')->toMediaCollection('image');
+        }
+
+        return $client;
     }
 
     public function show(Client $client): Client
@@ -60,9 +66,14 @@ class ClientService
         return $client->loadMissing(['branch', 'wilaya']);
     }
 
-    public function update(Client $client, array $data): Client
+    public function update(Client $client, array $data, Request $request): Client
     {
-        $client->update($data);
+        $client->update(collect($data)->except('image')->toArray());
+
+        if ($request->hasFile('image')) {
+            $client->clearMediaCollection('image');
+            $client->addMediaFromRequest('image')->toMediaCollection('image');
+        }
 
         return $client->refresh()->loadMissing(['branch', 'wilaya']);
     }

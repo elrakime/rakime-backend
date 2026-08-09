@@ -24,6 +24,8 @@ class StoreClientRequest extends FormRequest
             'ccp_number' => ['required', 'string', 'max:50', 'unique:clients,ccp_number'],
             'ccp_key'    => ['required', 'string', 'max:10', new CcpKey],
             'eccp'       => ['nullable', 'string', 'max:255'],
+            'image'      => ['nullable', 'image', 'max:2048'],
+            'metadata'   => ['nullable', 'json'],
         ];
     }
 }

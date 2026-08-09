@@ -16,6 +16,12 @@ class SupplierResource extends JsonResource
             'email'      => $this->email,
             'address'    => $this->address,
             'is_active'  => $this->is_active,
+            'wilaya'     => $this->whenLoaded('wilaya', fn () => [
+                'id'   => $this->wilaya->id,
+                'name' => $this->wilaya->name,
+            ]),
+            'image'     => $this->getFirstMediaUrl('image') ?: null,
+            'metadata'  => $this->metadata,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'created_by' => new AvatarResource($this->whenLoaded('creator')),

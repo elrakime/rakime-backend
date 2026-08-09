@@ -14,10 +14,12 @@ class SupplierService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Supplier::class, $request)
+            ->with('wilaya')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('phone'),
                 AllowedFilter::exact('is_active'),
+                AllowedFilter::exact('wilaya_id'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")
@@ -35,19 +37,30 @@ class SupplierService
             ->appends($request->query());
     }
 
-    public function create(array $data): Supplier
+    public function create(array $data, Request $request): Supplier
     {
-        return Supplier::create($data);
+        $supplier = Supplier::create(collect($data)->except('image')->toArray());
+
+        if ($request->hasFile('image')) {
+            $supplier->addMediaFromRequest('image')->toMediaCollection('image');
+        }
+
+        return $supplier;
     }
 
     public function show(Supplier $supplier): Supplier
     {
-        return $supplier;
+        return $supplier->loadMissing('wilaya');
     }
 
-    public function update(Supplier $supplier, array $data): Supplier
+    public function update(Supplier $supplier, array $data, Request $request): Supplier
     {
-        $supplier->update($data);
+        $supplier->update(collect($data)->except('image')->toArray());
+
+        if ($request->hasFile('image')) {
+            $supplier->clearMediaCollection('image');
+            $supplier->addMediaFromRequest('image')->toMediaCollection('image');
+        }
 
         return $supplier->refresh();
     }
