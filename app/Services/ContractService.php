@@ -67,7 +67,7 @@ class ContractService
         return $contract->load(['client', 'account', 'branch']);
     }
 
-    public function approve(Contract $contract, int $maxAmount): Contract
+    public function approve(Contract $contract, float $maxAmount): Contract
     {
         if ($contract->status !== ContractStatus::PENDING) {
             throw new Exception(__('contracts.not_pending'), 422);

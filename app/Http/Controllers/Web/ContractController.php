@@ -66,7 +66,7 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
-            $contract = $this->contractService->approve($contract, $data['max_amount']);
+            $contract = $this->contractService->approve($contract, (float) $data['max_amount']);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
@@ -129,7 +129,7 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
-            $contract = $this->contractService->configure($contract, $data['subscription_count']);
+            $contract = $this->contractService->configure($contract, (int) $data['subscription_count']);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
