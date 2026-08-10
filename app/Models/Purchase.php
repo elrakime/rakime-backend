@@ -33,6 +33,8 @@ class Purchase extends Model
         'note',
     ];
 
+    protected $appends = ['payment_status'];
+
     protected function casts(): array
     {
         return [
@@ -54,19 +56,30 @@ class Purchase extends Model
         $query->where('status', PurchaseStatus::PENDING);
     }
 
-    public function scopeReceived(Builder $query): void
+    public function scopeCompleted(Builder $query): void
     {
-        $query->where('status', PurchaseStatus::RECEIVED);
+        $query->where('status', PurchaseStatus::COMPLETED);
     }
 
-    public function scopePaid(Builder $query): void
+    public function scopeCanceled(Builder $query): void
     {
-        $query->where('status', PurchaseStatus::PAID);
+        $query->where('status', PurchaseStatus::CANCELED);
     }
 
-    public function scopePartiallyPaid(Builder $query): void
+    /**
+     * Computed payment status: unpaid, partially_paid, or paid.
+     */
+    public function getPaymentStatusAttribute(): string
     {
-        $query->where('status', PurchaseStatus::PARTIALLY_PAID);
+        if ($this->paid_amount <= 0) {
+            return 'unpaid';
+        }
+
+        if ($this->paid_amount >= $this->total_amount) {
+            return 'paid';
+        }
+
+        return 'partially_paid';
     }
 
     public function branch(): BelongsTo

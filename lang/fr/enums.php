@@ -40,10 +40,9 @@ return [
     ],
 
     'purchase_status' => [
-        'DRAFT'          => 'Brouillon',
-        'RECEIVED'       => 'Reçu',
-        'PAID'           => 'Payé',
-        'PARTIALLY_PAID' => 'Partiellement payé',
+        'pending'   => 'En attente',
+        'completed' => 'Terminé',
+        'canceled'  => 'Annulé',
     ],
 
     'purchase_payment_method' => [

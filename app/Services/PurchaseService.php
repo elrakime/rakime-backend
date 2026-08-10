@@ -39,6 +39,16 @@ class PurchaseService
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::callback('payment_status', function ($query, string $value) {
+                    $query->where(function ($q) use ($value) {
+                        match ($value) {
+                            'unpaid'         => $q->where('paid_amount', '<=', 0),
+                            'partially_paid' => $q->where('paid_amount', '>', 0)->where('paid_amount', '<', DB::raw('total_amount')),
+                            'paid'           => $q->where('paid_amount', '>=', DB::raw('total_amount')),
+                            default          => null,
+                        };
+                    });
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%");
@@ -90,7 +100,7 @@ class PurchaseService
     public function update(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::PENDING) {
-            throw new Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_pending'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {
@@ -124,23 +134,34 @@ class PurchaseService
     public function delete(Purchase $purchase): void
     {
         if ($purchase->status !== PurchaseStatus::PENDING) {
-            throw new Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_pending'), 422);
         }
 
         $purchase->delete();
     }
 
+    public function cancel(Purchase $purchase): Purchase
+    {
+        if ($purchase->status !== PurchaseStatus::PENDING) {
+            throw new Exception(__('purchases.not_pending'), 422);
+        }
+
+        $purchase->update(['status' => PurchaseStatus::CANCELED]);
+
+        return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
+    }
+
     public function receive(Purchase $purchase, array $data): Purchase
     {
         if ($purchase->status !== PurchaseStatus::PENDING) {
-            throw new Exception(__('purchases.not_draft'), 422);
+            throw new Exception(__('purchases.not_pending'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $data) {
             $inventoryId = $this->resolveInventoryId($purchase, $data['inventory_id'] ?? null);
 
             $purchase->update([
-                'status'       => PurchaseStatus::RECEIVED,
+                'status'       => PurchaseStatus::COMPLETED,
                 'inventory_id' => $inventoryId,
             ]);
 

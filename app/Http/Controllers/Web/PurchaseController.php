@@ -98,4 +98,19 @@ class PurchaseController extends Controller
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
     }
+
+    public function cancel(Purchase $purchase): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::CANCEL_PURCHASES->value)) {
+            return $response;
+        }
+
+        try {
+            $purchase = $this->purchaseService->cancel($purchase);
+
+            return $this->successResponse(new PurchaseResource($purchase));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
 }

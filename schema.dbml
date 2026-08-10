@@ -29,10 +29,9 @@ ENUM wallet_movement_type {
 }
 
 ENUM purchase_status {
-  DRAFT
-  RECEIVED
-  PAID
-  PARTIALLY_PAID
+  PENDING
+  COMPLETED
+  CANCELED
 }
 
 ENUM purchase_payment_method {

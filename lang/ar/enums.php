@@ -40,10 +40,9 @@ return [
     ],
 
     'purchase_status' => [
-        'DRAFT'          => 'مسودة',
-        'RECEIVED'       => 'مستلم',
-        'PAID'           => 'مدفوع',
-        'PARTIALLY_PAID' => 'مدفوع جزئياً',
+        'pending'   => 'قيد الانتظار',
+        'completed' => 'مكتمل',
+        'canceled'  => 'ملغي',
     ],
 
     'purchase_payment_method' => [

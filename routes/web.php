@@ -82,6 +82,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('inventory-transfers/{inventory_transfer}/cancel', [InventoryTransferController::class, 'cancel']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::post('purchases/{purchase}/receive', [PurchaseController::class, 'receive']);
+    Route::post('purchases/{purchase}/cancel', [PurchaseController::class, 'cancel']);
     Route::apiResource('stocks', StockController::class)->except(['update']);
     Route::apiResource('purchases.payments', PurchasePaymentController::class)->parameters(['payments' => 'purchase_payment'])->only(['index', 'store']);
     Route::post('purchases/{purchase}/payments/{purchase_payment}/cancel', [PurchasePaymentController::class, 'cancel']);

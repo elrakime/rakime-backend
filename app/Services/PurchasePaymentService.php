@@ -23,8 +23,8 @@ class PurchasePaymentService
 
     public function create(Purchase $purchase, array $data): PurchasePayment
     {
-        if ($purchase->status === PurchaseStatus::PENDING) {
-            throw new Exception(__('purchases.must_be_received'), 422);
+        if ($purchase->status !== PurchaseStatus::COMPLETED) {
+            throw new Exception(__('purchases.must_be_completed'), 422);
         }
 
         $remaining = $purchase->total_amount - $purchase->paid_amount;
@@ -39,14 +39,8 @@ class PurchasePaymentService
                 'amount'      => $data['amount'],
             ]);
 
-            $newPaid = $purchase->paid_amount + $data['amount'];
-            $status  = $newPaid >= $purchase->total_amount
-                ? PurchaseStatus::PAID
-                : PurchaseStatus::PARTIALLY_PAID;
-
             $purchase->update([
-                'paid_amount' => $newPaid,
-                'status'      => $status,
+                'paid_amount' => $purchase->paid_amount + $data['amount'],
             ]);
 
             $wallet = Wallet::findOrFail($data['wallet_id']);
@@ -64,21 +58,13 @@ class PurchasePaymentService
 
     public function cancel(Purchase $purchase, PurchasePayment $payment): PurchasePayment
     {
-        if ($purchase->status === PurchaseStatus::PENDING) {
-            throw new Exception(__('purchases.must_be_received'), 422);
+        if ($purchase->status !== PurchaseStatus::COMPLETED) {
+            throw new Exception(__('purchases.must_be_completed'), 422);
         }
 
         return DB::transaction(function () use ($purchase, $payment) {
-            $newPaid = $purchase->paid_amount - $payment->amount;
-            $status  = $newPaid <= 0
-                ? PurchaseStatus::RECEIVED
-                : ($newPaid >= $purchase->total_amount
-                    ? PurchaseStatus::PAID
-                    : PurchaseStatus::PARTIALLY_PAID);
-
             $purchase->update([
-                'paid_amount' => max(0, $newPaid),
-                'status'      => $status,
+                'paid_amount' => max(0, $purchase->paid_amount - $payment->amount),
             ]);
 
             $movement = WalletMovement::where('source_type', PurchasePayment::class)

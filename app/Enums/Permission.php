@@ -105,6 +105,7 @@ enum Permission: string
     case UPDATE_PURCHASES  = 'purchases.update';
     case DELETE_PURCHASES  = 'purchases.delete';
     case APPROVE_PURCHASES = 'purchases.approve';
+    case CANCEL_PURCHASES  = 'purchases.cancel';
 
     // Purchase Payments
     case VIEW_PURCHASE_PAYMENTS   = 'purchase_payments.view';
