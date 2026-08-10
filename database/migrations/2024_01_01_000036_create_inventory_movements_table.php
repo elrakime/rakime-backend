@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->nullableMorphs('source');
             $table->enum('movement_type', InventoryMovementType::keys());
+            $table->integer('old_quantity')->nullable();
+            $table->integer('new_quantity')->nullable();
             $table->integer('quantity');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

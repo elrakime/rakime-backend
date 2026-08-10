@@ -10,11 +10,13 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('wilaya_id')->constrained();
             $table->string('name');
             $table->string('code', 1);
             $table->string('shop_name')->nullable();
             $table->text('address')->nullable();
             $table->string('phone')->nullable();
+            $table->json('metadata')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

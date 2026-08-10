@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('ccp_number')->unique();
             $table->string('ccp_key');
             $table->string('eccp')->nullable();
+            $table->json('metadata')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

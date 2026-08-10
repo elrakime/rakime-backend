@@ -10,10 +10,12 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('wilaya_id')->constrained();
             $table->string('name');
             $table->string('phone');
             $table->string('email')->nullable();
             $table->string('address');
+            $table->json('metadata')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
