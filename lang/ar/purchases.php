@@ -12,4 +12,8 @@ return [
     'missing_branch' => 'لم يتم تعيين فرع لعملية الشراء هذه. يرجى تقديم معرف المخزن.',
     'no_branch_inventories' => 'لم يتم العثور على مخزن لفرع عملية الشراء هذه.',
     'multiple_branch_inventories' => 'هذا الفرع لديه عدة مخازن. يرجى تحديد المخزن المراد استخدامه.',
+    'selling_price_below_purchase' => 'يجب أن يكون سعر البيع أكبر من سعر الشراء (:price).',
+    'selling_price_below_old_batches' => 'يجب أن يكون سعر البيع أكبر من الحد الأقصى لسعر شراء الدُفعات الموجودة في المخزون (:price).',
+    'installment_price_below_purchase' => 'يجب أن يكون سعر التقسيط أكبر من سعر الشراء (:price).',
+    'installment_price_below_old_batches' => 'يجب أن يكون سعر التقسيط أكبر من الحد الأقصى لسعر شراء الدُفعات الموجودة في المخزون (:price).',
 ];

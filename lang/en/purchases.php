@@ -12,4 +12,8 @@ return [
     'missing_branch' => 'No branch assigned to this purchase. Please provide an inventory_id.',
     'no_branch_inventories' => 'No inventory found for this purchase\'s branch.',
     'multiple_branch_inventories' => 'This branch has multiple inventories. Please specify which inventory to use.',
+    'selling_price_below_purchase' => 'Selling price must be greater than the purchase price (:price).',
+    'selling_price_below_old_batches' => 'Selling price must be greater than the maximum purchase price of existing stock batches (:price).',
+    'installment_price_below_purchase' => 'Installment price must be greater than the purchase price (:price).',
+    'installment_price_below_old_batches' => 'Installment price must be greater than the maximum purchase price of existing stock batches (:price).',
 ];

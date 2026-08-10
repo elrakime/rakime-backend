@@ -24,7 +24,9 @@ class PurchaseService
 {
     use ScopesByUserBranches;
 
-    public function __construct(private readonly InventoryService $inventoryService) {}
+    public function __construct(private readonly InventoryService $inventoryService)
+    {
+    }
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Purchase::query();
@@ -42,10 +44,10 @@ class PurchaseService
                 AllowedFilter::callback('payment_status', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         match ($value) {
-                            'unpaid'         => $q->where('paid_amount', '<=', 0),
+                            'unpaid' => $q->where('paid_amount', '<=', 0),
                             'partially_paid' => $q->where('paid_amount', '>', 0)->where('paid_amount', '<', DB::raw('total_amount')),
-                            'paid'           => $q->where('paid_amount', '>=', DB::raw('total_amount')),
-                            default          => null,
+                            'paid' => $q->where('paid_amount', '>=', DB::raw('total_amount')),
+                            default => null,
                         };
                     });
                 }),
@@ -69,22 +71,22 @@ class PurchaseService
         return DB::transaction(function () use ($data) {
             $items = $data['items'];
 
-            $totalAmount = collect($items)->sum(fn ($item) => $item['quantity'] * $item['price']);
+            $totalAmount = collect($items)->sum(fn($item) => $item['quantity'] * $item['price']);
 
             $purchase = Purchase::create([
-                'supplier_id'  => $data['supplier_id'],
-                'branch_id'    => $data['branch_id'],
-                'status'       => PurchaseStatus::PENDING,
+                'supplier_id' => $data['supplier_id'],
+                'branch_id' => $data['branch_id'],
+                'status' => PurchaseStatus::PENDING,
                 'total_amount' => $totalAmount,
-                'paid_amount'  => 0,
-                'note'         => $data['note'] ?? null,
+                'paid_amount' => 0,
+                'note' => $data['note'] ?? null,
             ]);
 
             $purchase->items()->createMany(
-                collect($items)->map(fn ($item) => [
+                collect($items)->map(fn($item) => [
                     'product_id' => $item['product_id'],
-                    'quantity'   => $item['quantity'],
-                    'price'      => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
                 ])->all()
             );
 
@@ -105,22 +107,22 @@ class PurchaseService
 
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update(array_filter([
-                'supplier_id'  => $data['supplier_id'] ?? null,
-                'branch_id'    => $data['branch_id'] ?? null,
-                'note'         => $data['note'] ?? null,
-            ], fn ($v) => $v !== null));
+                'supplier_id' => $data['supplier_id'] ?? null,
+                'branch_id' => $data['branch_id'] ?? null,
+                'note' => $data['note'] ?? null,
+            ], fn($v) => $v !== null));
 
             if (array_key_exists('items', $data)) {
                 $items = $data['items'];
 
-                $totalAmount = collect($items)->sum(fn ($item) => $item['quantity'] * $item['price']);
+                $totalAmount = collect($items)->sum(fn($item) => $item['quantity'] * $item['price']);
 
                 $purchase->items()->delete();
                 $purchase->items()->createMany(
-                    collect($items)->map(fn ($item) => [
+                    collect($items)->map(fn($item) => [
                         'product_id' => $item['product_id'],
-                        'quantity'   => $item['quantity'],
-                        'price'      => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
                     ])->all()
                 );
 
@@ -161,12 +163,15 @@ class PurchaseService
             $inventoryId = $this->resolveInventoryId($purchase, $data['inventory_id'] ?? null);
 
             $purchase->update([
-                'status'       => PurchaseStatus::COMPLETED,
+                'status' => PurchaseStatus::COMPLETED,
                 'inventory_id' => $inventoryId,
             ]);
 
             // Index optional per-item pricing overrides by product_id
             $pricingByProduct = collect($data['items'] ?? [])->keyBy('product_id');
+
+            // Validate prices before processing
+            $this->validatePrices($purchase, $inventoryId, $pricingByProduct);
 
             // If this purchase was created from a restock, load the restock to update fulfilled quantities
             $restock = Restock::where('fulfilled_with_id', $purchase->id)
@@ -178,15 +183,15 @@ class PurchaseService
 
                 $stock = Stock::firstOrCreate([
                     'inventory_id' => $inventoryId,
-                    'product_id'   => $item->product_id,
+                    'product_id' => $item->product_id,
                 ]);
 
                 $oldQuantity = $stock->batches()->sum('current_quantity');
 
                 $batch = $stock->batches()->create([
-                    'source_id'        => $item->id,
-                    'source_type'      => PurchaseItem::class,
-                    'purchase_price'   => $item->price,
+                    'source_id' => $item->id,
+                    'source_type' => PurchaseItem::class,
+                    'purchase_price' => $item->price,
                     'initial_quantity' => $item->quantity,
                     'current_quantity' => $item->quantity,
                 ]);
@@ -223,6 +228,64 @@ class PurchaseService
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
         });
+    }
+
+    private function validatePrices(Purchase $purchase, int $inventoryId, \Illuminate\Support\Collection $pricingByProduct): void
+    {
+        if ($pricingByProduct->isEmpty()) {
+            return;
+        }
+
+        // Fetch max old-batch purchase prices in a single query, keyed by product_id
+        $maxOldBatchPrices = Stock::where('inventory_id', $inventoryId)
+            ->whereIn('product_id', $pricingByProduct->keys())
+            ->join('batches', 'stocks.id', '=', 'batches.stock_id')
+            ->where('batches.current_quantity', '>', 0)
+            ->groupBy('stocks.product_id')
+            ->selectRaw('stocks.product_id, MAX(batches.purchase_price) as max_price')
+            ->pluck('max_price', 'stocks.product_id')
+            ->map(fn($v) => (int) $v);
+
+        foreach ($purchase->items as $item) {
+            $pricing = $pricingByProduct->get($item->product_id);
+            $maxOldBatchPrice = $maxOldBatchPrices->get($item->product_id, 0);
+
+            if (!$pricing) {
+                continue;
+            }
+
+
+
+            foreach ($pricing['selling_prices'] ?? [] as $amount) {
+                $amount = (int) $amount;
+
+                if ($amount <= $item->price) {
+                    throw new Exception(__('purchases.selling_price_below_purchase', [
+                        'price' => $item->price,
+                    ]), 422);
+                }
+                if ($maxOldBatchPrice > 0 && $amount <= $maxOldBatchPrice) {
+                    throw new Exception(__('purchases.selling_price_below_old_batches', [
+                        'price' => $maxOldBatchPrice,
+                    ]), 422);
+                }
+            }
+
+            foreach ($pricing['installment_prices'] ?? [] as $amount) {
+                $amount = (int) $amount;
+
+                if ($amount <= $item->price) {
+                    throw new Exception(__('purchases.installment_price_below_purchase', [
+                        'price' => $item->price,
+                    ]), 422);
+                }
+                if ($maxOldBatchPrice > 0 && $amount <= $maxOldBatchPrice) {
+                    throw new Exception(__('purchases.installment_price_below_old_batches', [
+                        'price' => $maxOldBatchPrice,
+                    ]), 422);
+                }
+            }
+        }
     }
 
     private function resolveInventoryId(Purchase $purchase, ?int $inventoryId): int

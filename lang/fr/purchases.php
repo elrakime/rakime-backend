@@ -12,4 +12,8 @@ return [
     'missing_branch' => 'Aucune branche assignée à cet achat. Veuillez fournir un inventory_id.',
     'no_branch_inventories' => 'Aucun inventaire trouvé pour la branche de cet achat.',
     'multiple_branch_inventories' => 'Cette branche a plusieurs inventaires. Veuillez spécifier lequel utiliser.',
+    'selling_price_below_purchase' => 'Le prix de vente doit être supérieur au prix d\'achat (:price).',
+    'selling_price_below_old_batches' => 'Le prix de vente doit être supérieur au prix d\'achat maximum des lots en stock (:price).',
+    'installment_price_below_purchase' => 'Le prix de versement doit être supérieur au prix d\'achat (:price).',
+    'installment_price_below_old_batches' => 'Le prix de versement doit être supérieur au prix d\'achat maximum des lots en stock (:price).',
 ];

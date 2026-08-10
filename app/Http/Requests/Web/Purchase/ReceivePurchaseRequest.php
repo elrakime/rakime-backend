@@ -18,9 +18,9 @@ class ReceivePurchaseRequest extends FormRequest
             'items'                          => ['nullable', 'array'],
             'items.*.product_id'             => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.selling_prices'          => ['nullable', 'array'],
-            'items.*.selling_prices.*'        => ['integer', 'min:0'],
+            'items.*.selling_prices.*'        => ['integer', 'gt:0'],
             'items.*.installment_prices'      => ['nullable', 'array'],
-            'items.*.installment_prices.*'    => ['integer', 'min:0'],
+            'items.*.installment_prices.*'    => ['integer', 'gt:0'],
         ];
     }
 }
