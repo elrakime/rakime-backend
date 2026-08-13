@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\InventoryMovementType;
 use App\Enums\InventoryTransferStatus;
+use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
 use App\Models\Restock;
@@ -168,35 +170,71 @@ class InventoryTransferService
 
                 $oldQuantity = $toStock->batches()->sum('current_quantity');
 
-                $toBatch = $toStock->batches()->create([
-                    'source_id'        => $transferItem->id,
-                    'source_type'      => InventoryTransferItem::class,
-                    'purchase_price'   => 0,
-                    'initial_quantity' => $transferItem->quantity,
-                    'current_quantity' => $transferItem->quantity,
-                ]);
+                $sourceAllocations = InventoryMovement::query()
+                    ->where('source_type', InventoryTransfer::class)
+                    ->where('source_id', $transfer->id)
+                    ->where('movement_type', InventoryMovementType::TRANSFER_OUT)
+                    ->where('stock_id', $transferItem->stock_id)
+                    ->with('allocations')
+                    ->first()
+                    ?->allocations ?? collect();
+
+                $toAllocations = [];
+                $receivedQuantity = 0;
+
+                if ($sourceAllocations->isEmpty()) {
+                    $toBatch = $toStock->batches()->create([
+                        'source_id'        => $transferItem->id,
+                        'source_type'      => InventoryTransferItem::class,
+                        'purchase_price'   => 0,
+                        'initial_quantity' => $transferItem->quantity,
+                        'current_quantity' => $transferItem->quantity,
+                    ]);
+
+                    $toAllocations[] = [
+                        'batch_id'       => $toBatch->id,
+                        'quantity'       => $transferItem->quantity,
+                        'purchase_price' => 0,
+                    ];
+
+                    $receivedQuantity = $transferItem->quantity;
+                } else {
+                    foreach ($sourceAllocations as $sourceAllocation) {
+                        $quantity = abs($sourceAllocation->quantity);
+
+                        $toBatch = $toStock->batches()->create([
+                            'source_id'        => $transferItem->id,
+                            'source_type'      => InventoryTransferItem::class,
+                            'purchase_price'   => $sourceAllocation->purchase_price,
+                            'initial_quantity' => $quantity,
+                            'current_quantity' => $quantity,
+                        ]);
+
+                        $toAllocations[] = [
+                            'batch_id'       => $toBatch->id,
+                            'quantity'       => $quantity,
+                            'purchase_price' => $sourceAllocation->purchase_price,
+                        ];
+
+                        $receivedQuantity += $quantity;
+                    }
+                }
 
                 $this->inventoryService->transferIn(
                     stockId: $toStock->id,
                     inventoryId: $transfer->to_inventory_id,
                     productId: $transferItem->stock->product_id,
                     oldQuantity: $oldQuantity,
-                    quantity: $transferItem->quantity,
+                    quantity: $receivedQuantity,
                     source: $transfer,
-                    allocations: [
-                        [
-                            'batch_id'       => $toBatch->id,
-                            'quantity'       => $transferItem->quantity,
-                            'purchase_price' => $toBatch->purchase_price,
-                        ],
-                    ],
+                    allocations: $toAllocations,
                 );
 
                 // Update restock fulfilled_quantity if linked
-                if ($restock) {
+                if ($restock && $receivedQuantity > 0) {
                     $restockItem = $restock->items()->where('product_id', $transferItem->stock->product_id)->first();
                     if ($restockItem) {
-                        $restockItem->increment('fulfilled_quantity', $transferItem->quantity);
+                        $restockItem->increment('fulfilled_quantity', $receivedQuantity);
                     }
                 }
             }
