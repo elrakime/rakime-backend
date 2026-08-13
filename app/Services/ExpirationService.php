@@ -107,9 +107,17 @@ class ExpirationService
 
                 $oldQuantity = $batches->sum('current_quantity');
 
+                $allocations = [];
+
                 foreach ($batches as $batch) {
                     $deduct = min($remaining, $batch->current_quantity);
                     $batch->decrement('current_quantity', $deduct);
+
+                    $allocations[] = [
+                        'batch_id'       => $batch->id,
+                        'quantity'       => -$deduct,
+                        'purchase_price' => $batch->purchase_price,
+                    ];
 
                     $remaining -= $deduct;
                     if ($remaining <= 0) {
@@ -124,6 +132,7 @@ class ExpirationService
                     oldQuantity: $oldQuantity,
                     quantity: $item->quantity,
                     source: $expiration,
+                    allocations: $allocations,
                 );
             }
 

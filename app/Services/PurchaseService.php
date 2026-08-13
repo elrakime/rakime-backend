@@ -215,6 +215,13 @@ class PurchaseService
                     oldQuantity: $oldQuantity,
                     quantity: $item->quantity,
                     source: $purchase,
+                    allocations: [
+                        [
+                            'batch_id'       => $batch->id,
+                            'quantity'       => $item->quantity,
+                            'purchase_price' => $item->price,
+                        ],
+                    ],
                 );
 
                 // Update restock fulfilled_quantity if linked

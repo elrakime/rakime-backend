@@ -105,15 +105,31 @@ class InventoryTransferService
                 $fromStock = $transferItem->stock;
 
                 if ($fromStock) {
-                    $fromBatch = $fromStock->batches()
+                    $remaining = $transferItem->quantity;
+
+                    $batches = $fromStock->batches()
                         ->where('current_quantity', '>', 0)
                         ->orderBy('created_at')
-                        ->first();
+                        ->get();
 
-                    $oldQuantity = $fromStock->batches()->sum('current_quantity');
+                    $oldQuantity = $batches->sum('current_quantity');
 
-                    if ($fromBatch) {
-                        $fromBatch->decrement('current_quantity', $transferItem->quantity);
+                    $allocations = [];
+
+                    foreach ($batches as $batch) {
+                        $deduct = min($remaining, $batch->current_quantity);
+                        $batch->decrement('current_quantity', $deduct);
+
+                        $allocations[] = [
+                            'batch_id'       => $batch->id,
+                            'quantity'       => -$deduct,
+                            'purchase_price' => $batch->purchase_price,
+                        ];
+
+                        $remaining -= $deduct;
+                        if ($remaining <= 0) {
+                            break;
+                        }
                     }
 
                     $this->inventoryService->transferOut(
@@ -123,6 +139,7 @@ class InventoryTransferService
                         oldQuantity: $oldQuantity,
                         quantity: $transferItem->quantity,
                         source: $transfer,
+                        allocations: $allocations,
                     );
                 }
             }
@@ -166,6 +183,13 @@ class InventoryTransferService
                     oldQuantity: $oldQuantity,
                     quantity: $transferItem->quantity,
                     source: $transfer,
+                    allocations: [
+                        [
+                            'batch_id'       => $toBatch->id,
+                            'quantity'       => $transferItem->quantity,
+                            'purchase_price' => $toBatch->purchase_price,
+                        ],
+                    ],
                 );
 
                 // Update restock fulfilled_quantity if linked
@@ -195,7 +219,7 @@ class InventoryTransferService
                     if ($fromStock) {
                         $oldQuantity = $fromStock->batches()->sum('current_quantity');
 
-                        $fromStock->batches()->create([
+                        $creditBatch = $fromStock->batches()->create([
                             'source_id'        => $transferItem->id,
                             'source_type'      => InventoryTransferItem::class,
                             'purchase_price'   => 0,
@@ -210,6 +234,13 @@ class InventoryTransferService
                             oldQuantity: $oldQuantity,
                             quantity: $transferItem->quantity,
                             source: $transfer,
+                            allocations: [
+                                [
+                                    'batch_id'       => $creditBatch->id,
+                                    'quantity'       => $transferItem->quantity,
+                                    'purchase_price' => $creditBatch->purchase_price,
+                                ],
+                            ],
                         );
                     }
                 }

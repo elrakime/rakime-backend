@@ -244,6 +244,8 @@ class SaleService
 
             $oldTotal = $batches->sum('current_quantity');
 
+            $allocations = [];
+
             if ($newQty > $oldQty) {
                 // ADDED or INCREASED: outflow, must check availability for the delta
                 $delta = $newQty - $oldQty;
@@ -260,6 +262,11 @@ class SaleService
                     $deduct = min($remaining, $batch->current_quantity);
                     if ($deduct > 0) {
                         $batch->decrement('current_quantity', $deduct);
+                        $allocations[] = [
+                            'batch_id'       => $batch->id,
+                            'quantity'       => -$deduct,
+                            'purchase_price' => $batch->purchase_price,
+                        ];
                         $remaining -= $deduct;
                     }
                     if ($remaining <= 0) {
@@ -275,6 +282,11 @@ class SaleService
                 $batch = $batches->first();
                 if ($batch) {
                     $batch->increment('current_quantity', $delta);
+                    $allocations[] = [
+                        'batch_id'       => $batch->id,
+                        'quantity'       => $delta,
+                        'purchase_price' => $batch->purchase_price,
+                    ];
                 }
 
                 $newTotal = $oldTotal + $delta;
@@ -288,6 +300,7 @@ class SaleService
                 oldQuantity: $oldTotal,
                 quantity: $newQty - $oldQty,
                 source: $sale,
+                allocations: $allocations,
             );
         }
     }
@@ -335,9 +348,17 @@ class SaleService
 
             $oldQuantity = $batches->sum('current_quantity');
 
+            $allocations = [];
+
             foreach ($batches as $batch) {
                 $deduct = min($remaining, $batch->current_quantity);
                 $batch->decrement('current_quantity', $deduct);
+
+                $allocations[] = [
+                    'batch_id'       => $batch->id,
+                    'quantity'       => -$deduct,
+                    'purchase_price' => $batch->purchase_price,
+                ];
 
                 $remaining -= $deduct;
                 if ($remaining <= 0) {
@@ -353,6 +374,7 @@ class SaleService
                 oldQuantity: $oldQuantity,
                 quantity: $item->quantity,
                 source: $sale,
+                allocations: $allocations,
             );
         }
     }

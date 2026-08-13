@@ -83,6 +83,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -92,6 +93,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -105,6 +107,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -114,6 +117,7 @@ class InventoryService
             $oldQuantity,
             -abs($quantity),
             $source,
+            $allocations,
         );
     }
 
@@ -127,6 +131,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -136,6 +141,7 @@ class InventoryService
             $oldQuantity,
             -abs($quantity),
             $source,
+            $allocations,
         );
     }
 
@@ -149,6 +155,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -158,6 +165,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -171,6 +179,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -180,6 +189,7 @@ class InventoryService
             $oldQuantity,
             -abs($quantity),
             $source,
+            $allocations,
         );
     }
 
@@ -193,6 +203,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -202,6 +213,7 @@ class InventoryService
             $oldQuantity,
             -abs($quantity),
             $source,
+            $allocations,
         );
     }
 
@@ -215,6 +227,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -224,6 +237,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -237,6 +251,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -246,6 +261,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -259,6 +275,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -268,6 +285,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -281,6 +299,7 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
         return $this->recordMovement(
             $stockId,
@@ -290,6 +309,7 @@ class InventoryService
             $oldQuantity,
             $quantity,
             $source,
+            $allocations,
         );
     }
 
@@ -308,8 +328,9 @@ class InventoryService
         int $oldQuantity,
         int $quantity,
         ?Model $source = null,
+        array $allocations = [],
     ): InventoryMovement {
-        return InventoryMovement::create([
+        $movement = InventoryMovement::create([
             'stock_id'      => $stockId,
             'inventory_id'  => $inventoryId,
             'product_id'    => $productId,
@@ -320,5 +341,17 @@ class InventoryService
             'new_quantity'  => $oldQuantity + $quantity,
             'quantity'      => $quantity,
         ]);
+
+        if ($allocations !== []) {
+            $movement->allocations()->createMany(
+                collect($allocations)->map(fn (array $allocation) => [
+                    'batch_id'       => $allocation['batch_id'],
+                    'quantity'       => $allocation['quantity'],
+                    'purchase_price' => $allocation['purchase_price'],
+                ])->all()
+            );
+        }
+
+        return $movement;
     }
 }

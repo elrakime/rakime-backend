@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Traits\HasUserstamps;
 
@@ -38,5 +39,10 @@ class Batch extends Model
     public function source(): MorphTo
     {
         return $this->morphTo('source', 'source_type', 'source_id');
+    }
+
+    public function allocations(): HasMany
+    {
+        return $this->hasMany(BatchAllocation::class);
     }
 }

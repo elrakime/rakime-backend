@@ -151,6 +151,13 @@ class SaleReturnService
                         oldQuantity: $oldQuantity,
                         quantity: $returnItem->quantity,
                         source: $saleReturn,
+                        allocations: [
+                            [
+                                'batch_id'       => $batch->id,
+                                'quantity'       => $returnItem->quantity,
+                                'purchase_price' => $batch->purchase_price,
+                            ],
+                        ],
                     );
                 }
             }
