@@ -130,28 +130,48 @@ class PurchaseReturnService
                 $purchaseItem = $returnItem->purchaseItem;
                 $totalReturnAmount += $returnItem->quantity * $purchaseItem->price;
 
-                $batch = Batch::where('source_id', $purchaseItem->id)
-                    ->where('source_type', 'purchase_items')
+                $sourceBatch = Batch::where('source_id', $purchaseItem->id)
+                    ->where('source_type', PurchaseItem::class)
                     ->first();
 
-                if ($batch) {
-                    $oldQuantity = $batch->stock->batches()->sum('current_quantity');
-                    $batch->decrement('current_quantity', $returnItem->quantity);
+                if ($sourceBatch) {
+                    $stock = $sourceBatch->stock;
+
+                    $remaining = $returnItem->quantity;
+
+                    $batches = $stock->batches()
+                        ->where('current_quantity', '>', 0)
+                        ->orderBy('created_at')
+                        ->get();
+
+                    $oldQuantity = $batches->sum('current_quantity');
+
+                    $allocations = [];
+
+                    foreach ($batches as $batch) {
+                        $deduct = min($remaining, $batch->current_quantity);
+                        $batch->decrement('current_quantity', $deduct);
+
+                        $allocations[] = [
+                            'batch_id'       => $batch->id,
+                            'quantity'       => -$deduct,
+                            'purchase_price' => $batch->purchase_price,
+                        ];
+
+                        $remaining -= $deduct;
+                        if ($remaining <= 0) {
+                            break;
+                        }
+                    }
 
                     $this->inventoryService->returnOut(
-                        stockId: $batch->stock_id,
-                        inventoryId: $batch->stock->inventory_id,
+                        stockId: $stock->id,
+                        inventoryId: $stock->inventory_id,
                         productId: $purchaseItem->product_id,
                         oldQuantity: $oldQuantity,
                         quantity: $returnItem->quantity,
                         source: $purchaseReturn,
-                        allocations: [
-                            [
-                                'batch_id'       => $batch->id,
-                                'quantity'       => -$returnItem->quantity,
-                                'purchase_price' => $batch->purchase_price,
-                            ],
-                        ],
+                        allocations: $allocations,
                     );
                 }
             }
