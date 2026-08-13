@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Enums\InventoryTransferStatus;
+use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
@@ -257,28 +258,61 @@ class InventoryTransferService
                     if ($fromStock) {
                         $oldQuantity = $fromStock->batches()->sum('current_quantity');
 
-                        $creditBatch = $fromStock->batches()->create([
-                            'source_id'        => $transferItem->id,
-                            'source_type'      => InventoryTransferItem::class,
-                            'purchase_price'   => 0,
-                            'initial_quantity' => $transferItem->quantity,
-                            'current_quantity' => $transferItem->quantity,
-                        ]);
+                        $sourceAllocations = InventoryMovement::query()
+                            ->where('source_type', InventoryTransfer::class)
+                            ->where('source_id', $transfer->id)
+                            ->where('movement_type', InventoryMovementType::TRANSFER_OUT)
+                            ->where('stock_id', $transferItem->stock_id)
+                            ->with('allocations')
+                            ->first()
+                            ?->allocations ?? collect();
+
+                        $toAllocations = [];
+                        $restoredQuantity = 0;
+
+                        if ($sourceAllocations->isEmpty()) {
+                            $creditBatch = $fromStock->batches()->create([
+                                'source_id'        => $transferItem->id,
+                                'source_type'      => InventoryTransferItem::class,
+                                'purchase_price'   => 0,
+                                'initial_quantity' => $transferItem->quantity,
+                                'current_quantity' => $transferItem->quantity,
+                            ]);
+
+                            $toAllocations[] = [
+                                'batch_id'       => $creditBatch->id,
+                                'quantity'       => $transferItem->quantity,
+                                'purchase_price' => $creditBatch->purchase_price,
+                            ];
+
+                            $restoredQuantity = $transferItem->quantity;
+                        } else {
+                            foreach ($sourceAllocations as $sourceAllocation) {
+                                $batch = Batch::find($sourceAllocation->batch_id);
+                                $quantity = abs($sourceAllocation->quantity);
+
+                                if ($batch) {
+                                    $batch->increment('current_quantity', $quantity);
+
+                                    $toAllocations[] = [
+                                        'batch_id'       => $batch->id,
+                                        'quantity'       => $quantity,
+                                        'purchase_price' => $batch->purchase_price,
+                                    ];
+
+                                    $restoredQuantity += $quantity;
+                                }
+                            }
+                        }
 
                         $this->inventoryService->transferCancel(
                             stockId: $fromStock->id,
                             inventoryId: $transfer->from_inventory_id,
                             productId: $transferItem->stock->product_id,
                             oldQuantity: $oldQuantity,
-                            quantity: $transferItem->quantity,
+                            quantity: $restoredQuantity,
                             source: $transfer,
-                            allocations: [
-                                [
-                                    'batch_id'       => $creditBatch->id,
-                                    'quantity'       => $transferItem->quantity,
-                                    'purchase_price' => $creditBatch->purchase_price,
-                                ],
-                            ],
+                            allocations: $toAllocations,
                         );
                     }
                 }
