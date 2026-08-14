@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\Role as RoleEnum;
+use Exception;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 
@@ -36,6 +38,8 @@ class RoleService
 
     public function update(Role $role, array $data): Role
     {
+        $this->assertNotDefault($role, __('roles.cannot_update_default'));
+
         if (isset($data['name'])) {
             $role->update(['name' => $data['name']]);
         }
@@ -49,6 +53,19 @@ class RoleService
 
     public function delete(Role $role): void
     {
+        $this->assertNotDefault($role, __('roles.cannot_delete_default'));
+
+        if ($role->users()->exists()) {
+            throw new Exception(__('roles.cannot_delete_role_with_users'), 422);
+        }
+
         $role->delete();
+    }
+
+    private function assertNotDefault(Role $role, string $message): void
+    {
+        if (in_array($role->name, RoleEnum::keys(), true)) {
+            throw new Exception($message, 422);
+        }
     }
 }
