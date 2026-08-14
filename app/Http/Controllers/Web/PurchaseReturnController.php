@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
+use App\Enums\PurchaseReturnStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\PurchaseReturn\ApprovePurchaseReturnRequest;
 use App\Http\Requests\Web\PurchaseReturn\StorePurchaseReturnRequest;
@@ -124,6 +125,8 @@ class PurchaseReturnController extends Controller
 
         try {
             $data = $this->validateRequest($request);
+
+            $purchaseReturn->assertCanTransitionTo(PurchaseReturnStatus::COMPLETED->value);
 
             $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn, $data['wallet_id']);
 

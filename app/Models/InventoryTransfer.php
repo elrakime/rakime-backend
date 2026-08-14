@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
+use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 use App\Enums\InventoryTransferStatus;
 
@@ -18,6 +19,7 @@ class InventoryTransfer extends Model
 {
     use LogsActivity;
     use HasStatusHistory;
+    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [

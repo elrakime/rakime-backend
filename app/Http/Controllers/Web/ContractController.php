@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Enums\ContractStatus;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Contract\ApproveContractRequest;
@@ -66,6 +67,8 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
+            $contract->assertCanTransitionTo(ContractStatus::APPROVED->value);
+
             $contract = $this->contractService->approve($contract, (float) $data['max_amount']);
 
             return $this->successResponse(new ContractResource($contract));
@@ -87,6 +90,8 @@ class ContractController extends Controller
         $this->validateRequest($request);
 
         try {
+            $contract->assertCanTransitionTo(ContractStatus::REJECTED->value);
+
             $contract = $this->contractService->reject($contract);
 
             return $this->successResponse(new ContractResource($contract));
@@ -108,6 +113,8 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
+            $contract->assertCanTransitionTo(ContractStatus::CONFIRMED->value);
+
             $contract = $this->contractService->confirm($contract, $data);
 
             return $this->successResponse(new ContractResource($contract));
@@ -129,6 +136,8 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
+            $contract->assertCanTransitionTo(ContractStatus::CONFIGURED->value);
+
             $contract = $this->contractService->configure($contract, (int) $data['subscription_count']);
 
             return $this->successResponse(new ContractResource($contract));

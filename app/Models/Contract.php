@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
+use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 
 class Contract extends Model
 {
     use LogsActivity;
     use HasStatusHistory;
+    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [

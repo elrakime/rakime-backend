@@ -47,4 +47,17 @@ enum SaleReturnStatus: string
     {
         return self::PENDING;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PENDING => [self::COMPLETED],
+            self::COMPLETED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

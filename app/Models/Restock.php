@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
+use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 
 class Restock extends Model
 {
     use LogsActivity;
     use HasStatusHistory;
+    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [

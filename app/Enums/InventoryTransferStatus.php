@@ -51,4 +51,18 @@ enum InventoryTransferStatus: string
     {
         return self::PENDING;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PENDING => [self::DISPATCHED, self::CANCELED],
+            self::DISPATCHED => [self::RECEIVED, self::CANCELED],
+            self::RECEIVED, self::CANCELED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

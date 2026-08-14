@@ -49,4 +49,17 @@ enum SubscriptionStatus: string
     {
         return self::ACTIVE;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::ACTIVE => [self::CANCELLED, self::COMPLETED],
+            self::CANCELLED, self::COMPLETED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
+use App\Enums\PurchaseStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Purchase\ReceivePurchaseRequest;
 use App\Http\Requests\Web\Purchase\StorePurchaseRequest;
@@ -91,6 +92,8 @@ class PurchaseController extends Controller
         }
 
         try {
+            $purchase->assertCanTransitionTo(PurchaseStatus::COMPLETED->value);
+
             $purchase = $this->purchaseService->receive($purchase, $this->validateRequest($request));
 
             return $this->successResponse(new PurchaseResource($purchase));
@@ -106,6 +109,8 @@ class PurchaseController extends Controller
         }
 
         try {
+            $purchase->assertCanTransitionTo(PurchaseStatus::CANCELED->value);
+
             $purchase = $this->purchaseService->cancel($purchase);
 
             return $this->successResponse(new PurchaseResource($purchase));

@@ -49,4 +49,17 @@ enum ExpirationStatus: string
     {
         return self::PENDING;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PENDING => [self::APPROVED, self::CANCELED],
+            self::APPROVED, self::CANCELED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

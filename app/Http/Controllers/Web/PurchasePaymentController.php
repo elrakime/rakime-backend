@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
+use App\Enums\PurchasePaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\PurchasePayment\StorePurchasePaymentRequest;
 use App\Http\Resources\Web\PurchasePaymentResource;
@@ -52,6 +53,8 @@ class PurchasePaymentController extends Controller
         }
 
         try {
+            $purchase_payment->assertCanTransitionTo(PurchasePaymentStatus::CANCELED->value);
+
             $payment = $this->purchasePaymentService->cancel($purchase, $purchase_payment);
 
             return $this->successResponse(new PurchasePaymentResource($payment));

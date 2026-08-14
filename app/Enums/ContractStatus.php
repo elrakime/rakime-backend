@@ -61,4 +61,21 @@ enum ContractStatus: string
     {
         return self::PENDING;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PENDING => [self::APPROVED, self::REJECTED],
+            self::APPROVED => [self::CONFIRMED],
+            self::CONFIRMED => [self::CONFIGURED],
+            self::CONFIGURED => [self::ACTIVE, self::CANCELLED],
+            self::ACTIVE => [self::COMPLETED, self::CLOSED, self::CANCELLED],
+            self::REJECTED, self::COMPLETED, self::CLOSED, self::CANCELLED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

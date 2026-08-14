@@ -49,4 +49,17 @@ enum RestockStatus: string
     {
         return self::PENDING;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PENDING => [self::FULFILLED, self::CANCELLED],
+            self::FULFILLED, self::CANCELLED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }

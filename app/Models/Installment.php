@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Traits\HasStatusHistory;
+use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 
 class Installment extends Model
 {
     use HasStatusHistory;
+    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [

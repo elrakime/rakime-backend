@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
+use App\Enums\RestockStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Restock\FulfillRestockRequest;
 use App\Http\Requests\Web\Restock\StoreRestockRequest;
@@ -138,6 +139,8 @@ class RestockController extends Controller
         }
 
         try {
+            $restock->assertCanTransitionTo(RestockStatus::CANCELLED->value);
+
             $restock = $this->restockService->cancel($restock);
 
             return $this->successResponse(new RestockResource($restock));
@@ -159,6 +162,8 @@ class RestockController extends Controller
         $data = $this->validateRequest($request);
 
         try {
+            $restock->assertCanTransitionTo(RestockStatus::FULFILLED->value);
+
             $restock = $this->restockService->fulfill($restock, $data);
 
             return $this->successResponse(new RestockResource($restock));

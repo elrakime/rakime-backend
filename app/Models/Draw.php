@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\HasStatusHistory;
+use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 
 class Draw extends Model
 {
     use HasStatusHistory;
+    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Enums\ExpirationStatus;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Expiration\StoreExpirationRequest;
@@ -97,6 +98,8 @@ class ExpirationController extends Controller
         }
 
         try {
+            $expiration->assertCanTransitionTo(ExpirationStatus::APPROVED->value);
+
             $expiration = $this->expirationService->approve($expiration);
 
             return $this->successResponse(new ExpirationResource($expiration));

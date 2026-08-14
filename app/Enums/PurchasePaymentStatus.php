@@ -47,4 +47,17 @@ enum PurchasePaymentStatus: string
     {
         return self::PAID;
     }
+
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::PAID => [self::CANCELED],
+            self::CANCELED => [],
+        };
+    }
+
+    public function canTransitionTo(self $newStatus): bool
+    {
+        return in_array($newStatus, $this->allowedTransitions(), true);
+    }
 }
