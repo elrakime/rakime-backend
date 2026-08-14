@@ -183,53 +183,37 @@ class InventoryTransferService
                 $toAllocations = [];
                 $receivedQuantity = 0;
 
-                if ($sourceAllocations->isEmpty()) {
+                foreach ($sourceAllocations as $sourceAllocation) {
+                    $quantity = abs($sourceAllocation->quantity);
+
                     $toBatch = $toStock->batches()->create([
                         'source_id'        => $transferItem->id,
                         'source_type'      => InventoryTransferItem::class,
-                        'purchase_price'   => 0,
-                        'initial_quantity' => $transferItem->quantity,
-                        'current_quantity' => $transferItem->quantity,
+                        'purchase_price'   => $sourceAllocation->purchase_price,
+                        'initial_quantity' => $quantity,
+                        'current_quantity' => $quantity,
                     ]);
 
                     $toAllocations[] = [
                         'batch_id'       => $toBatch->id,
-                        'quantity'       => $transferItem->quantity,
-                        'purchase_price' => 0,
+                        'quantity'       => $quantity,
+                        'purchase_price' => $sourceAllocation->purchase_price,
                     ];
 
-                    $receivedQuantity = $transferItem->quantity;
-                } else {
-                    foreach ($sourceAllocations as $sourceAllocation) {
-                        $quantity = abs($sourceAllocation->quantity);
-
-                        $toBatch = $toStock->batches()->create([
-                            'source_id'        => $transferItem->id,
-                            'source_type'      => InventoryTransferItem::class,
-                            'purchase_price'   => $sourceAllocation->purchase_price,
-                            'initial_quantity' => $quantity,
-                            'current_quantity' => $quantity,
-                        ]);
-
-                        $toAllocations[] = [
-                            'batch_id'       => $toBatch->id,
-                            'quantity'       => $quantity,
-                            'purchase_price' => $sourceAllocation->purchase_price,
-                        ];
-
-                        $receivedQuantity += $quantity;
-                    }
+                    $receivedQuantity += $quantity;
                 }
 
-                $this->inventoryService->transferIn(
-                    stockId: $toStock->id,
-                    inventoryId: $transfer->to_inventory_id,
-                    productId: $transferItem->stock->product_id,
-                    oldQuantity: $oldQuantity,
-                    quantity: $receivedQuantity,
-                    source: $transfer,
-                    allocations: $toAllocations,
-                );
+                if ($receivedQuantity > 0) {
+                    $this->inventoryService->transferIn(
+                        stockId: $toStock->id,
+                        inventoryId: $transfer->to_inventory_id,
+                        productId: $transferItem->stock->product_id,
+                        oldQuantity: $oldQuantity,
+                        quantity: $receivedQuantity,
+                        source: $transfer,
+                        allocations: $toAllocations,
+                    );
+                }
 
                 // Update restock fulfilled_quantity if linked
                 if ($restock && $receivedQuantity > 0) {
@@ -270,50 +254,34 @@ class InventoryTransferService
                         $toAllocations = [];
                         $restoredQuantity = 0;
 
-                        if ($sourceAllocations->isEmpty()) {
-                            $creditBatch = $fromStock->batches()->create([
-                                'source_id'        => $transferItem->id,
-                                'source_type'      => InventoryTransferItem::class,
-                                'purchase_price'   => 0,
-                                'initial_quantity' => $transferItem->quantity,
-                                'current_quantity' => $transferItem->quantity,
-                            ]);
+                        foreach ($sourceAllocations as $sourceAllocation) {
+                            $batch = Batch::find($sourceAllocation->batch_id);
+                            $quantity = abs($sourceAllocation->quantity);
 
-                            $toAllocations[] = [
-                                'batch_id'       => $creditBatch->id,
-                                'quantity'       => $transferItem->quantity,
-                                'purchase_price' => $creditBatch->purchase_price,
-                            ];
+                            if ($batch) {
+                                $batch->increment('current_quantity', $quantity);
 
-                            $restoredQuantity = $transferItem->quantity;
-                        } else {
-                            foreach ($sourceAllocations as $sourceAllocation) {
-                                $batch = Batch::find($sourceAllocation->batch_id);
-                                $quantity = abs($sourceAllocation->quantity);
+                                $toAllocations[] = [
+                                    'batch_id'       => $batch->id,
+                                    'quantity'       => $quantity,
+                                    'purchase_price' => $batch->purchase_price,
+                                ];
 
-                                if ($batch) {
-                                    $batch->increment('current_quantity', $quantity);
-
-                                    $toAllocations[] = [
-                                        'batch_id'       => $batch->id,
-                                        'quantity'       => $quantity,
-                                        'purchase_price' => $batch->purchase_price,
-                                    ];
-
-                                    $restoredQuantity += $quantity;
-                                }
+                                $restoredQuantity += $quantity;
                             }
                         }
 
-                        $this->inventoryService->transferCancel(
-                            stockId: $fromStock->id,
-                            inventoryId: $transfer->from_inventory_id,
-                            productId: $transferItem->stock->product_id,
-                            oldQuantity: $oldQuantity,
-                            quantity: $restoredQuantity,
-                            source: $transfer,
-                            allocations: $toAllocations,
-                        );
+                        if ($restoredQuantity > 0) {
+                            $this->inventoryService->transferCancel(
+                                stockId: $fromStock->id,
+                                inventoryId: $transfer->from_inventory_id,
+                                productId: $transferItem->stock->product_id,
+                                oldQuantity: $oldQuantity,
+                                quantity: $restoredQuantity,
+                                source: $transfer,
+                                allocations: $toAllocations,
+                            );
+                        }
                     }
                 }
             }
