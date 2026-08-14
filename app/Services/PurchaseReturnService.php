@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\InventoryMovementType;
 use App\Enums\PurchaseReturnStatus;
 use App\Models\Batch;
+use App\Models\InventoryMovement;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
@@ -23,6 +25,7 @@ class PurchaseReturnService
         private readonly InventoryService $inventoryService,
         private readonly WalletService $walletService,
     ) {}
+
     public function list(Request $request, Purchase $purchase): LengthAwarePaginator
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
@@ -86,7 +89,7 @@ class PurchaseReturnService
 
         return DB::transaction(function () use ($purchaseReturn, $data) {
             $purchaseReturn->update([
-                'note'        => $data['note'] ?? $purchaseReturn->note,
+                'note' => $data['note'] ?? $purchaseReturn->note,
             ]);
 
             if (isset($data['items'])) {
@@ -128,52 +131,35 @@ class PurchaseReturnService
 
             foreach ($purchaseReturn->items as $returnItem) {
                 $purchaseItem = $returnItem->purchaseItem;
-                $totalReturnAmount += $returnItem->quantity * $purchaseItem->price;
 
                 $sourceBatch = Batch::where('source_id', $purchaseItem->id)
                     ->where('source_type', PurchaseItem::class)
                     ->first();
 
-                if ($sourceBatch) {
-                    $stock = $sourceBatch->stock;
-
-                    $remaining = $returnItem->quantity;
-
-                    $batches = $stock->batches()
-                        ->where('current_quantity', '>', 0)
-                        ->orderBy('created_at')
-                        ->get();
-
-                    $oldQuantity = $batches->sum('current_quantity');
-
-                    $allocations = [];
-
-                    foreach ($batches as $batch) {
-                        $deduct = min($remaining, $batch->current_quantity);
-                        $batch->decrement('current_quantity', $deduct);
-
-                        $allocations[] = [
-                            'batch_id'       => $batch->id,
-                            'quantity'       => -$deduct,
-                            'purchase_price' => $batch->purchase_price,
-                        ];
-
-                        $remaining -= $deduct;
-                        if ($remaining <= 0) {
-                            break;
-                        }
-                    }
-
-                    $this->inventoryService->returnOut(
-                        stockId: $stock->id,
-                        inventoryId: $stock->inventory_id,
-                        productId: $purchaseItem->product_id,
-                        oldQuantity: $oldQuantity,
-                        quantity: $returnItem->quantity,
-                        source: $purchaseReturn,
-                        allocations: $allocations,
-                    );
+                if (!$sourceBatch) {
+                    throw new Exception(__('purchase_returns.source_batch_not_found'), 422);
                 }
+
+                $totalReturnAmount += $returnItem->quantity * $purchaseItem->price;
+
+                $stock = $sourceBatch->stock;
+                $oldQuantity = $stock->batches()->sum('current_quantity');
+
+                $allocations = $this->reverseReceiveAllocation(
+                    $sourceBatch->id,
+                    $purchaseReturn->purchase_id,
+                    $returnItem->quantity,
+                );
+
+                $this->inventoryService->returnOut(
+                    stockId: $stock->id,
+                    inventoryId: $stock->inventory_id,
+                    productId: $purchaseItem->product_id,
+                    oldQuantity: $oldQuantity,
+                    quantity: $returnItem->quantity,
+                    source: $purchaseReturn,
+                    allocations: $allocations,
+                );
             }
 
             if ($totalReturnAmount > 0) {
@@ -205,6 +191,77 @@ class PurchaseReturnService
         });
     }
 
+    /**
+     * Reverse the batch's single RECEIVE allocation, crediting the return
+     * against it. A batch is created by exactly one receive event tied to
+     * exactly one PurchaseItem, so there is only ever one allocation to
+     * reverse against here - no LIFO/multi-layer walk needed (unlike sales).
+     */
+    private function reverseReceiveAllocation(int $batchId, int $purchaseId, int $returnQty): array
+    {
+        $movement = InventoryMovement::query()
+            ->where('movement_type', InventoryMovementType::RECEIVE->value)
+            ->whereHas('allocations', fn ($q) => $q->where('batch_id', $batchId))
+            ->with(['allocations' => fn ($q) => $q->where('batch_id', $batchId)])
+            ->first();
+
+        $allocation = $movement?->allocations->first();
+
+        if (!$allocation) {
+            throw new Exception(__('purchase_returns.no_receive_allocation'), 422);
+        }
+
+        $received = $allocation->quantity;
+        $alreadyReturned = $this->purchaseAlreadyReturnedForBatch($batchId, $purchaseId);
+        $available = $received - $alreadyReturned;
+
+        if ($returnQty > $available) {
+            throw new Exception(__('purchase_returns.insufficient_allocations'), 422);
+        }
+
+        $batch = Batch::whereKey($batchId)->lockForUpdate()->first();
+
+        if (!$batch) {
+            throw new Exception(__('purchase_returns.batch_not_found'), 422);
+        }
+
+        if ($returnQty > $batch->current_quantity) {
+            // Distinct from insufficient_allocations: the ledger allows it,
+            // but this stock has since left the building (sold/transferred).
+            throw new Exception(__('purchase_returns.stock_no_longer_available'), 422);
+        }
+
+        $batch->decrement('current_quantity', $returnQty);
+
+        return [[
+            'batch_id'       => $batchId,
+            'quantity'       => -$returnQty,
+            'purchase_price' => $allocation->purchase_price,
+        ]];
+    }
+
+    private function purchaseAlreadyReturnedForBatch(int $batchId, int $purchaseId): int
+    {
+        $returnIds = PurchaseReturn::query()
+            ->where('purchase_id', $purchaseId)
+            ->where('status', PurchaseReturnStatus::COMPLETED->value)
+            ->pluck('id');
+
+        if ($returnIds->isEmpty()) {
+            return 0;
+        }
+
+        return InventoryMovement::query()
+            ->where('movement_type', InventoryMovementType::RETURN->value)
+            ->where('source_type', PurchaseReturn::class)
+            ->whereIn('source_id', $returnIds)
+            ->whereHas('allocations', fn ($q) => $q->where('batch_id', $batchId))
+            ->with(['allocations' => fn ($q) => $q->where('batch_id', $batchId)])
+            ->get()
+            ->flatMap->allocations
+            ->sum(fn ($allocation) => abs($allocation->quantity));
+    }
+
     private function validateItemsBelongToPurchase(int $purchaseId, array $items): void
     {
         $itemIds = collect($items)->pluck('purchase_item_id')->unique()->toArray();
@@ -234,5 +291,4 @@ class PurchaseReturnService
             }
         }
     }
-
 }
