@@ -8,4 +8,5 @@ return [
     'exceeds_purchased_amount' => 'The return quantity or amount exceeds the original purchase amount for item #:item.',
     'quantity_exceeds_available' => 'The return quantity exceeds the available quantity for this item.',
     'insufficient_allocations' => 'Not enough allocated batches to reverse for this return.',
+    'not_pending' => 'A purchase return can only be canceled if it is in pending status.',
 ];

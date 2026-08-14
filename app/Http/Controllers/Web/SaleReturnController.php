@@ -140,4 +140,26 @@ class SaleReturnController extends Controller
             );
         }
     }
+
+    public function cancel(Sale $sale, SaleReturn $saleReturn): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::CANCEL_SALE_RETURNS->value)) {
+            return $response;
+        }
+
+        try {
+            $saleReturn->assertCanTransitionTo(SaleReturnStatus::CANCELED->value);
+
+            $saleReturn = $this->saleReturnService->cancel($saleReturn);
+
+            return $this->successResponse(
+                new SaleReturnResource($saleReturn)
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                message: $e->getMessage(),
+                statusCode: $e->getCode() ?: 400
+            );
+        }
+    }
 }

@@ -191,6 +191,17 @@ class PurchaseReturnService
         });
     }
 
+    public function cancel(PurchaseReturn $purchaseReturn): PurchaseReturn
+    {
+        if ($purchaseReturn->status !== PurchaseReturnStatus::PENDING) {
+            throw new Exception(__('purchase_returns.not_pending'), 422);
+        }
+
+        $purchaseReturn->update(['status' => PurchaseReturnStatus::CANCELED]);
+
+        return $purchaseReturn->refresh()->loadMissing(['purchase', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
+    }
+
     /**
      * Reverse the batch's single RECEIVE allocation, crediting the return
      * against it. A batch is created by exactly one receive event tied to

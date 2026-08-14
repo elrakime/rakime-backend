@@ -8,4 +8,5 @@ return [
     'exceeds_purchased_amount' => 'La quantité ou le montant du retour dépasse le montant d\'achat original pour l\'article #:item.',
     'quantity_exceeds_available' => "La quantité retournée dépasse la quantité disponible pour cet article.",
     'insufficient_allocations' => 'Pas assez de lots alloués à annuler pour ce retour.',
+    'not_pending' => 'Un retour d\'achat ne peut être annulé que s\'il est en attente.',
 ];

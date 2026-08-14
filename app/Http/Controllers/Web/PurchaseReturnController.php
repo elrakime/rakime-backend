@@ -140,4 +140,26 @@ class PurchaseReturnController extends Controller
             );
         }
     }
+
+    public function cancel(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::CANCEL_PURCHASE_RETURNS->value)) {
+            return $response;
+        }
+
+        try {
+            $purchaseReturn->assertCanTransitionTo(PurchaseReturnStatus::CANCELED->value);
+
+            $purchaseReturn = $this->purchaseReturnService->cancel($purchaseReturn);
+
+            return $this->successResponse(
+                new PurchaseReturnResource($purchaseReturn)
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                message: $e->getMessage(),
+                statusCode: $e->getCode() ?: 400
+            );
+        }
+    }
 }

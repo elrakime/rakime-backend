@@ -117,6 +117,7 @@ enum Permission: string
     case UPDATE_PURCHASE_RETURNS  = 'purchase_returns.update';
     case DELETE_PURCHASE_RETURNS  = 'purchase_returns.delete';
     case APPROVE_PURCHASE_RETURNS = 'purchase_returns.approve';
+    case CANCEL_PURCHASE_RETURNS  = 'purchase_returns.cancel';
 
     // Sales
     case VIEW_SALES   = 'sales.view';
@@ -130,6 +131,7 @@ enum Permission: string
     case UPDATE_SALE_RETURNS  = 'sale_returns.update';
     case DELETE_SALE_RETURNS  = 'sale_returns.delete';
     case APPROVE_SALE_RETURNS = 'sale_returns.approve';
+    case CANCEL_SALE_RETURNS  = 'sale_returns.cancel';
 
     // Inventory Transfers
     case VIEW_INVENTORY_TRANSFERS    = 'inventory_transfers.view';

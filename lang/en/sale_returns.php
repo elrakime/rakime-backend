@@ -8,4 +8,5 @@ return [
     'no_items'                 => 'At least one item must be added to the sale return.',
     'quantity_exceeds_available' => 'The return quantity exceeds the available quantity for this item.',
     'insufficient_allocations' => 'Not enough allocated batches to reverse for this return.',
+    'not_pending' => 'A sale return can only be canceled if it is in pending status.',
 ];

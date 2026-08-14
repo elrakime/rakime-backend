@@ -8,6 +8,7 @@ enum PurchaseReturnStatus: string
 {
     case PENDING   = 'pending';
     case COMPLETED = 'completed';
+    case CANCELED  = 'canceled';
 
     public static function keys(): array
     {
@@ -40,6 +41,7 @@ enum PurchaseReturnStatus: string
         return match ($this) {
             self::PENDING   => 'amber',
             self::COMPLETED => 'green',
+            self::CANCELED  => 'red',
         };
     }
 
@@ -51,8 +53,8 @@ enum PurchaseReturnStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::PENDING => [self::COMPLETED],
-            self::COMPLETED => [],
+            self::PENDING => [self::COMPLETED, self::CANCELED],
+            self::COMPLETED, self::CANCELED => [],
         };
     }
 

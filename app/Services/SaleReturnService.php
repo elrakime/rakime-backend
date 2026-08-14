@@ -194,6 +194,17 @@ class SaleReturnService
         });
     }
 
+    public function cancel(SaleReturn $saleReturn): SaleReturn
+    {
+        if ($saleReturn->status !== SaleReturnStatus::PENDING) {
+            throw new Exception(__('sale_returns.not_pending'), 422);
+        }
+
+        $saleReturn->update(['status' => SaleReturnStatus::CANCELED]);
+
+        return $saleReturn->refresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+    }
+
     /**
      * Reverse the sale's SALE / SALE_UPDATE allocation ledger in LIFO order,
      * crediting back the exact batches that were originally deducted.
