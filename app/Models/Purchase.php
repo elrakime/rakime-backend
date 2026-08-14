@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PurchaseReturnStatus;
 use App\Enums\PurchaseStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ class Purchase extends Model
         'note',
     ];
 
-    protected $appends = ['payment_status'];
+    protected $appends = ['payment_status', 'net_amount'];
 
     protected function casts(): array
     {
@@ -77,11 +78,38 @@ class Purchase extends Model
             return 'unpaid';
         }
 
-        if ($this->paid_amount >= $this->total_amount) {
+        if ($this->paid_amount >= $this->net_amount) {
             return 'paid';
         }
 
         return 'partially_paid';
+    }
+
+    /**
+     * Total amount after subtracting completed return amounts.
+     */
+    public function getNetAmountAttribute(): int
+    {
+        return $this->total_amount - $this->totalReturnsAmount();
+    }
+
+    private function totalReturnsAmount(): int
+    {
+        if ($this->relationLoaded('returns')) {
+            return $this->returns
+                ->filter(fn (PurchaseReturn $return) => $return->status === PurchaseReturnStatus::COMPLETED)
+                ->sum(fn (PurchaseReturn $return) => $return->items->sum(
+                    fn (PurchaseReturnItem $item) => $item->quantity * $item->purchaseItem->price
+                ));
+        }
+
+        return (int) $this->returns()
+            ->where('status', PurchaseReturnStatus::COMPLETED->value)
+            ->with('items.purchaseItem')
+            ->get()
+            ->sum(fn (PurchaseReturn $return) => $return->items->sum(
+                fn (PurchaseReturnItem $item) => $item->quantity * $item->purchaseItem->price
+            ));
     }
 
     public function branch(): BelongsTo

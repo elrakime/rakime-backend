@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Enums\PriceType;
+use App\Enums\PurchaseReturnStatus;
 use App\Enums\PurchaseStatus;
 use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
+use App\Models\PurchaseReturn;
 use App\Models\Restock;
 use App\Models\Stock;
 use App\Traits\ScopesByUserBranches;
@@ -33,20 +35,30 @@ class PurchaseService
 
         $this->scopeByUserBranches($query);
 
+        $completedReturnAmount = PurchaseReturn::query()
+            ->selectRaw('coalesce(sum(purchase_return_items.quantity * purchase_items.price), 0)')
+            ->join('purchase_return_items', 'purchase_returns.id', '=', 'purchase_return_items.purchase_return_id')
+            ->join('purchase_items', 'purchase_return_items.purchase_item_id', '=', 'purchase_items.id')
+            ->whereColumn('purchase_returns.purchase_id', 'purchases.id')
+            ->where('purchase_returns.status', PurchaseReturnStatus::COMPLETED->value);
+
         return QueryBuilder::for($query, $request)
-            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory'])
+            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory', 'returns.items.purchaseItem'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::callback('payment_status', function ($query, string $value) {
-                    $query->where(function ($q) use ($value) {
+                AllowedFilter::callback('payment_status', function ($query, string $value) use ($completedReturnAmount) {
+                    $query->where(function ($q) use ($value, $completedReturnAmount) {
+                        $netAmountSql = 'total_amount - (' . $completedReturnAmount->toSql() . ')';
+
                         match ($value) {
                             'unpaid' => $q->where('paid_amount', '<=', 0),
-                            'partially_paid' => $q->where('paid_amount', '>', 0)->where('paid_amount', '<', DB::raw('total_amount')),
-                            'paid' => $q->where('paid_amount', '>=', DB::raw('total_amount')),
+                            'partially_paid' => $q->where('paid_amount', '>', 0)
+                                ->whereRaw('paid_amount < ' . $netAmountSql, $completedReturnAmount->getBindings()),
+                            'paid' => $q->whereRaw('paid_amount >= ' . $netAmountSql, $completedReturnAmount->getBindings()),
                             default => null,
                         };
                     });
@@ -90,13 +102,13 @@ class PurchaseService
                 ])->all()
             );
 
-            return $purchase->loadMissing(['supplier', 'items.product']);
+            return $purchase->loadMissing(['supplier', 'items.product', 'returns.items.purchaseItem']);
         });
     }
 
     public function show(Purchase $purchase): Purchase
     {
-        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'inventory']);
+        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'inventory', 'returns.items.purchaseItem']);
     }
 
     public function update(Purchase $purchase, array $data): Purchase
@@ -129,7 +141,7 @@ class PurchaseService
                 $purchase->update(['total_amount' => $totalAmount]);
             }
 
-            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
+            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
         });
     }
 
@@ -150,7 +162,7 @@ class PurchaseService
 
         $purchase->update(['status' => PurchaseStatus::CANCELED]);
 
-        return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
+        return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
     }
 
     public function receive(Purchase $purchase, array $data): Purchase
@@ -233,7 +245,7 @@ class PurchaseService
                 }
             }
 
-            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments']);
+            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
         });
     }
 

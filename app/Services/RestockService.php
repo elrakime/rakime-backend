@@ -37,7 +37,7 @@ class RestockService
             ->with(['user', 'branch', 'items.product'])
             ->with('fulfilledWith', function ($morphTo) {
                 $morphTo->morphWith([
-                    Purchase::class          => ['inventory', 'supplier'],
+                    Purchase::class          => ['inventory', 'supplier', 'returns.items.purchaseItem'],
                     InventoryTransfer::class => ['fromInventory', 'toInventory'],
                 ]);
             })
@@ -87,7 +87,7 @@ class RestockService
     {
         $restock->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
         $restock->loadMorph('fulfilledWith', [
-            Purchase::class          => ['inventory', 'supplier'],
+            Purchase::class          => ['inventory', 'supplier', 'returns.items.purchaseItem'],
             InventoryTransfer::class => ['fromInventory', 'toInventory'],
         ]);
 
@@ -175,7 +175,7 @@ class RestockService
 
             $restock = $restock->fresh()->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
             $restock->loadMorph('fulfilledWith', [
-                Purchase::class          => ['inventory', 'supplier'],
+                Purchase::class          => ['inventory', 'supplier', 'returns.items.purchaseItem'],
                 InventoryTransfer::class => ['fromInventory', 'toInventory'],
             ]);
 
