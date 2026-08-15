@@ -22,6 +22,10 @@ return [
     'update_branches' => 'Modifier les agences',
     'delete_branches' => 'Supprimer les agences',
 
+    // Verrouillages de jour de prélèvement
+    'view_account_draw_locks'   => 'Voir les verrouillages de jour de prélèvement',
+    'create_account_draw_locks' => 'Créer un verrouillage de jour de prélèvement',
+
     // Catégories
     'view_categories'   => 'Voir les catégories',
     'create_categories' => 'Créer des catégories',

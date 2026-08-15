@@ -62,6 +62,18 @@ class AccountService
 
     public function update(Account $account, array $data): Account
     {
+        if (
+            array_key_exists('draw_day', $data)
+            && $data['draw_day'] !== null
+            && (int) $data['draw_day'] !== $account->draw_day
+            && $account->drawLocks()
+                ->whereYear('month', now()->year)
+                ->whereMonth('month', now()->month)
+                ->exists()
+        ) {
+            throw new \Exception(__('account_draw_locks.draw_day_locked'), 422);
+        }
+
         $account->update(array_filter([
             'name'                => $data['name'] ?? null,
             'ccp_number'          => $data['ccp_number'] ?? null,

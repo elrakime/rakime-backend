@@ -51,4 +51,9 @@ class Account extends Model
     {
         return $this->hasMany(Contract::class);
     }
+
+    public function drawLocks(): HasMany
+    {
+        return $this->hasMany(AccountDrawLock::class);
+    }
 }

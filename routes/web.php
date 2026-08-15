@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\AccountController;
+use App\Http\Controllers\Web\AccountDrawLockController;
 use App\Http\Controllers\Web\Auth\AuthController;
 use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
@@ -61,6 +62,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::get('permissions', [PermissionController::class, 'index']);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
+    Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
     Route::apiResource('wilayas', WilayaController::class);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('brands', BrandController::class);

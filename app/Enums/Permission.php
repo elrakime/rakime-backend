@@ -24,6 +24,10 @@ enum Permission: string
     case UPDATE_ACCOUNTS = 'accounts.update';
     case DELETE_ACCOUNTS = 'accounts.delete';
 
+    // Account Draw Locks
+    case VIEW_ACCOUNT_DRAW_LOCKS   = 'account_draw_locks.view';
+    case CREATE_ACCOUNT_DRAW_LOCKS = 'account_draw_locks.create';
+
     // Wilayas
     case VIEW_WILAYAS   = 'wilayas.view';
     case CREATE_WILAYAS = 'wilayas.create';
@@ -225,7 +229,7 @@ enum Permission: string
     {
         return match (explode('.', $this->value)[0]) {
             'users', 'branches'               => 'red',
-            'categories', 'brands', 'products', 'suppliers', 'accounts', 'wilayas', 'types', 'colors' => 'blue',
+            'categories', 'brands', 'products', 'suppliers', 'accounts', 'account_draw_locks', 'wilayas', 'types', 'colors' => 'blue',
             'clients'                         => 'teal',
             'inventory', 'inventory_movements', 'stocks', 'batches', 'prices' => 'orange',
             'purchases', 'purchase_payments', 'purchase_returns' => 'yellow',

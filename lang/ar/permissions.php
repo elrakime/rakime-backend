@@ -22,6 +22,10 @@ return [
     'update_branches' => 'تعديل الفروع',
     'delete_branches' => 'حذف الفروع',
 
+    // أقفال يوم السحب للحسابات
+    'view_account_draw_locks'   => 'عرض أقفال يوم السحب للحسابات',
+    'create_account_draw_locks' => 'إنشاء قفل يوم سحب لحساب',
+
     // الفئات
     'view_categories'   => 'عرض التصنيفات',
     'create_categories' => 'إنشاء تصنيفات',

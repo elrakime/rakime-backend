@@ -69,6 +69,9 @@ enum Role: string
                 Permission::CREATE_ACCOUNTS->value,
                 Permission::UPDATE_ACCOUNTS->value,
                 Permission::DELETE_ACCOUNTS->value,
+                // Account Draw Locks
+                Permission::VIEW_ACCOUNT_DRAW_LOCKS->value,
+                Permission::CREATE_ACCOUNT_DRAW_LOCKS->value,
                 // Wilayas
                 Permission::VIEW_WILAYAS->value,
                 Permission::CREATE_WILAYAS->value,
@@ -188,6 +191,7 @@ enum Role: string
                 // View only: branches, accounts, wilayas, categories, types, brands, colors, suppliers
                 Permission::VIEW_BRANCHES->value,
                 Permission::VIEW_ACCOUNTS->value,
+                Permission::VIEW_ACCOUNT_DRAW_LOCKS->value,
                 Permission::VIEW_WILAYAS->value,
                 Permission::VIEW_CATEGORIES->value,
                 Permission::VIEW_TYPES->value,

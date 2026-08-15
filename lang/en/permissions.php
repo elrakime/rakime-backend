@@ -22,6 +22,10 @@ return [
     'update_branches' => 'Update Branches',
     'delete_branches' => 'Delete Branches',
 
+    // Account Draw Locks
+    'view_account_draw_locks'   => 'View Account Draw Locks',
+    'create_account_draw_locks' => 'Create Account Draw Locks',
+
     // Categories
     'view_categories'   => 'View Categories',
     'create_categories' => 'Create Categories',
