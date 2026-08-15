@@ -139,7 +139,7 @@ class ContractController extends Controller
         try {
             $contract->assertCanTransitionTo(ContractStatus::CONFIGURED->value);
 
-            $contract = $this->contractService->configure($contract, (int) $data['subscription_count']);
+            $contract = $this->contractService->configure($contract, (int) $data['subscription_count'], $data['draw_date']);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {

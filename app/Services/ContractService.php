@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\ContractStatus;
+use App\Enums\DrawStatus;
+use App\Enums\InstallmentPaymentMethod;
 use App\Enums\SubscriptionStatus;
 use App\Models\Contract;
 use App\Models\ContractItem;
@@ -211,49 +213,78 @@ class ContractService
         ]);
     }
 
-    public function configure(Contract $contract, int $subscriptionCount): Contract
+    public function configure(Contract $contract, int $subscriptionCount, string $drawDate): Contract
     {
         if ($contract->status !== ContractStatus::APPROVED) {
             throw new Exception(__('contracts.not_approved'), 422);
         }
 
-        $installments = $contract->installments;
-        if ($installments->isEmpty()) {
-            throw new Exception(__('contracts.no_installments'), 422);
+        $monthlyAmount = $contract->monthly_amount;
+        $monthsCount   = $contract->months_count;
+
+        if ($monthlyAmount === null || $monthsCount === null || $monthsCount < 1) {
+            throw new Exception(__('contracts.missing_terms'), 422);
         }
 
         $account = $contract->account;
         $drawDay = $account->draw_day;
 
-        $monthlyAmount = $contract->monthly_amount;
+        $drawDate = Carbon::parse($drawDate)->startOfDay();
+
+        if ($drawDate->day !== min($drawDay, $drawDate->daysInMonth)) {
+            throw new Exception(__('contracts.draw_date_invalid'), 422);
+        }
+
+        $lastLock = $account->drawLocks()->latest('month')->first();
+
+        if ($lastLock !== null && $drawDate->lte(Carbon::parse($lastLock->month)->startOfDay())) {
+            throw new Exception(__('contracts.draw_date_before_lock'), 422);
+        }
+
+        if ($subscriptionCount >= $account->max_withdraw_count) {
+            throw new Exception(__('contracts.subscription_count_exceeds_limit'), 422);
+        }
+
         $perDrawAmount = (int) ceil($monthlyAmount / $subscriptionCount);
 
-        return DB::transaction(function () use ($contract, $subscriptionCount, $installments, $perDrawAmount, $drawDay) {
-            // Clear any existing subscriptions and draws (re-configuration)
-            $contract->subscriptions()->delete();
+        if ($perDrawAmount <= $account->min_withdraw_amount) {
+            throw new Exception(__('contracts.subscription_amount_below_minimum'), 422);
+        }
 
-            // Create subscriptions
+        return DB::transaction(function () use ($contract, $subscriptionCount, $monthsCount, $monthlyAmount, $perDrawAmount, $drawDay, $drawDate) {
+            $installments = [];
+
+            foreach (range(1, $monthsCount) as $monthNumber) {
+                $month = Carbon::create($drawDate->year, $drawDate->month + ($monthNumber - 1), 1);
+
+                $installments[] = Installment::create([
+                    'contract_id'    => $contract->id,
+                    'month_number'   => $monthNumber,
+                    'amount'         => $monthlyAmount,
+                    'payment_method' => InstallmentPaymentMethod::BANK->value,
+                    'due_date'       => $this->resolveDrawDate($month, $drawDay),
+                ]);
+            }
+
             foreach (range(1, $subscriptionCount) as $subNumber) {
                 $subscription = Subscription::create([
                     'contract_id'         => $contract->id,
                     'reference'           => $contract->reference . '-SUB' . $subNumber,
                     'subscription_number' => $subNumber,
                     'amount'              => $perDrawAmount,
-                    'total_months'        => $contract->months_count,
+                    'total_months'        => $monthsCount,
                     'status'              => SubscriptionStatus::ACTIVE,
+                    'draw_date'           => $drawDate,
                 ]);
 
-                // Create draws: one per installment × subscription combination
                 foreach ($installments as $installment) {
-                    $scheduledDate = Carbon::parse($installment->due_date)->day($drawDay);
-
                     Draw::create([
                         'subscription_id' => $subscription->id,
                         'installment_id'  => $installment->id,
                         'month_number'    => $installment->month_number,
                         'amount'          => $perDrawAmount,
-                        'status'          => 'pending',
-                        'scheduled_date'  => $scheduledDate,
+                        'status'          => DrawStatus::PENDING->value,
+                        'scheduled_date'  => $this->resolveDrawDate(Carbon::parse($installment->due_date), $drawDay),
                     ]);
                 }
             }
@@ -268,5 +299,13 @@ class ContractService
                 'installments', 'subscriptions.draws',
             ]);
         });
+    }
+
+    private function resolveDrawDate(Carbon $month, int $drawDay): Carbon
+    {
+        $date = $month->copy()->startOfMonth();
+        $day  = min($drawDay, $date->daysInMonth);
+
+        return $date->setDay($day);
     }
 }

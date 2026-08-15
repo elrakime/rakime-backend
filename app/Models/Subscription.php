@@ -26,6 +26,7 @@ class Subscription extends Model
         'amount',
         'total_months',
         'status',
+        'draw_date',
     ];
 
     protected function casts(): array
@@ -35,6 +36,7 @@ class Subscription extends Model
             'subscription_number' => 'integer',
             'amount'              => 'integer',
             'total_months'        => 'integer',
+            'draw_date'           => 'date',
             'created_at'          => 'datetime',
         ];
     }

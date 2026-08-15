@@ -17,6 +17,7 @@ class ConfigureContractRequest extends FormRequest
     {
         return [
             'subscription_count' => ['required', 'integer', 'min:1'],
+            'draw_date'           => ['required', 'date'],
         ];
     }
 }

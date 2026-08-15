@@ -16,6 +16,7 @@ class SubscriptionResource extends JsonResource
             'subscription_number' => $this->subscription_number,
             'amount'              => $this->amount,
             'total_months'        => $this->total_months,
+            'draw_date'           => $this->draw_date,
             'status'              => [
                 'value' => $this->status->value,
                 'name'  => $this->status->get_name(),
