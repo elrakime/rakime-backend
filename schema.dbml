@@ -13,6 +13,10 @@ Enum purchase_payment_status {
   canceled
 }
 
+Enum purchase_refund_status {
+  paid
+}
+
 Enum purchase_return_status {
   pending
   completed
@@ -485,6 +489,18 @@ Table purchase_return_items {
   reason             varchar
   created_by         bigint    [null, ref: > users.id]
   updated_by         bigint    [null, ref: > users.id]
+  created_at         timestamp
+  updated_at         timestamp
+}
+
+Table purchase_refunds {
+  id                 bigint                [pk, increment]
+  purchase_id        bigint                [ref: > purchases.id]
+  purchase_return_id bigint                [ref: > purchase_returns.id]
+  amount             int
+  status             purchase_refund_status [default: 'paid']
+  created_by         bigint                [null, ref: > users.id]
+  updated_by         bigint                [null, ref: > users.id]
   created_at         timestamp
   updated_at         timestamp
 }

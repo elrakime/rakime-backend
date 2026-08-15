@@ -42,6 +42,11 @@ class PurchaseReturn extends Model
         return $this->hasMany(PurchaseReturnItem::class);
     }
 
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(PurchaseRefund::class);
+    }
+
     public function inventoryMovements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'source_id');

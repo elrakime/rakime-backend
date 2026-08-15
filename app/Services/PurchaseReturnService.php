@@ -8,6 +8,7 @@ use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
+use App\Models\PurchaseRefund;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
 use App\Models\Wallet;
@@ -165,10 +166,16 @@ class PurchaseReturnService
             if ($totalReturnAmount > 0) {
                 $wallet = Wallet::findOrFail($walletId);
 
+                $refund = PurchaseRefund::create([
+                    'purchase_id'        => $purchaseReturn->purchase_id,
+                    'purchase_return_id' => $purchaseReturn->id,
+                    'amount'             => $totalReturnAmount,
+                ]);
+
                 $this->walletService->purchaseReturn(
                     wallet: $wallet,
                     amount: $totalReturnAmount,
-                    source: $purchaseReturn,
+                    source: $refund,
                     note: $purchaseReturn->note,
                 );
             }

@@ -137,6 +137,11 @@ class Purchase extends Model
         return $this->hasMany(PurchasePayment::class);
     }
 
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(PurchaseRefund::class);
+    }
+
     public function returns(): HasMany
     {
         return $this->hasMany(PurchaseReturn::class);
