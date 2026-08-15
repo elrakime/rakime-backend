@@ -185,6 +185,14 @@ enum Role: string
                 Permission::VIEW_WALLET_TRANSFERS->value,
                 Permission::CREATE_WALLET_TRANSFERS->value,
                 Permission::DELETE_WALLET_TRANSFERS->value,
+                // Contracts
+                Permission::VIEW_CONTRACTS->value,
+                Permission::CREATE_CONTRACTS->value,
+                Permission::UPDATE_CONTRACTS->value,
+                Permission::APPROVE_CONTRACTS->value,
+                Permission::REJECT_CONTRACTS->value,
+                Permission::CONFIRM_CONTRACTS->value,
+                Permission::CONFIGURE_CONTRACTS->value,
             ],
 
             self::EMPLOYEE => [
@@ -249,6 +257,10 @@ enum Role: string
                 // Wallet Transfers: view + create
                 Permission::VIEW_WALLET_TRANSFERS->value,
                 Permission::CREATE_WALLET_TRANSFERS->value,
+                // Contracts
+                Permission::VIEW_CONTRACTS->value,
+                Permission::CREATE_CONTRACTS->value,
+                Permission::UPDATE_CONTRACTS->value,
             ],
         };
     }

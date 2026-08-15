@@ -85,6 +85,9 @@ return [
     'view_wallet'   => 'View Wallet',
     'manage_wallet' => 'Manage Wallet',
 
+    // Contracts
+    'update_contracts' => 'Update Contracts',
+
     // Installments
     'view_installments'   => 'View Installments',
     'create_installments' => 'Create Installments',

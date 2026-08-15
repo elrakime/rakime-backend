@@ -6,12 +6,14 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\ContractStatus;
 use App\Enums\Permission;
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Contract\ApproveContractRequest;
 use App\Http\Requests\Web\Contract\ConfigureContractRequest;
 use App\Http\Requests\Web\Contract\ConfirmContractRequest;
 use App\Http\Requests\Web\Contract\RejectContractRequest;
 use App\Http\Requests\Web\Contract\StoreContractRequest;
+use App\Http\Requests\Web\Contract\UpdateContractRequest;
 use App\Http\Resources\Web\ContractResource;
 use App\Models\Contract;
 use App\Services\ContractService;
@@ -49,6 +51,29 @@ class ContractController extends Controller
             $contract = $this->contractService->create($data);
 
             return $this->successResponse(new ContractResource($contract), statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function update(UpdateContractRequest $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::UPDATE_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $data = $this->validateRequest($request);
+
+        $isAdmin = auth()->user()->hasRole(Role::ADMIN->value);
+
+        try {
+            $contract = $this->contractService->update($contract, $data, $isAdmin);
+
+            return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }

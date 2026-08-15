@@ -189,6 +189,7 @@ enum Permission: string
     case REJECT_CONTRACTS  = 'contracts.reject';
     case CONFIRM_CONTRACTS    = 'contracts.confirm';
     case CONFIGURE_CONTRACTS = 'contracts.configure';
+    case UPDATE_CONTRACTS   = 'contracts.update';
 
     // Installments
     case VIEW_INSTALLMENTS = 'installments.view';

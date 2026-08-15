@@ -85,6 +85,9 @@ return [
     'view_wallet'   => 'Voir le portefeuille',
     'manage_wallet' => 'Gérer le portefeuille',
 
+    // Contrats
+    'update_contracts' => 'Modifier les contrats',
+
     // Mensualités
     'view_installments'   => 'Voir les mensualités',
     'create_installments' => 'Créer des mensualités',

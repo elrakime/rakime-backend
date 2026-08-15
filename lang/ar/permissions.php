@@ -85,6 +85,9 @@ return [
     'view_wallet'   => 'عرض المحفظة',
     'manage_wallet' => 'إدارة المحفظة',
 
+    // العقود
+    'update_contracts' => 'تعديل العقود',
+
     // الأقساط
     'view_installments'   => 'عرض الأقساط',
     'create_installments' => 'إنشاء أقساط',
