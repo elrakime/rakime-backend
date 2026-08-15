@@ -30,6 +30,8 @@ class PurchaseSeeder extends Seeder
         // ------ Purchase 1: completed & fully paid ------
         $purchase1 = Purchase::create([
             'supplier_id'  => $supplier->id,
+            'branch_id'    => $inventory->branch_id,
+            'inventory_id' => $inventory->id,
             'reference'    => 'PO-2024-001',
             'status'       => PurchaseStatus::COMPLETED,
             'total_amount' => 150000,
@@ -77,6 +79,8 @@ class PurchaseSeeder extends Seeder
         // ------ Purchase 2: completed & partially paid ------
         $purchase2 = Purchase::create([
             'supplier_id'  => $supplier->id,
+            'branch_id'    => $inventory->branch_id,
+            'inventory_id' => $inventory->id,
             'reference'    => 'PO-2024-002',
             'status'       => PurchaseStatus::COMPLETED,
             'total_amount' => 200000,

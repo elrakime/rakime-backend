@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Inventory;
 use App\Models\Wallet;
+use App\Models\Wilaya;
 use Illuminate\Database\Seeder;
 
 class BranchSeeder extends Seeder
@@ -34,11 +35,17 @@ class BranchSeeder extends Seeder
         ];
 
         $accounts = Account::all();
+        $wilaya   = Wilaya::where('name', 'Alger')->first();
+
+        if (! $wilaya) {
+            return;
+        }
 
         foreach ($branches as $data) {
             $branch = Branch::firstOrCreate(
                 ['code' => $data['code']],
                 [
+                    'wilaya_id' => $wilaya->id,
                     'name'      => $data['name'],
                     'shop_name' => $data['shop_name'],
                     'address'   => $data['address'],
