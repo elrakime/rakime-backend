@@ -3,13 +3,11 @@
 namespace App\Services;
 
 use App\Enums\PriceType;
-use App\Enums\PurchaseReturnStatus;
 use App\Enums\PurchaseStatus;
 use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
-use App\Models\PurchaseReturn;
 use App\Models\Restock;
 use App\Models\Stock;
 use App\Traits\ScopesByUserBranches;
@@ -35,13 +33,6 @@ class PurchaseService
 
         $this->scopeByUserBranches($query);
 
-        $completedReturnAmount = PurchaseReturn::query()
-            ->selectRaw('coalesce(sum(purchase_return_items.quantity * purchase_items.price), 0)')
-            ->join('purchase_return_items', 'purchase_returns.id', '=', 'purchase_return_items.purchase_return_id')
-            ->join('purchase_items', 'purchase_return_items.purchase_item_id', '=', 'purchase_items.id')
-            ->whereColumn('purchase_returns.purchase_id', 'purchases.id')
-            ->where('purchase_returns.status', PurchaseReturnStatus::COMPLETED->value);
-
         return QueryBuilder::for($query, $request)
             ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory', 'returns.items.purchaseItem'])
             ->allowedFilters(
@@ -50,15 +41,13 @@ class PurchaseService
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::callback('payment_status', function ($query, string $value) use ($completedReturnAmount) {
-                    $query->where(function ($q) use ($value, $completedReturnAmount) {
-                        $netAmountSql = 'total_amount - (' . $completedReturnAmount->toSql() . ')';
-
+                AllowedFilter::callback('payment_status', function ($query, string $value) {
+                    $query->where(function ($q) use ($value) {
                         match ($value) {
                             'unpaid' => $q->where('paid_amount', '<=', 0),
                             'partially_paid' => $q->where('paid_amount', '>', 0)
-                                ->whereRaw('paid_amount < ' . $netAmountSql, $completedReturnAmount->getBindings()),
-                            'paid' => $q->whereRaw('paid_amount >= ' . $netAmountSql, $completedReturnAmount->getBindings()),
+                                ->whereColumn('paid_amount', '<', 'net_amount'),
+                            'paid' => $q->whereColumn('paid_amount', '>=', 'net_amount'),
                             default => null,
                         };
                     });
@@ -90,7 +79,6 @@ class PurchaseService
                 'branch_id' => $data['branch_id'],
                 'status' => PurchaseStatus::PENDING,
                 'total_amount' => $totalAmount,
-                'paid_amount' => 0,
                 'note' => $data['note'] ?? null,
             ]);
 
@@ -101,6 +89,8 @@ class PurchaseService
                     'price' => $item['price'],
                 ])->all()
             );
+
+            $purchase->recalculateAmounts();
 
             return $purchase->loadMissing(['supplier', 'items.product', 'returns.items.purchaseItem']);
         });
@@ -139,6 +129,8 @@ class PurchaseService
                 );
 
                 $purchase->update(['total_amount' => $totalAmount]);
+
+                $purchase->recalculateAmounts();
             }
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);

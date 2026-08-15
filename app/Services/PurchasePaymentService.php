@@ -27,7 +27,7 @@ class PurchasePaymentService
             throw new Exception(__('purchases.must_be_completed'), 422);
         }
 
-        $remaining = $purchase->total_amount - $purchase->paid_amount;
+        $remaining = $purchase->net_amount - $purchase->paid_amount;
 
         if ($data['amount'] > $remaining) {
             throw new Exception(__('purchases.amount_exceeds_remaining'), 422);
@@ -39,10 +39,6 @@ class PurchasePaymentService
                 'amount'      => $data['amount'],
             ]);
 
-            $purchase->update([
-                'paid_amount' => $purchase->paid_amount + $data['amount'],
-            ]);
-
             $wallet = Wallet::findOrFail($data['wallet_id']);
 
             $this->walletService->purchasePayment(
@@ -51,6 +47,8 @@ class PurchasePaymentService
                 source: $payment,
                 note: $data['note'] ?? null,
             );
+
+            $purchase->recalculateAmounts();
 
             return $payment->fresh();
         });
@@ -63,10 +61,6 @@ class PurchasePaymentService
         }
 
         return DB::transaction(function () use ($purchase, $payment) {
-            $purchase->update([
-                'paid_amount' => max(0, $purchase->paid_amount - $payment->amount),
-            ]);
-
             $movement = WalletMovement::where('source_type', PurchasePayment::class)
                 ->where('source_id', $payment->id)
                 ->where('movement_type', WalletMovementType::PURCHASE_PAYMENT)
@@ -84,6 +78,8 @@ class PurchasePaymentService
             }
 
             $payment->update(['status' => PurchasePaymentStatus::CANCELED]);
+
+            $purchase->recalculateAmounts();
 
             return $payment->refresh();
         });

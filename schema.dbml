@@ -438,6 +438,7 @@ Table purchases {
   reference    varchar
   status       purchase_status [default: 'pending']
   total_amount int
+  net_amount   int             [default: 0]
   paid_amount  int             [default: 0]
   note         varchar         [null]
   created_by   bigint          [null, ref: > users.id]

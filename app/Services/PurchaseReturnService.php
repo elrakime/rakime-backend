@@ -163,24 +163,33 @@ class PurchaseReturnService
                 );
             }
 
-            if ($totalReturnAmount > 0) {
+            // Refund only the portion of paid_amount that is now overpaid
+            // after this return reduces the amount still owed.
+            $purchase = $purchaseReturn->purchase()->first();
+
+            $newNetAmount = $purchase->net_amount - $totalReturnAmount;
+            $refundAmount = max(0, $purchase->paid_amount - $newNetAmount);
+
+            if ($refundAmount > 0) {
                 $wallet = Wallet::findOrFail($walletId);
 
                 $refund = PurchaseRefund::create([
                     'purchase_id'        => $purchaseReturn->purchase_id,
                     'purchase_return_id' => $purchaseReturn->id,
-                    'amount'             => $totalReturnAmount,
+                    'amount'             => $refundAmount,
                 ]);
 
                 $this->walletService->purchaseReturn(
                     wallet: $wallet,
-                    amount: $totalReturnAmount,
+                    amount: $refundAmount,
                     source: $refund,
                     note: $purchaseReturn->note,
                 );
             }
 
             $purchaseReturn->update(['status' => PurchaseReturnStatus::COMPLETED]);
+
+            $purchase->recalculateAmounts();
 
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });

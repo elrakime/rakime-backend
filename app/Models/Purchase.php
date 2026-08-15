@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PurchasePaymentStatus;
+use App\Enums\PurchaseRefundStatus;
 use App\Enums\PurchaseReturnStatus;
 use App\Enums\PurchaseStatus;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,17 +34,17 @@ class Purchase extends Model
         'reference',
         'status',
         'total_amount',
-        'paid_amount',
         'note',
     ];
 
-    protected $appends = ['payment_status', 'net_amount'];
+    protected $appends = ['payment_status'];
 
     protected function casts(): array
     {
         return [
             'status'        => PurchaseStatus::class,
             'total_amount'  => 'integer',
+            'net_amount'    => 'integer',
             'paid_amount'   => 'integer',
             'inventory_id'  => 'integer',
             'branch_id'     => 'integer',
@@ -86,23 +88,23 @@ class Purchase extends Model
     }
 
     /**
-     * Total amount after subtracting completed return amounts.
+     * Recompute the derived amount columns from their sources of truth.
      */
-    public function getNetAmountAttribute(): int
+    public function recalculateAmounts(): void
     {
-        return $this->total_amount - $this->totalReturnsAmount();
+        $values = [
+            'net_amount'  => $this->total_amount - $this->completedReturnsAmount(),
+            'paid_amount' => $this->paidPaymentsAmount() - $this->paidRefundsAmount(),
+        ];
+
+        static::query()->whereKey($this->getKey())->update($values);
+
+        $this->forceFill($values);
+        $this->syncOriginal();
     }
 
-    private function totalReturnsAmount(): int
+    private function completedReturnsAmount(): int
     {
-        if ($this->relationLoaded('returns')) {
-            return $this->returns
-                ->filter(fn (PurchaseReturn $return) => $return->status === PurchaseReturnStatus::COMPLETED)
-                ->sum(fn (PurchaseReturn $return) => $return->items->sum(
-                    fn (PurchaseReturnItem $item) => $item->quantity * $item->purchaseItem->price
-                ));
-        }
-
         return (int) $this->returns()
             ->where('status', PurchaseReturnStatus::COMPLETED->value)
             ->with('items.purchaseItem')
@@ -110,6 +112,20 @@ class Purchase extends Model
             ->sum(fn (PurchaseReturn $return) => $return->items->sum(
                 fn (PurchaseReturnItem $item) => $item->quantity * $item->purchaseItem->price
             ));
+    }
+
+    private function paidPaymentsAmount(): int
+    {
+        return (int) $this->payments()
+            ->where('status', PurchasePaymentStatus::PAID->value)
+            ->sum('amount');
+    }
+
+    private function paidRefundsAmount(): int
+    {
+        return (int) $this->refunds()
+            ->where('status', PurchaseRefundStatus::PAID->value)
+            ->sum('amount');
     }
 
     public function branch(): BelongsTo

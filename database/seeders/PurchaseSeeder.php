@@ -33,7 +33,6 @@ class PurchaseSeeder extends Seeder
             'reference'    => 'PO-2024-001',
             'status'       => PurchaseStatus::COMPLETED,
             'total_amount' => 150000,
-            'paid_amount'  => 150000,
             'note'         => 'First purchase order',
         ]);
 
@@ -73,13 +72,14 @@ class PurchaseSeeder extends Seeder
             'amount'      => 150000,
         ]);
 
+        $purchase1->recalculateAmounts();
+
         // ------ Purchase 2: completed & partially paid ------
         $purchase2 = Purchase::create([
             'supplier_id'  => $supplier->id,
             'reference'    => 'PO-2024-002',
             'status'       => PurchaseStatus::COMPLETED,
             'total_amount' => 200000,
-            'paid_amount'  => 100000,
             'note'         => 'Second purchase order',
         ]);
 
@@ -115,6 +115,8 @@ class PurchaseSeeder extends Seeder
             'purchase_id' => $purchase2->id,
             'amount'      => 100000,
         ]);
+
+        $purchase2->recalculateAmounts();
 
         // ------ Purchase Return for Purchase 2 ------
         $return = PurchaseReturn::create([

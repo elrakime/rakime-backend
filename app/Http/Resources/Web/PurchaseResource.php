@@ -24,7 +24,7 @@ class PurchaseResource extends JsonResource
             'payments'         => PurchasePaymentResource::collection($this->whenLoaded('payments')),
             'total_amount'     => $this->total_amount,
             'paid_amount'      => $this->paid_amount,
-            'remaining_amount' => $this->total_amount - $this->paid_amount,
+            'remaining_amount' => $this->net_amount - $this->paid_amount,
             'net_amount'       => $this->net_amount,
             'payment_status'   => $this->payment_status,
             'note'             => $this->note,

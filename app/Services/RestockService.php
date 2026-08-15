@@ -197,7 +197,6 @@ class RestockService
             'supplier_id'  => $data['supplier_id'],
             'status'       => PurchaseStatus::PENDING,
             'total_amount' => 0,
-            'paid_amount'  => 0,
             'note'         => $data['note'] ?? null,
         ]);
 
@@ -219,6 +218,8 @@ class RestockService
         }
 
         $purchase->update(['total_amount' => $totalAmount]);
+
+        $purchase->recalculateAmounts();
 
         return $purchase;
     }
