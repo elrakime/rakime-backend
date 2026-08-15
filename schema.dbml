@@ -290,6 +290,7 @@ Table clients {
   occupation varchar   [null]
   employer   varchar   [null]
   salary     decimal
+  incomes    json      [null]
   nin        varchar   [unique]
   ccp_number varchar   [unique]
   ccp_key    varchar

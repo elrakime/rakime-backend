@@ -27,6 +27,7 @@ class ClientResource extends JsonResource
             'occupation' => $this->occupation,
             'employer'   => $this->employer,
             'salary'     => $this->salary,
+            'incomes'    => $this->incomes,
             'nin'        => $this->nin,
             'ccp_number' => $this->ccp_number,
             'ccp_key'    => $this->ccp_key,

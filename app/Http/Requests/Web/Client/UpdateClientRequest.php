@@ -23,6 +23,8 @@ class UpdateClientRequest extends FormRequest
             'occupation' => ['sometimes', 'nullable', 'string', 'max:255'],
             'employer'   => ['sometimes', 'nullable', 'string', 'max:255'],
             'salary'     => ['sometimes', 'required', 'numeric', 'min:0'],
+            'incomes'    => ['sometimes', 'nullable', 'json'],
+            'incomes.*'  => ['numeric'],
             'nin'        => ['sometimes', 'required', 'string', 'max:50', Rule::unique('clients', 'nin')->ignore($id)],
             'ccp_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('clients', 'ccp_number')->ignore($id)],
             'ccp_key'    => ['sometimes', 'required', 'string', 'max:10', new CcpKey],

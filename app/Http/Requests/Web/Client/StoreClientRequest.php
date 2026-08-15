@@ -20,6 +20,8 @@ class StoreClientRequest extends FormRequest
             'occupation' => ['nullable', 'string', 'max:255'],
             'employer'   => ['nullable', 'string', 'max:255'],
             'salary'     => ['required', 'numeric', 'min:0'],
+            'incomes'    => ['nullable', 'json'],
+            'incomes.*'  => ['numeric'],
             'nin'        => ['required', 'string', 'max:50', 'unique:clients,nin'],
             'ccp_number' => ['required', 'string', 'max:50', 'unique:clients,ccp_number'],
             'ccp_key'    => ['required', 'string', 'max:10', new CcpKey],

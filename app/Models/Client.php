@@ -30,6 +30,7 @@ class Client extends Model implements HasMedia
         'occupation',
         'employer',
         'salary',
+        'incomes',
         'nin',
         'ccp_number',
         'ccp_key',
@@ -42,6 +43,7 @@ class Client extends Model implements HasMedia
         return [
             'birthdate' => 'date',
             'salary'    => 'decimal:2',
+            'incomes'   => 'json',
             'metadata'  => 'json',
         ];
     }
