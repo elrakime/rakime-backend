@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('occupation')->nullable();
             $table->string('employer')->nullable();
             $table->decimal('salary', 15, 2);
+            $table->json('incomes')->nullable();
             $table->string('nin')->unique();
             $table->string('ccp_number')->unique();
             $table->string('ccp_key');

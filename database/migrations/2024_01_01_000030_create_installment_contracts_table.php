@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('advance_amount')->nullable();
             $table->unsignedSmallInteger('months_count')->nullable();
             $table->unsignedInteger('total_amount')->nullable();
+            $table->unsignedInteger('net_amount')->nullable();
             $table->unsignedInteger('monthly_amount')->nullable();
             $table->string('note')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
