@@ -9,7 +9,6 @@ enum ContractStatus: string
     case PENDING   = 'pending';
     case APPROVED  = 'approved';
     case REJECTED  = 'rejected';
-    case CONFIRMED = 'confirmed';
     case CONFIGURED = 'configured';
     case ACTIVE    = 'active';
     case COMPLETED = 'completed';
@@ -48,7 +47,6 @@ enum ContractStatus: string
             self::PENDING   => 'amber',
             self::APPROVED  => 'blue',
             self::REJECTED  => 'red',
-            self::CONFIRMED => 'purple',
             self::ACTIVE    => 'green',
             self::COMPLETED => 'emerald',
             self::CLOSED    => 'slate',
@@ -66,8 +64,7 @@ enum ContractStatus: string
     {
         return match ($this) {
             self::PENDING => [self::APPROVED, self::REJECTED],
-            self::APPROVED => [self::CONFIRMED],
-            self::CONFIRMED => [self::CONFIGURED],
+            self::APPROVED => [self::CONFIGURED],
             self::CONFIGURED => [self::ACTIVE, self::CANCELLED],
             self::ACTIVE => [self::COMPLETED, self::CLOSED, self::CANCELLED],
             self::REJECTED, self::COMPLETED, self::CLOSED, self::CANCELLED => [],

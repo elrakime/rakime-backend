@@ -56,21 +56,51 @@ class ContractService
 
     public function create(array $data): Contract
     {
-        $contract = Contract::create([
-            'client_id'  => $data['client_id'],
-            'account_id' => $data['account_id'],
-            'branch_id'  => $data['branch_id'],
-            'status'     => ContractStatus::PENDING,
-            'note'       => $data['note'] ?? null,
-        ]);
+        return DB::transaction(function () use ($data) {
+            $contract = Contract::create([
+                'client_id'      => $data['client_id'],
+                'account_id'     => $data['account_id'],
+                'branch_id'      => $data['branch_id'],
+                'status'         => ContractStatus::PENDING,
+                'advance_amount' => $data['advance_amount'] ?? null,
+                'months_count'   => $data['months_count'] ?? null,
+                'note'           => $data['note'] ?? null,
+            ]);
 
-        return $contract->load(['client', 'account', 'branch']);
+            if (! empty($data['items'])) {
+                foreach ($data['items'] as $item) {
+                    ContractItem::create([
+                        'contract_id' => $contract->id,
+                        'product_id'  => $item['product_id'],
+                        'stock_id'    => $item['stock_id'],
+                        'quantity'    => $item['quantity'],
+                        'price'       => $item['price'],
+                    ]);
+                }
+            }
+
+            $contract->update([
+                'reference' => 'CTR-' . now()->format('Ym') . '-' . str_pad((string) $contract->id, 5, '0', STR_PAD_LEFT),
+            ]);
+
+            $this->recalculateAmounts($contract);
+
+            return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
+        });
     }
 
-    public function approve(Contract $contract, float $maxAmount): Contract
+    public function approve(Contract $contract, ?float $maxAmount = null): Contract
     {
         if ($contract->status !== ContractStatus::PENDING) {
             throw new Exception(__('contracts.not_pending'), 422);
+        }
+
+        if ($maxAmount === null) {
+            if ($contract->net_amount === null) {
+                throw new Exception(__('contracts.max_amount_required'), 422);
+            }
+
+            $maxAmount = $contract->net_amount;
         }
 
         $contract->update([
@@ -78,7 +108,7 @@ class ContractService
             'max_amount' => $maxAmount,
         ]);
 
-        return $contract->fresh(['client', 'account', 'branch']);
+        return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
     }
 
     public function reject(Contract $contract): Contract
@@ -92,49 +122,6 @@ class ContractService
         ]);
 
         return $contract->fresh(['client', 'account', 'branch']);
-    }
-
-    public function confirm(Contract $contract, array $data): Contract
-    {
-        if ($contract->status !== ContractStatus::APPROVED) {
-            throw new Exception(__('contracts.not_approved'), 422);
-        }
-
-        return DB::transaction(function () use ($contract, $data) {
-            $contract->items()->delete();
-
-            $totalAmount = 0;
-            foreach ($data['items'] as $item) {
-                ContractItem::create([
-                    'contract_id' => $contract->id,
-                    'product_id'  => $item['product_id'],
-                    'stock_id'    => $item['stock_id'],
-                    'quantity'    => $item['quantity'],
-                    'price'       => $item['price'],
-                ]);
-                $totalAmount += $item['quantity'] * $item['price'];
-            }
-
-            $advanceAmount = $data['advance_amount'];
-            $monthsCount   = $data['months_count'];
-            $monthlyAmount = $monthsCount > 0
-                ? (int) ceil(($totalAmount - $advanceAmount) / $monthsCount)
-                : 0;
-
-            $reference = $contract->reference
-                ?? 'CTR-' . now()->format('Ym') . '-' . str_pad((string) $contract->id, 5, '0', STR_PAD_LEFT);
-
-            $contract->update([
-                'reference'      => $reference,
-                'advance_amount' => $advanceAmount,
-                'months_count'   => $monthsCount,
-                'total_amount'   => $totalAmount,
-                'monthly_amount' => $monthlyAmount,
-                'status'         => ContractStatus::CONFIRMED,
-            ]);
-
-            return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
-        });
     }
 
     public function update(Contract $contract, array $data, bool $isAdmin): Contract
@@ -154,25 +141,6 @@ class ContractService
                 $updates['max_amount'] = $data['max_amount'];
             }
 
-            if (array_key_exists('items', $data)) {
-                $contract->items()->delete();
-
-                $totalAmount = 0;
-                foreach ($data['items'] as $item) {
-                    ContractItem::create([
-                        'contract_id' => $contract->id,
-                        'product_id'  => $item['product_id'],
-                        'stock_id'    => $item['stock_id'],
-                        'quantity'    => $item['quantity'],
-                        'price'       => $item['price'],
-                    ]);
-
-                    $totalAmount += $item['quantity'] * $item['price'];
-                }
-
-                $updates['total_amount'] = $totalAmount;
-            }
-
             if (array_key_exists('advance_amount', $data)) {
                 $updates['advance_amount'] = $data['advance_amount'];
             }
@@ -181,13 +149,22 @@ class ContractService
                 $updates['months_count'] = $data['months_count'];
             }
 
-            $totalAmount   = $updates['total_amount'] ?? $contract->total_amount;
-            $advanceAmount = $updates['advance_amount'] ?? $contract->advance_amount;
-            $monthsCount   = $updates['months_count'] ?? $contract->months_count;
-            $maxAmount     = $updates['max_amount'] ?? $contract->max_amount;
+            if (array_key_exists('items', $data)) {
+                $contract->items()->delete();
 
-            if ($maxAmount !== null && $totalAmount !== null && $totalAmount > $maxAmount) {
-                throw new Exception(__('contracts.total_exceeds_max_amount'), 422);
+                foreach ($data['items'] as $item) {
+                    ContractItem::create([
+                        'contract_id' => $contract->id,
+                        'product_id'  => $item['product_id'],
+                        'stock_id'    => $item['stock_id'],
+                        'quantity'    => $item['quantity'],
+                        'price'       => $item['price'],
+                    ]);
+                }
+            }
+
+            if ($updates !== []) {
+                $contract->update($updates);
             }
 
             if (
@@ -195,21 +172,49 @@ class ContractService
                 || array_key_exists('advance_amount', $data)
                 || array_key_exists('months_count', $data)
             ) {
-                $updates['monthly_amount'] = $monthsCount > 0
-                    ? (int) ceil(((int) ($totalAmount ?? 0) - (int) ($advanceAmount ?? 0)) / $monthsCount)
-                    : 0;
+                $this->recalculateAmounts($contract);
             }
 
-            $contract->update($updates);
+            $maxAmount = $updates['max_amount'] ?? $contract->max_amount;
+
+            if ($maxAmount !== null && $contract->net_amount !== null && $contract->net_amount > $maxAmount) {
+                throw new Exception(__('contracts.net_exceeds_max_amount'), 422);
+            }
 
             return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
         });
     }
 
+    private function recalculateAmounts(Contract $contract): void
+    {
+        $items = $contract->items()->get();
+
+        $totalAmount = $items->isEmpty()
+            ? null
+            : (int) $items->sum(fn ($item) => $item->quantity * $item->price);
+
+        $advanceAmount = (int) ($contract->advance_amount ?? 0);
+        $monthsCount   = $contract->months_count;
+
+        $netAmount = $totalAmount !== null
+            ? $totalAmount - $advanceAmount
+            : null;
+
+        $monthlyAmount = ($netAmount !== null && $monthsCount > 0)
+            ? (int) ceil($netAmount / $monthsCount)
+            : null;
+
+        $contract->update([
+            'total_amount'   => $totalAmount,
+            'net_amount'     => $netAmount,
+            'monthly_amount' => $monthlyAmount,
+        ]);
+    }
+
     public function configure(Contract $contract, int $subscriptionCount): Contract
     {
-        if ($contract->status !== ContractStatus::CONFIRMED) {
-            throw new Exception(__('contracts.not_confirmed'), 422);
+        if ($contract->status !== ContractStatus::APPROVED) {
+            throw new Exception(__('contracts.not_approved'), 422);
         }
 
         $installments = $contract->installments;

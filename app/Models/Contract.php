@@ -32,6 +32,7 @@ class Contract extends Model
         'advance_amount',
         'months_count',
         'total_amount',
+        'net_amount',
         'monthly_amount',
         'note',
     ];
@@ -44,6 +45,7 @@ class Contract extends Model
             'advance_amount' => 'integer',
             'months_count'   => 'integer',
             'total_amount'   => 'integer',
+            'net_amount'     => 'integer',
             'monthly_amount' => 'integer',
             'created_at'     => 'datetime',
         ];
@@ -67,11 +69,6 @@ class Contract extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('status', ContractStatus::ACTIVE);
-    }
-
-    public function scopeConfirmed(Builder $query): void
-    {
-        $query->where('status', ContractStatus::CONFIRMED);
     }
 
     public function scopeCompleted(Builder $query): void

@@ -10,7 +10,6 @@ use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Contract\ApproveContractRequest;
 use App\Http\Requests\Web\Contract\ConfigureContractRequest;
-use App\Http\Requests\Web\Contract\ConfirmContractRequest;
 use App\Http\Requests\Web\Contract\RejectContractRequest;
 use App\Http\Requests\Web\Contract\StoreContractRequest;
 use App\Http\Requests\Web\Contract\UpdateContractRequest;
@@ -94,7 +93,7 @@ class ContractController extends Controller
         try {
             $contract->assertCanTransitionTo(ContractStatus::APPROVED->value);
 
-            $contract = $this->contractService->approve($contract, (float) $data['max_amount']);
+            $contract = $this->contractService->approve($contract, isset($data['max_amount']) ? (float) $data['max_amount'] : null);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
@@ -118,29 +117,6 @@ class ContractController extends Controller
             $contract->assertCanTransitionTo(ContractStatus::REJECTED->value);
 
             $contract = $this->contractService->reject($contract);
-
-            return $this->successResponse(new ContractResource($contract));
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
-        }
-    }
-
-    public function confirm(ConfirmContractRequest $request, Contract $contract): JsonResponse
-    {
-        if ($response = $this->authorizeBranchAccess($contract)) {
-            return $response;
-        }
-
-        if ($response = $this->authorizePermission(Permission::CONFIRM_CONTRACTS->value)) {
-            return $response;
-        }
-
-        $data = $this->validateRequest($request);
-
-        try {
-            $contract->assertCanTransitionTo(ContractStatus::CONFIRMED->value);
-
-            $contract = $this->contractService->confirm($contract, $data);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {

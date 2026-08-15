@@ -24,6 +24,7 @@ class ContractResource extends JsonResource
             'advance_amount' => $this->advance_amount,
             'months_count'   => $this->months_count,
             'total_amount'   => $this->total_amount,
+            'net_amount'     => $this->net_amount,
             'monthly_amount' => $this->monthly_amount,
             'note'           => $this->note,
             'created_at'     => $this->created_at,
