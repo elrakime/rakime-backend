@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\AccountDrawLock;
-use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -33,11 +32,7 @@ class AccountDrawLockService
     {
         $account = Account::findOrFail($data['account_id']);
 
-        if ($data['month'] !== now()->format('Y-m')) {
-            throw new \Exception(__('account_draw_locks.current_month_only'), 422);
-        }
-
-        $month = Carbon::createFromFormat('Y-m', $data['month'])->startOfMonth();
+        $month = now()->startOfMonth();
         $day   = min($account->draw_day, $month->daysInMonth);
         $lockDate = $month->copy()->addDays($day - 1);
 

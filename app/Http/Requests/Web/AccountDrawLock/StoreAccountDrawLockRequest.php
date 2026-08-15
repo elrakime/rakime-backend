@@ -14,8 +14,7 @@ class StoreAccountDrawLockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_id' => ['required', 'exists:accounts,id'],
-            'month'      => ['required', 'date_format:Y-m'],
+            'account_id' => ['required', 'integer', 'exists:accounts,id'],
         ];
     }
 }
