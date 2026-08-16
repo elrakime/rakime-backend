@@ -197,6 +197,9 @@ enum Permission: string
     // Subscriptions
     case VIEW_SUBSCRIPTIONS = 'subscriptions.view';
 
+    // Draws
+    case VIEW_DRAWS = 'draws.view';
+
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';
 
@@ -237,7 +240,7 @@ enum Permission: string
             'sales', 'sale_returns'                            => 'green',
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
-            'contracts', 'installments', 'subscriptions' => 'amber',
+            'contracts', 'installments', 'subscriptions', 'draws' => 'amber',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };
