@@ -329,6 +329,15 @@ items:
                   - name: phone
                     type: text
                     value: '0123456789'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -381,6 +390,15 @@ items:
                   value: ''
                   type: query
                 - name: filter[code]
+                  value: ''
+                  type: query
+                - name: filter[shop_name]
+                  value: ''
+                  type: query
+                - name: filter[phone]
+                  value: ''
+                  type: query
+                - name: filter[wilaya_id]
                   value: ''
                   type: query
                 - name: sort
@@ -453,6 +471,15 @@ items:
                   - name: phone
                     type: text
                     value: '0123456789'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -1000,6 +1027,12 @@ items:
                   - name: eccp
                     type: text
                     value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -1038,7 +1071,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/clients?filter[search]=&filter[phone]=&filter[nin]=&filter[branch_id]=&filter[wilaya_id]=&sort=-created_at&page=1&per_page=15&filter[ccp_number]='
+              url: '{{url}}/v1/clients?filter[search]=&filter[firstname]=&filter[lastname]=&filter[phone]=&filter[nin]=&filter[branch_id]=&filter[wilaya_id]=&sort=-created_at&page=1&per_page=15&filter[ccp_number]='
               headers:
                 - name: Accept
                   value: application/json
@@ -1046,6 +1079,12 @@ items:
                   value: web
               params:
                 - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[firstname]
+                  value: ''
+                  type: query
+                - name: filter[lastname]
                   value: ''
                   type: query
                 - name: filter[phone]
@@ -1166,6 +1205,12 @@ items:
                   - name: eccp
                     type: text
                     value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -1254,6 +1299,12 @@ items:
                   value: web
               params:
                 - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
                   value: ''
                   type: query
                 - name: sort
@@ -1388,21 +1439,12 @@ items:
                   - name: inventory_id
                     type: text
                     value: '1'
-                  - name: reference
-                    type: text
-                    value: EO-001
                   - name: note
                     type: text
                     value: First expiration report
-                  - name: reported_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][stock_id]
                     type: text
                     value: '1'
-                  - name: items[0][batch_id]
-                    type: text
-                    value: '5'
                   - name: items[0][quantity]
                     type: text
                     value: '2'
@@ -1452,7 +1494,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/expirations?filter[search]=&filter[inventory_id]=1&filter[user_id]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/expirations?filter[search]=&filter[inventory_id]=1&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -1465,17 +1507,14 @@ items:
                 - name: filter[inventory_id]
                   value: '1'
                   type: query
-                - name: filter[user_id]
-                  value: ''
-                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -1534,19 +1573,10 @@ items:
                   - name: inventory_id
                     type: text
                     value: '1'
-                  - name: reference
-                    type: text
-                    value: EO-001
                   - name: note
                     type: text
                     value: First expiration report
-                  - name: reported_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][stock_id]
-                    type: text
-                    value: '1'
-                  - name: items[0][batch_id]
                     type: text
                     value: '1'
                   - name: items[0][quantity]
@@ -1580,7 +1610,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/inventory-movements?filter[search]=&filter[inventory_id]=1&filter[stock_id]=&filter[product_id]=&filter[movement_type]=&sort=-created_at&page=&per_page='
+              url: '{{url}}/v1/inventory-movements?filter[search]=&filter[inventory_id]=1&filter[stock_id]=&filter[product_id]=&filter[movement_type]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
               headers:
                 - name: Accept
                   value: application/json
@@ -1600,6 +1630,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[movement_type]
+                  value: ''
+                  type: query
+                - name: filter[from_date]
+                  value: ''
+                  type: query
+                - name: filter[to_date]
                   value: ''
                   type: query
                 - name: sort
@@ -1838,9 +1874,6 @@ items:
                   - name: to_inventory_id
                     type: text
                     value: '2'
-                  - name: reference
-                    type: text
-                    value: EO-001
                   - name: items[0][stock_id]
                     type: text
                     value: '1'
@@ -1922,7 +1955,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/inventory-transfers?filter[search]=&filter[from_inventory_id]=&filter[to_inventory_id]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/inventory-transfers?filter[search]=&filter[from_inventory_id]=&filter[to_inventory_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -1941,11 +1974,11 @@ items:
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -2038,15 +2071,15 @@ items:
                     type: text
                     value: '1'
                     disabled: true
-                  - name: reference
-                    type: text
-                    value: EO-001
                   - name: items[0][stock_id]
                     type: text
                     value: '6'
                   - name: items[0][quantity]
                     type: text
                     value: '6'
+                  - name: note
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -2286,18 +2319,15 @@ items:
               body:
                 type: multipart-form
                 data:
+                  - name: branch_id
+                    type: text
+                    value: '1'
                   - name: supplier_id
                     type: text
                     value: '1'
-                  - name: reference
-                    type: text
-                    value: PO-001
                   - name: note
                     type: text
                     value: First purchase order
-                  - name: purchased_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][product_id]
                     type: text
                     value: '1'
@@ -2355,10 +2385,22 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
+                - name: filter[reference]
+                  value: ''
+                  type: query
                 - name: filter[supplier_id]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[inventory_id]
+                  value: ''
+                  type: query
                 - name: filter[status]
+                  value: ''
+                  type: query
+                - name: filter[payment_status]
                   value: ''
                   type: query
                 - name: sort
@@ -2466,18 +2508,15 @@ items:
               body:
                 type: multipart-form
                 data:
+                  - name: branch_id
+                    type: text
+                    value: '1'
                   - name: supplier_id
                     type: text
                     value: '1'
-                  - name: reference
-                    type: text
-                    value: PO-001
                   - name: note
                     type: text
                     value: Updated purchase order
-                  - name: purchased_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][product_id]
                     type: text
                     value: '1'
@@ -2805,12 +2844,12 @@ items:
                   - name: note
                     type: text
                     value: Fulfilled via purchase
-                  - name: items[product_id]
+                  - name: items[0][product_id]
                     type: text
-                    value: ''
-                  - name: items[price]
+                    value: '1'
+                  - name: items[0][price]
                     type: text
-                    value: ''
+                    value: '50000'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -2867,7 +2906,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/restocks?filter[search]=&filter[branch_id]=&filter[status]=&sort=-created_at&page=&per_page='
+              url: '{{url}}/v1/restocks?filter[search]=&filter[branch_id]=&filter[status]=&filter[reference]=&sort=-created_at&page=&per_page='
               headers:
                 - name: Accept
                   value: application/json
@@ -2881,6 +2920,9 @@ items:
                   value: ''
                   type: query
                 - name: filter[status]
+                  value: ''
+                  type: query
+                - name: filter[reference]
                   value: ''
                   type: query
                 - name: sort
@@ -3052,12 +3094,6 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: reference
-                    type: text
-                    value: EO-001
-                  - name: returned_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][purchase_item_id]
                     type: text
                     value: '5'
@@ -3119,7 +3155,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/purchases/{{purchase}}/returns?filter[search]=&filter[reference]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/purchases/{{purchase}}/returns?filter[search]=&filter[reference]=&filter[inventory_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -3132,14 +3168,17 @@ items:
                 - name: filter[reference]
                   value: ''
                   type: query
+                - name: filter[inventory_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -3201,12 +3240,6 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: reference
-                    type: text
-                    value: EO-001
-                  - name: returned_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][purchase_item_id]
                     type: text
                     value: '5'
@@ -3216,6 +3249,9 @@ items:
                   - name: items[0][reason]
                     type: text
                     value: damaged
+                  - name: note
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -3430,9 +3466,6 @@ items:
                   - name: note
                     type: text
                     value: First sale order
-                  - name: sold_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][stock_id]
                     type: text
                     value: '1'
@@ -3576,9 +3609,6 @@ items:
                   - name: client_id
                     type: text
                     value: '1'
-                  - name: reference
-                    type: text
-                    value: SA-001
                   - name: note
                     type: text
                     value: Updated sale order
@@ -3672,12 +3702,6 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: reference
-                    type: text
-                    value: EO-001
-                  - name: returned_at
-                    type: text
-                    value: '2026-06-03'
                   - name: items[0][sale_item_id]
                     type: text
                     value: '1'
@@ -3739,7 +3763,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/sales/{{sale}}/returns?filter[search]=&filter[reference]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/sales/{{sale}}/returns?filter[search]=&filter[reference]=&filter[branch_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -3752,14 +3776,17 @@ items:
                 - name: filter[reference]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -3821,13 +3848,7 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: reference
-                    type: text
-                    value: EO-001
-                  - name: returned_at
-                    type: text
-                    value: '2026-06-03'
-                  - name: items[0][purchase_item_id]
+                  - name: items[0][sale_item_id]
                     type: text
                     value: '5'
                   - name: items[0][quantity]
@@ -3836,6 +3857,9 @@ items:
                   - name: items[0][reason]
                     type: text
                     value: damaged
+                  - name: note
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -3900,6 +3924,12 @@ items:
               body:
                 type: multipart-form
                 data:
+                  - name: source_id
+                    type: text
+                    value: ''
+                  - name: source_type
+                    type: text
+                    value: ''
                   - name: purchase_price
                     type: text
                     value: '60000'
@@ -3909,9 +3939,6 @@ items:
                   - name: current_quantity
                     type: text
                     value: '10'
-                  - name: purchased_at
-                    type: text
-                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -3956,7 +3983,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/batches?filter[search]=&filter[source_type]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/stocks/{{stock}}/batches?filter[search]=&filter[source_type]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -3972,11 +3999,11 @@ items:
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -4007,6 +4034,12 @@ items:
               body:
                 type: multipart-form
                 data:
+                  - name: source_id
+                    type: text
+                    value: ''
+                  - name: source_type
+                    type: text
+                    value: ''
                   - name: purchase_price
                     type: text
                     value: ''
@@ -4014,9 +4047,6 @@ items:
                     type: text
                     value: ''
                   - name: current_quantity
-                    type: text
-                    value: ''
-                  - name: purchased_at
                     type: text
                     value: ''
               auth:
@@ -4133,7 +4163,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/prices?filter[search]=&filter[type]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/stocks/{{stock}}/prices?filter[search]=&filter[type]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -4149,11 +4179,11 @@ items:
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -4260,6 +4290,12 @@ items:
                   - name: product_id
                     type: text
                     value: '2'
+                  - name: source_id
+                    type: text
+                    value: ''
+                  - name: source_type
+                    type: text
+                    value: ''
                   - name: initial_quantity
                     type: text
                     value: '20'
@@ -4269,15 +4305,15 @@ items:
                   - name: purchase_price
                     type: text
                     value: '50000'
-                  - name: selling_price
+                  - name: selling_prices[0]
                     type: text
                     value: '60000'
-                  - name: installment_price
+                  - name: installment_prices[0]
                     type: text
                     value: '65000'
-                  - name: purchased_at
+                  - name: wholesale_prices[0]
                     type: text
-                    value: '2026-06-01'
+                    value: '55000'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -4412,6 +4448,15 @@ items:
                   - name: is_active
                     type: text
                     value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -4461,6 +4506,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[phone]
+                  value: ''
+                  type: query
+                - name: filter[wilaya_id]
                   value: ''
                   type: query
                 - name: filter[is_active]
@@ -4539,6 +4590,15 @@ items:
                   - name: is_active
                     type: text
                     value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -4723,6 +4783,12 @@ items:
                   - name: email
                     type: text
                     value: john@example.com
+                  - name: password
+                    type: text
+                    value: ''
+                  - name: password_confirmation
+                    type: text
+                    value: ''
                   - name: phone
                     type: text
                     value: '0555123456'
@@ -4917,7 +4983,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/wallet-movements?filter[search]=&filter[wallet_id]=&filter[movement_type]=&filter[inflow]=&filter[outflow]=&sort=-created_at&page=&per_page='
+              url: '{{url}}/v1/wallet-movements?filter[search]=&filter[wallet_id]=&filter[movement_type]=&filter[inflow]=&filter[outflow]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
               headers:
                 - name: Accept
                   value: application/json
@@ -4937,6 +5003,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[outflow]
+                  value: ''
+                  type: query
+                - name: filter[from_date]
+                  value: ''
+                  type: query
+                - name: filter[to_date]
                   value: ''
                   type: query
                 - name: sort
@@ -5035,7 +5107,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/wallet-transfers?filter[search]=&filter[from_wallet_id]=&filter[to_wallet_id]=&filter[performed_by]=&sort=-created_at&pages=&per_page='
+              url: '{{url}}/v1/wallet-transfers?filter[search]=&filter[from_wallet_id]=&filter[to_wallet_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -5051,17 +5123,14 @@ items:
                 - name: filter[to_wallet_id]
                   value: ''
                   type: query
-                - name: filter[performed_by]
-                  value: ''
-                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
-                - name: pages
-                  value: ''
+                - name: page
+                  value: '1'
                   type: query
                 - name: per_page
-                  value: ''
+                  value: '15'
                   type: query
               auth:
                 type: bearer
@@ -5124,6 +5193,12 @@ items:
               body:
                 type: multipart-form
                 data:
+                  - name: owner_type
+                    type: text
+                    value: ''
+                  - name: owner_id
+                    type: text
+                    value: ''
                   - name: name
                     type: text
                     value: Test Wallet
@@ -5206,7 +5281,7 @@ items:
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/wallets?filter[search]=&sort=-created_at&page=1&per_page=15&filter[owner_id]=&filter[owner_type]='
+              url: '{{url}}/v1/wallets?filter[search]=&filter[name]=&filter[owner_id]=&filter[owner_type]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -5214,6 +5289,9 @@ items:
                   value: web
               params:
                 - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
                   value: ''
                   type: query
                 - name: sort
@@ -5297,7 +5375,7 @@ items:
               followRedirects: true
               maxRedirects: 5
           - info:
-              name: waithdraw wallet
+              name: withdraw wallet
               type: http
               seq: 7
             http:
@@ -5554,6 +5632,24 @@ items:
                   - name: note
                     type: text
                     value: ''
+                  - name: advance_amount
+                    type: text
+                    value: '5000'
+                  - name: months_count
+                    type: text
+                    value: '12'
+                  - name: items[0][product_id]
+                    type: text
+                    value: '1'
+                  - name: items[0][stock_id]
+                    type: text
+                    value: '1'
+                  - name: items[0][quantity]
+                    type: text
+                    value: '1'
+                  - name: items[0][price]
+                    type: text
+                    value: '5000'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -5654,8 +5750,16 @@ items:
               headers:
                 - name: Accept
                   value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
                 - name: X-Client-Type
                   value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: ban_client
+                    type: text
+                    value: '0'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -5715,6 +5819,25 @@ items:
                   value: application/json
                 - name: X-Client-Type
                   value: web
+              params:
+                - name: filter[status]
+                  value: ''
+                  type: query
+                - name: filter[payment_method]
+                  value: ''
+                  type: query
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -5739,6 +5862,92 @@ items:
                   value: application/json
                 - name: X-Client-Type
                   value: web
+              params:
+                - name: filter[status]
+                  value: ''
+                  type: query
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: show contract
+              type: http
+              seq: 9
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/{{contract}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: list draws
+              type: http
+              seq: 10
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/{{contract}}/draws'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: filter[status]
+                  value: ''
+                  type: query
+                - name: filter[installment_id]
+                  value: ''
+                  type: query
+                - name: filter[subscription_id]
+                  value: ''
+                  type: query
+                - name: filter[month_number]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: scheduled_date
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'
