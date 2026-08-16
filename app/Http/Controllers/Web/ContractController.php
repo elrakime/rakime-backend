@@ -34,6 +34,21 @@ class ContractController extends Controller
         );
     }
 
+    public function show(Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::VIEW_CONTRACTS->value)) {
+            return $response;
+        }
+
+        return $this->successResponse(
+            new ContractResource($this->contractService->show($contract)),
+        );
+    }
+
     public function store(StoreContractRequest $request): JsonResponse
     {
         if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {

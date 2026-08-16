@@ -56,6 +56,17 @@ class ContractService
             ->appends($request->query());
     }
 
+    public function show(Contract $contract): Contract
+    {
+        return $contract->loadMissing([
+            'client', 'account', 'branch',
+            'items.product',
+            'installments',
+            'subscriptions.draws',
+            'account.drawLocks',
+        ]);
+    }
+
     public function create(array $data): Contract
     {
         return DB::transaction(function () use ($data) {

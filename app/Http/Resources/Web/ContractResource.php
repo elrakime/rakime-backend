@@ -36,8 +36,9 @@ class ContractResource extends JsonResource
             'client'       => new ClientResource($this->whenLoaded('client')),
             'account'      => new AccountResource($this->whenLoaded('account')),
             'branch'       => new BranchResource($this->whenLoaded('branch')),
-            'items'        => ContractItemResource::collection($this->whenLoaded('items')),
-            'installments' => InstallmentResource::collection($this->whenLoaded('installments')),
+            'items'         => ContractItemResource::collection($this->whenLoaded('items')),
+            'installments'  => InstallmentResource::collection($this->whenLoaded('installments')),
+            'subscriptions' => SubscriptionResource::collection($this->whenLoaded('subscriptions')),
 
             'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];
