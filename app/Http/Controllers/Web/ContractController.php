@@ -126,12 +126,12 @@ class ContractController extends Controller
             return $response;
         }
 
-        $this->validateRequest($request);
+        $data = $this->validateRequest($request);
 
         try {
             $contract->assertCanTransitionTo(ContractStatus::REJECTED->value);
 
-            $contract = $this->contractService->reject($contract);
+            $contract = $this->contractService->reject($contract, (bool) ($data['ban_client'] ?? false));
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {

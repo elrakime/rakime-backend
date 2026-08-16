@@ -15,6 +15,8 @@ class RejectContractRequest extends FormRequest
 
     public function rules(): array
     {
-        return [];
+        return [
+            'ban_client' => ['sometimes', 'boolean'],
+        ];
     }
 }

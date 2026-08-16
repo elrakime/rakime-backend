@@ -35,6 +35,7 @@ class Client extends Model implements HasMedia
         'ccp_number',
         'ccp_key',
         'eccp',
+        'is_banned',
         'metadata',
     ];
 
@@ -45,6 +46,7 @@ class Client extends Model implements HasMedia
             'salary'    => 'decimal:2',
             'incomes'   => 'json',
             'metadata'  => 'json',
+            'is_banned' => 'boolean',
         ];
     }
 

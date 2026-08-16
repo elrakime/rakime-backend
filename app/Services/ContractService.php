@@ -108,14 +108,6 @@ class ContractService
             throw new Exception(__('contracts.not_pending'), 422);
         }
 
-        if ($maxAmount === null) {
-            if ($contract->net_amount === null) {
-                throw new Exception(__('contracts.max_amount_required'), 422);
-            }
-
-            $maxAmount = $contract->net_amount;
-        }
-
         $contract->update([
             'status'     => ContractStatus::APPROVED,
             'max_amount' => $maxAmount,
@@ -124,17 +116,25 @@ class ContractService
         return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
     }
 
-    public function reject(Contract $contract): Contract
+    public function reject(Contract $contract, bool $banClient = false): Contract
     {
         if ($contract->status !== ContractStatus::PENDING) {
             throw new Exception(__('contracts.not_pending'), 422);
         }
 
-        $contract->update([
-            'status' => ContractStatus::REJECTED,
-        ]);
+        return DB::transaction(function () use ($contract, $banClient) {
+            $contract->update([
+                'status' => ContractStatus::REJECTED,
+            ]);
 
-        return $contract->fresh(['client', 'account', 'branch']);
+            if ($banClient) {
+                $contract->client()->update([
+                    'is_banned' => true,
+                ]);
+            }
+
+            return $contract->fresh(['client', 'account', 'branch']);
+        });
     }
 
     public function update(Contract $contract, array $data, bool $isAdmin): Contract

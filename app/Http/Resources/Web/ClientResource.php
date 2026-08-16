@@ -32,6 +32,7 @@ class ClientResource extends JsonResource
             'ccp_number' => $this->ccp_number,
             'ccp_key'    => $this->ccp_key,
             'eccp'       => $this->eccp,
+            'is_banned'  => $this->is_banned,
             'image'      => $this->getFirstMediaUrl('image') ?: null,
             'metadata'   => $this->metadata,
             'created_at' => $this->created_at,
