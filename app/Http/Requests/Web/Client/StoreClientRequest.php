@@ -14,7 +14,7 @@ class StoreClientRequest extends FormRequest
             'wilaya_id'  => ['required', 'integer', 'exists:wilayas,id'],
             'firstname'  => ['required', 'string', 'max:255'],
             'lastname'   => ['required', 'string', 'max:255'],
-            'phone'      => ['required', 'string', 'max:20', 'unique:clients,phone'],
+            'phone'      => ['required', 'string', 'max:20'],
             'birthdate'  => ['nullable', 'date'],
             'address'    => ['nullable', 'string', 'max:500'],
             'occupation' => ['nullable', 'string', 'max:255'],

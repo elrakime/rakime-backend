@@ -284,7 +284,7 @@ Table clients {
   wilaya_id  bigint    [ref: > wilayas.id]
   firstname  varchar
   lastname   varchar
-  phone      varchar   [unique]
+  phone      varchar
   birthdate  date      [null]
   address    varchar   [null]
   occupation varchar   [null]
