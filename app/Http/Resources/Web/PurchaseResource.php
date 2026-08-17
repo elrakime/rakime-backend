@@ -22,6 +22,7 @@ class PurchaseResource extends JsonResource
             'inventory'        => new InventoryResource($this->whenLoaded('inventory')),
             'items'            => PurchaseItemResource::collection($this->whenLoaded('items')),
             'payments'         => PurchasePaymentResource::collection($this->whenLoaded('payments')),
+            'refunds'          => PurchaseRefundResource::collection($this->whenLoaded('refunds')),
             'total_amount'     => $this->total_amount,
             'paid_amount'      => $this->paid_amount,
             'remaining_amount' => $this->net_amount - $this->paid_amount,

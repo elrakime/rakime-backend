@@ -34,7 +34,7 @@ class PurchaseService
         $this->scopeByUserBranches($query);
 
         return QueryBuilder::for($query, $request)
-            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory', 'returns.items.purchaseItem'])
+            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory', 'returns.items.purchaseItem', 'payments', 'refunds'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),
@@ -98,7 +98,7 @@ class PurchaseService
 
     public function show(Purchase $purchase): Purchase
     {
-        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'inventory', 'returns.items.purchaseItem']);
+        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'refunds', 'inventory', 'returns.items.purchaseItem']);
     }
 
     public function update(Purchase $purchase, array $data): Purchase
