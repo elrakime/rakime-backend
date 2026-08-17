@@ -27,15 +27,18 @@ class PurchaseReturnService
         private readonly WalletService $walletService,
     ) {}
 
-    public function list(Request $request, Purchase $purchase): LengthAwarePaginator
+    public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(PurchaseReturn::class, $request)
-            ->where('purchase_id', $purchase->id)
-            ->with(['purchase.inventory', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn'])
+            ->with(['purchase.inventory', 'purchase.branch', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
+                AllowedFilter::exact('purchase_id'),
                 AllowedFilter::callback('inventory_id', function ($query, $value) {
                     $query->whereHas('purchase', fn ($q) => $q->where('inventory_id', $value));
+                }),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->whereHas('purchase', fn ($q) => $q->where('branch_id', $value));
                 }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {

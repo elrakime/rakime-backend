@@ -19,7 +19,7 @@ class SaleReturnController extends Controller
 {
     public function __construct(private readonly SaleReturnService $saleReturnService) {}
 
-    public function index(Request $request, Sale $sale): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_SALE_RETURNS->value)) {
             return $response;
@@ -27,22 +27,23 @@ class SaleReturnController extends Controller
 
         return $this->successResponse(
             SaleReturnResource::collection(
-                $this->saleReturnService->list($request, $sale)
+                $this->saleReturnService->list($request)
             ),
         );
     }
 
-    public function store(StoreSaleReturnRequest $request, Sale $sale): JsonResponse
+    public function store(StoreSaleReturnRequest $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::CREATE_SALE_RETURNS->value)) {
             return $response;
         }
 
         try {
-            $saleReturn = $this->saleReturnService->create(
-                $sale,
-                $this->validateRequest($request)
-            );
+            $data = $this->validateRequest($request);
+
+            $sale = Sale::findOrFail($data['sale_id']);
+
+            $saleReturn = $this->saleReturnService->create($sale, $data);
 
             return $this->successResponse(
                 new SaleReturnResource($saleReturn),
@@ -56,7 +57,7 @@ class SaleReturnController extends Controller
         }
     }
 
-    public function show(Sale $sale, SaleReturn $saleReturn): JsonResponse
+    public function show(SaleReturn $saleReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_SALE_RETURNS->value)) {
             return $response;
@@ -76,7 +77,7 @@ class SaleReturnController extends Controller
         }
     }
 
-    public function update(UpdateSaleReturnRequest $request, Sale $sale, SaleReturn $saleReturn): JsonResponse
+    public function update(UpdateSaleReturnRequest $request, SaleReturn $saleReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::UPDATE_SALE_RETURNS->value)) {
             return $response;
@@ -99,7 +100,7 @@ class SaleReturnController extends Controller
         }
     }
 
-    public function destroy(Sale $sale, SaleReturn $saleReturn): JsonResponse
+    public function destroy(SaleReturn $saleReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::DELETE_SALE_RETURNS->value)) {
             return $response;
@@ -117,7 +118,7 @@ class SaleReturnController extends Controller
         }
     }
 
-    public function approve(ApproveSaleReturnRequest $request, Sale $sale, SaleReturn $saleReturn): JsonResponse
+    public function approve(ApproveSaleReturnRequest $request, SaleReturn $saleReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::APPROVE_SALE_RETURNS->value)) {
             return $response;
@@ -141,7 +142,7 @@ class SaleReturnController extends Controller
         }
     }
 
-    public function cancel(Sale $sale, SaleReturn $saleReturn): JsonResponse
+    public function cancel(SaleReturn $saleReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::CANCEL_SALE_RETURNS->value)) {
             return $response;

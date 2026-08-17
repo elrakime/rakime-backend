@@ -14,6 +14,7 @@ class StoreSaleReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'sale_id'                   => ['required', 'integer', 'exists:sales,id'],
             'note'                     => ['nullable', 'string', 'max:65535'],
             'items'                    => ['required', 'array', 'min:1'],
             'items.*.sale_item_id'     => ['required', 'integer', 'exists:sale_items,id', 'distinct:strict'],

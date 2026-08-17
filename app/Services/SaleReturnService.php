@@ -26,13 +26,13 @@ class SaleReturnService
         private readonly WalletService $walletService,
     ) {}
 
-    public function list(Request $request, Sale $sale): LengthAwarePaginator
+    public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(SaleReturn::class, $request)
-            ->where('sale_id', $sale->id)
             ->with(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
+                AllowedFilter::exact('sale_id'),
                 AllowedFilter::callback('branch_id', function ($query, $value) {
                     $query->whereHas('sale', fn ($q) => $q->where('branch_id', $value));
                 }),

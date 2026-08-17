@@ -89,9 +89,9 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::apiResource('stocks', StockController::class)->except(['update']);
     Route::apiResource('purchases.payments', PurchasePaymentController::class)->parameters(['payments' => 'purchase_payment'])->only(['index', 'store']);
     Route::post('purchases/{purchase}/payments/{purchase_payment}/cancel', [PurchasePaymentController::class, 'cancel']);
-    Route::apiResource('purchases.returns', PurchaseReturnController::class)->parameters(['returns' => 'purchase_return']);
-    Route::post('purchases/{purchase}/returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
-    Route::post('purchases/{purchase}/returns/{purchase_return}/cancel', [PurchaseReturnController::class, 'cancel']);
+    Route::apiResource('purchase-returns', PurchaseReturnController::class)->parameters(['purchase-returns' => 'purchase_return']);
+    Route::post('purchase-returns/{purchase_return}/approve', [PurchaseReturnController::class, 'approve']);
+    Route::post('purchase-returns/{purchase_return}/cancel', [PurchaseReturnController::class, 'cancel']);
 
     Route::apiResource('restocks', RestockController::class);
     Route::post('restocks/{restock}/submit', [RestockController::class, 'submit']);
@@ -99,9 +99,9 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('restocks/{restock}/fulfill', [RestockController::class, 'fulfill']);
 
     Route::apiResource('sales', SaleController::class);
-    Route::apiResource('sales.returns', SaleReturnController::class)->parameters(['returns' => 'sale_return']);
-    Route::post('sales/{sale}/returns/{sale_return}/approve', [SaleReturnController::class, 'approve']);
-    Route::post('sales/{sale}/returns/{sale_return}/cancel', [SaleReturnController::class, 'cancel']);
+    Route::apiResource('sale-returns', SaleReturnController::class)->parameters(['sale-returns' => 'sale_return']);
+    Route::post('sale-returns/{sale_return}/approve', [SaleReturnController::class, 'approve']);
+    Route::post('sale-returns/{sale_return}/cancel', [SaleReturnController::class, 'cancel']);
 
     Route::apiResource('stocks.prices', PriceController::class);
     Route::apiResource('stocks.batches', BatchController::class);

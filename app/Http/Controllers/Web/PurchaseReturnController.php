@@ -19,7 +19,7 @@ class PurchaseReturnController extends Controller
 {
     public function __construct(private readonly PurchaseReturnService $purchaseReturnService) {}
 
-    public function index(Request $request, Purchase $purchase): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_PURCHASE_RETURNS->value)) {
             return $response;
@@ -27,22 +27,23 @@ class PurchaseReturnController extends Controller
 
         return $this->successResponse(
             PurchaseReturnResource::collection(
-                $this->purchaseReturnService->list($request, $purchase)
+                $this->purchaseReturnService->list($request)
             ),
         );
     }
 
-    public function store(StorePurchaseReturnRequest $request, Purchase $purchase): JsonResponse
+    public function store(StorePurchaseReturnRequest $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::CREATE_PURCHASE_RETURNS->value)) {
             return $response;
         }
 
         try {
-            $purchaseReturn = $this->purchaseReturnService->create(
-                $purchase,
-                $this->validateRequest($request)
-            );
+            $data = $this->validateRequest($request);
+
+            $purchase = Purchase::findOrFail($data['purchase_id']);
+
+            $purchaseReturn = $this->purchaseReturnService->create($purchase, $data);
 
             return $this->successResponse(
                 new PurchaseReturnResource($purchaseReturn),
@@ -56,7 +57,7 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function show(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function show(PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_PURCHASE_RETURNS->value)) {
             return $response;
@@ -76,7 +77,7 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function update(UpdatePurchaseReturnRequest $request, Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function update(UpdatePurchaseReturnRequest $request, PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::UPDATE_PURCHASE_RETURNS->value)) {
             return $response;
@@ -99,7 +100,7 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function destroy(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function destroy(PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::DELETE_PURCHASE_RETURNS->value)) {
             return $response;
@@ -117,7 +118,7 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function approve(ApprovePurchaseReturnRequest $request, Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function approve(ApprovePurchaseReturnRequest $request, PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::APPROVE_PURCHASE_RETURNS->value)) {
             return $response;
@@ -141,7 +142,7 @@ class PurchaseReturnController extends Controller
         }
     }
 
-    public function cancel(Purchase $purchase, PurchaseReturn $purchaseReturn): JsonResponse
+    public function cancel(PurchaseReturn $purchaseReturn): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::CANCEL_PURCHASE_RETURNS->value)) {
             return $response;

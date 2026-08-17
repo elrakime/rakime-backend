@@ -14,6 +14,7 @@ class StorePurchaseReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'purchase_id'                  => ['required', 'integer', 'exists:purchases,id'],
             'note'                         => ['nullable', 'string', 'max:65535'],
             'items'                        => ['required', 'array', 'min:1'],
             'items.*.purchase_item_id'     => ['required', 'integer', 'exists:purchase_items,id', 'distinct:strict'],
