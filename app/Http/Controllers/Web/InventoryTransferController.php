@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Enums\InventoryTransferStatus;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\InventoryTransfer\ReceiveInventoryTransferRequest;
 use App\Http\Requests\Web\InventoryTransfer\StoreInventoryTransferRequest;
 use App\Http\Requests\Web\InventoryTransfer\UpdateInventoryTransferRequest;
 use App\Http\Resources\Web\InventoryTransferResource;
@@ -105,7 +106,7 @@ class InventoryTransferController extends Controller
         }
     }
 
-    public function receive(InventoryTransfer $inventory_transfer): JsonResponse
+    public function receive(ReceiveInventoryTransferRequest $request, InventoryTransfer $inventory_transfer): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::RECEIVE_INVENTORY_TRANSFERS->value)) {
             return $response;
@@ -114,7 +115,7 @@ class InventoryTransferController extends Controller
         try {
             $inventory_transfer->assertCanTransitionTo(InventoryTransferStatus::RECEIVED->value);
 
-            $inventory_transfer = $this->transferService->receive($inventory_transfer);
+            $inventory_transfer = $this->transferService->receive($inventory_transfer, $this->validateRequest($request));
 
             return $this->successResponse(new InventoryTransferResource($inventory_transfer));
         } catch (\Exception $e) {

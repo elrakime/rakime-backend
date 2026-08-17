@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Enums\InventoryTransferStatus;
+use App\Enums\PriceType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
+use App\Models\Price;
 use App\Models\Restock;
 use App\Models\Stock;
 use Exception;
@@ -153,10 +155,13 @@ class InventoryTransferService
         });
     }
 
-    public function receive(InventoryTransfer $transfer): InventoryTransfer
+    public function receive(InventoryTransfer $transfer, array $data = []): InventoryTransfer
     {
-        return DB::transaction(function () use ($transfer) {
-            $transfer->loadMissing('items.stock');
+        return DB::transaction(function () use ($transfer, $data) {
+            $transfer->loadMissing('items.stock.prices');
+
+            // Index optional per-item pricing overrides by source stock_id
+            $pricingByStock = collect($data['items'] ?? [])->keyBy('stock_id');
 
             // If this transfer was created from a restock, load the restock to update fulfilled quantities
             $restock = Restock::where('fulfilled_with_id', $transfer->id)
@@ -213,6 +218,12 @@ class InventoryTransferService
                         source: $transfer,
                         allocations: $toAllocations,
                     );
+
+                    $this->applyPrices(
+                        $toStock,
+                        $transferItem->stock,
+                        $pricingByStock->get($transferItem->stock_id, []),
+                    );
                 }
 
                 // Update restock fulfilled_quantity if linked
@@ -228,6 +239,47 @@ class InventoryTransferService
 
             return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
+    }
+
+    /**
+     * Apply selling/installment prices to the destination stock on receive.
+     *
+     * Uses the prices provided for the transfer item; when a price type is not
+     * provided and the destination stock has no prices of that type, it falls
+     * back to the source stock's prices.
+     */
+    private function applyPrices(Stock $toStock, Stock $fromStock, array $pricing): void
+    {
+        $sellingPrices = $pricing['selling_prices'] ?? null;
+        $installmentPrices = $pricing['installment_prices'] ?? null;
+
+        if ($sellingPrices === null && !$toStock->prices()->where('type', PriceType::SELLING->value)->exists()) {
+            $sellingPrices = $fromStock->prices
+                ->filter(fn (Price $price) => $price->type === PriceType::SELLING)
+                ->pluck('amount')
+                ->all();
+        }
+
+        if ($installmentPrices === null && !$toStock->prices()->where('type', PriceType::INSTALLMENT->value)->exists()) {
+            $installmentPrices = $fromStock->prices
+                ->filter(fn (Price $price) => $price->type === PriceType::INSTALLMENT)
+                ->pluck('amount')
+                ->all();
+        }
+
+        $prices = collect();
+
+        foreach ($sellingPrices ?? [] as $amount) {
+            $prices->push(new Price(['type' => PriceType::SELLING, 'amount' => $amount]));
+        }
+
+        foreach ($installmentPrices ?? [] as $amount) {
+            $prices->push(new Price(['type' => PriceType::INSTALLMENT, 'amount' => $amount]));
+        }
+
+        if ($prices->isNotEmpty()) {
+            $toStock->prices()->saveMany($prices);
+        }
     }
 
     public function cancel(InventoryTransfer $transfer): InventoryTransfer
