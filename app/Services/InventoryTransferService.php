@@ -123,6 +123,16 @@ class InventoryTransferService
 
                     $oldQuantity = $batches->sum('current_quantity');
 
+                    $available = $batches->sum('current_quantity');
+                    if ($available < $transferItem->quantity) {
+                        throw new Exception(
+                            __('transfers.insufficient_stock', [
+                                'stock'     => $fromStock->id,
+                                'available' => $available,
+                            ]), 422
+                        );
+                    }
+
                     $allocations = [];
 
                     foreach ($batches as $batch) {

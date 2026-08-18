@@ -111,6 +111,16 @@ class ExpirationService
 
                 $oldQuantity = $batches->sum('current_quantity');
 
+                $available = $batches->sum('current_quantity');
+                if ($available < $item->quantity) {
+                    throw new Exception(
+                        __('expirations.insufficient_stock', [
+                            'stock'     => $item->stock_id,
+                            'available' => $available,
+                        ]), 422
+                    );
+                }
+
                 $allocations = [];
 
                 foreach ($batches as $batch) {
