@@ -18,7 +18,7 @@ class ClientService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with(['branch', 'wilaya'])
+            ->with(['branch', 'wilaya', 'financialRecords'])
             ->allowedFilters(
                 AllowedFilter::partial('firstname'),
                 AllowedFilter::partial('lastname'),
@@ -61,7 +61,7 @@ class ClientService
 
     public function show(Client $client): Client
     {
-        return $client->loadMissing(['branch', 'wilaya']);
+        return $client->loadMissing(['branch', 'wilaya', 'financialRecords']);
     }
 
     public function update(Client $client, array $data, Request $request): Client

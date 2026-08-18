@@ -30,8 +30,6 @@ class ClientSeeder extends Seeder
                 'address'     => "12 Rue de l'Independence, Alger",
                 'occupation'  => 'Engineer',
                 'employer'    => 'Sonatrach',
-                'salary'      => 120000,
-                'incomes'     => [120000, 30000, 15000],
                 'eccp'        => null,
             ],
             [
@@ -45,8 +43,6 @@ class ClientSeeder extends Seeder
                 'address'     => 'Cite El Salam, Alger',
                 'occupation'  => 'Teacher',
                 'employer'    => 'Ministry of Education',
-                'salary'      => 80000,
-                'incomes'     => [80000, 20000],
                 'eccp'        => null,
             ],
             [
@@ -60,8 +56,6 @@ class ClientSeeder extends Seeder
                 'address'     => 'Cite El Amel, Alger',
                 'occupation'  => 'Doctor',
                 'employer'    => 'Public Hospital',
-                'salary'      => 200000,
-                'incomes'     => [200000, 50000],
                 'eccp'        => null,
             ],
         ];

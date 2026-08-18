@@ -88,6 +88,12 @@ return [
     // Contrats
     'update_contracts' => 'Modifier les contrats',
 
+    // Relevés financiers
+    'view_financial_records'   => 'Voir les relevés financiers',
+    'create_financial_records' => 'Créer des relevés financiers',
+    'update_financial_records' => 'Modifier les relevés financiers',
+    'delete_financial_records' => 'Supprimer les relevés financiers',
+
     // Mensualités
     'view_installments'   => 'Voir les mensualités',
     'create_installments' => 'Créer des mensualités',

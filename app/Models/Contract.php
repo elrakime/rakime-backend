@@ -136,4 +136,9 @@ class Contract extends Model
     {
         return $this->hasMany(Subscription::class, 'contract_id');
     }
+
+    public function financialRecords(): HasMany
+    {
+        return $this->hasMany(FinancialRecord::class);
+    }
 }

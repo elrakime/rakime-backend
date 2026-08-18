@@ -200,6 +200,12 @@ enum Permission: string
     // Draws
     case VIEW_DRAWS = 'draws.view';
 
+    // Financial Records
+    case VIEW_FINANCIAL_RECORDS   = 'financial_records.view';
+    case CREATE_FINANCIAL_RECORDS = 'financial_records.create';
+    case UPDATE_FINANCIAL_RECORDS = 'financial_records.update';
+    case DELETE_FINANCIAL_RECORDS = 'financial_records.delete';
+
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';
 
@@ -241,6 +247,7 @@ enum Permission: string
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
             'contracts', 'installments', 'subscriptions', 'draws' => 'amber',
+            'financial_records' => 'lime',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

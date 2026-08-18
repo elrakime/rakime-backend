@@ -39,6 +39,7 @@ class ContractResource extends JsonResource
             'items'         => ContractItemResource::collection($this->whenLoaded('items')),
             'installments'  => InstallmentResource::collection($this->whenLoaded('installments')),
             'subscriptions' => SubscriptionResource::collection($this->whenLoaded('subscriptions')),
+            'financial_records' => FinancialRecordResource::collection($this->whenLoaded('financialRecords')),
 
             'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];

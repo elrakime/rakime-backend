@@ -32,7 +32,7 @@ class ContractService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with(['client', 'account', 'branch', 'items.product', 'items.stock'])
+            ->with(['client', 'account', 'branch', 'items.product', 'items.stock', 'financialRecords'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
@@ -62,6 +62,7 @@ class ContractService
             'installments',
             'subscriptions.draws',
             'account.drawLocks',
+            'financialRecords',
         ]);
     }
 

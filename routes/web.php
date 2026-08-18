@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\InstallmentController;
 use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
+use App\Http\Controllers\Web\FinancialRecordController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\InventoryMovementController;
 use App\Http\Controllers\Web\PermissionController;
@@ -116,6 +117,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
     Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);
     Route::apiResource('contracts.draws', DrawController::class)->only(['index']);
+
+    Route::get('financial-records', [FinancialRecordController::class, 'index']);
+    Route::post('financial-records', [FinancialRecordController::class, 'store']);
+    Route::put('financial-records/{financial_record}', [FinancialRecordController::class, 'update']);
+    Route::delete('financial-records/{financial_record}', [FinancialRecordController::class, 'destroy']);
 
     Route::post('ccp/info', [CcpController::class, 'info']);
 

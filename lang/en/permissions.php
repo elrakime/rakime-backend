@@ -88,6 +88,12 @@ return [
     // Contracts
     'update_contracts' => 'Update Contracts',
 
+    // Financial Records
+    'view_financial_records'   => 'View Financial Records',
+    'create_financial_records' => 'Create Financial Records',
+    'update_financial_records' => 'Update Financial Records',
+    'delete_financial_records' => 'Delete Financial Records',
+
     // Installments
     'view_installments'   => 'View Installments',
     'create_installments' => 'Create Installments',

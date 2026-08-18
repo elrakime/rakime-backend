@@ -31,8 +31,6 @@ class Client extends Model implements HasMedia
         'address',
         'occupation',
         'employer',
-        'salary',
-        'incomes',
         'nin',
         'ccp_number',
         'ccp_key',
@@ -45,8 +43,6 @@ class Client extends Model implements HasMedia
     {
         return [
             'birthdate' => 'date',
-            'salary'    => 'decimal:2',
-            'incomes'   => 'json',
             'metadata'  => 'json',
             'is_banned' => 'boolean',
         ];
@@ -90,6 +86,11 @@ class Client extends Model implements HasMedia
     public function installmentContracts(): HasMany
     {
         return $this->hasMany(Contract::class);
+    }
+
+    public function financialRecords(): HasMany
+    {
+        return $this->hasMany(FinancialRecord::class);
     }
 
     public function registerMediaCollections(): void

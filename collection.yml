@@ -1009,12 +1009,6 @@ items:
                   - name: employer
                     type: text
                     value: Sonatrach
-                  - name: salary
-                    type: text
-                    value: '80000'
-                  - name: incomes
-                    type: text
-                    value: '[80000,20000]'
                   - name: nin
                     type: text
                     value: '199001234567890'
@@ -1187,12 +1181,6 @@ items:
                   - name: employer
                     type: text
                     value: Sonatrach
-                  - name: salary
-                    type: text
-                    value: '80000'
-                  - name: incomes
-                    type: text
-                    value: '[80000,20000]'
                   - name: nin
                     type: text
                     value: '199001234567890'

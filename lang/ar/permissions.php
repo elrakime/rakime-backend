@@ -88,6 +88,12 @@ return [
     // العقود
     'update_contracts' => 'تعديل العقود',
 
+    // السجلات المالية
+    'view_financial_records'   => 'عرض السجلات المالية',
+    'create_financial_records' => 'إنشاء السجلات المالية',
+    'update_financial_records' => 'تعديل السجلات المالية',
+    'delete_financial_records' => 'حذف السجلات المالية',
+
     // الأقساط
     'view_installments'   => 'عرض الأقساط',
     'create_installments' => 'إنشاء أقساط',

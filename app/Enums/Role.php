@@ -193,6 +193,11 @@ enum Role: string
                 Permission::REJECT_CONTRACTS->value,
                 Permission::CONFIRM_CONTRACTS->value,
                 Permission::CONFIGURE_CONTRACTS->value,
+                // Financial Records
+                Permission::VIEW_FINANCIAL_RECORDS->value,
+                Permission::CREATE_FINANCIAL_RECORDS->value,
+                Permission::UPDATE_FINANCIAL_RECORDS->value,
+                Permission::DELETE_FINANCIAL_RECORDS->value,
             ],
 
             self::EMPLOYEE => [
@@ -261,6 +266,9 @@ enum Role: string
                 Permission::VIEW_CONTRACTS->value,
                 Permission::CREATE_CONTRACTS->value,
                 Permission::UPDATE_CONTRACTS->value,
+                // Financial Records
+                Permission::VIEW_FINANCIAL_RECORDS->value,
+                Permission::CREATE_FINANCIAL_RECORDS->value,
             ],
         };
     }
