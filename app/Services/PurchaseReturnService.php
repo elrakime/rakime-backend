@@ -174,7 +174,7 @@ class PurchaseReturnService
             $refundAmount = max(0, $purchase->paid_amount - $newNetAmount);
 
             if ($refundAmount > 0) {
-                $wallet = Wallet::findOrFail($walletId ?? $this->branchWalletId($purchaseReturn));
+                $wallet = Wallet::findOrFail($this->resolveWalletId($purchaseReturn, $walletId));
 
                 $refund = PurchaseRefund::create([
                     'purchase_id'        => $purchaseReturn->purchase_id,
@@ -221,15 +221,25 @@ class PurchaseReturnService
         return $purchaseReturn->refresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
     }
 
-    private function branchWalletId(PurchaseReturn $purchaseReturn): int
+    private function resolveWalletId(PurchaseReturn $purchaseReturn, ?int $walletId): int
     {
-        $wallet = $purchaseReturn->purchase?->branch?->wallets()->first();
-
-        if (!$wallet) {
-            throw new Exception(__('wallets.branch_wallet_not_found'), 422);
+        if ($walletId) {
+            return $walletId;
         }
 
-        return $wallet->id;
+        $branch = $purchaseReturn->purchase?->branch;
+
+        $wallets = $branch?->wallets()->get() ?? collect();
+
+        if ($wallets->isEmpty()) {
+            throw new Exception(__('wallets.no_branch_wallets'), 422);
+        }
+
+        if ($wallets->count() > 1) {
+            throw new Exception(__('wallets.multiple_branch_wallets'), 422);
+        }
+
+        return $wallets->first()->id;
     }
 
     /**

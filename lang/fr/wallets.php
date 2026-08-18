@@ -6,5 +6,6 @@ return [
     'invalid_name' => 'Le nom du portefeuille spécifié est invalide ou existe déjà.',
     'cannot_disable_primary' => 'Le portefeuille principal ne peut pas être désactivé.',
     'insufficient_balance_for_transaction' => 'Le solde disponible est insuffisant pour compléter cette transaction.',
-    'branch_wallet_not_found' => 'Aucun portefeuille n\'est disponible pour cette succursale.',
+    'no_branch_wallets' => 'Aucun portefeuille n\'est disponible pour cette succursale.',
+    'multiple_branch_wallets' => 'Cette succursale possède plusieurs portefeuilles. Veuillez spécifier un portefeuille.',
 ];
