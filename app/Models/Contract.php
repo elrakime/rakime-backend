@@ -141,4 +141,20 @@ class Contract extends Model
     {
         return $this->hasMany(FinancialRecord::class);
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $model) {
+            $model->reference = '';
+        });
+
+        static::created(function (self $model) {
+            $branchCode = $model->branch?->code ?? '';
+            $year = now()->format('y');
+
+            $model->updateQuietly([
+                'reference' => $branchCode . $year . '-' . str_pad((string) $model->id, 5, '0', STR_PAD_LEFT),
+            ]);
+        });
+    }
 }
