@@ -52,7 +52,7 @@ class RestockController extends Controller
 
     public function show(Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 
@@ -71,7 +71,7 @@ class RestockController extends Controller
 
     public function update(UpdateRestockRequest $request, Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 
@@ -92,7 +92,7 @@ class RestockController extends Controller
 
     public function destroy(Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 
@@ -111,7 +111,7 @@ class RestockController extends Controller
 
     public function submit(Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 
@@ -130,7 +130,7 @@ class RestockController extends Controller
 
     public function cancel(Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 
@@ -151,7 +151,7 @@ class RestockController extends Controller
 
     public function fulfill(FulfillRestockRequest $request, Restock $restock): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($restock)) {
+        if ($response = $this->authorizeBranchAccess($restock->branch_id)) {
             return $response;
         }
 

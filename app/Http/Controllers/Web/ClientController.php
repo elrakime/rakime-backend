@@ -48,7 +48,7 @@ class ClientController extends Controller
 
     public function show(Client $client): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($client)) {
+        if ($response = $this->authorizeBranchAccess($client->branch_id)) {
             return $response;
         }
 
@@ -65,7 +65,7 @@ class ClientController extends Controller
 
     public function update(UpdateClientRequest $request, Client $client): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($client)) {
+        if ($response = $this->authorizeBranchAccess($client->branch_id)) {
             return $response;
         }
 
@@ -86,7 +86,7 @@ class ClientController extends Controller
 
     public function destroy(Client $client): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($client)) {
+        if ($response = $this->authorizeBranchAccess($client->branch_id)) {
             return $response;
         }
 

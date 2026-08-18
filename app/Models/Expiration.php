@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,6 +32,21 @@ class Expiration extends Model
         return [
             'status' => ExpirationStatus::class,
         ];
+    }
+
+    public function scopeByUserBranches(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchIds = $user->branches()->pluck('branch_id');
+
+        if ($branchIds->isNotEmpty()) {
+            $query->whereHas('inventory', fn (Builder $q) => $q->whereIn('branch_id', $branchIds));
+        }
     }
 
     public function user(): BelongsTo

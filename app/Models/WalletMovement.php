@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Role;
 use App\Enums\WalletMovementType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use App\Traits\HasUserstamps;
 class WalletMovement extends Model
 {
     use HasUserstamps;
-    
+
 
     protected $fillable = [
         'wallet_id',
@@ -36,6 +37,24 @@ class WalletMovement extends Model
             'new_balance'   => 'decimal:2',
             'created_at'    => 'datetime',
         ];
+    }
+
+    public function scopeByUserBranches(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchIds = $user->branches()->pluck('branch_id');
+
+        if ($branchIds->isNotEmpty()) {
+            $query->whereHas('wallet', function (Builder $q) use ($branchIds) {
+                $q->where('owner_type', Branch::class)
+                  ->whereIn('owner_id', $branchIds);
+            });
+        }
     }
 
     public function scopeOfType(Builder $query, WalletMovementType $type): void

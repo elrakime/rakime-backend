@@ -48,6 +48,10 @@ class WalletTransferController extends Controller
 
     public function show(WalletTransfer $walletTransfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($walletTransfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_WALLET_TRANSFERS->value)) {
             return $response;
         }
@@ -63,6 +67,10 @@ class WalletTransferController extends Controller
 
     public function destroy(WalletTransfer $walletTransfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($walletTransfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_WALLET_TRANSFERS->value)) {
             return $response;
         }

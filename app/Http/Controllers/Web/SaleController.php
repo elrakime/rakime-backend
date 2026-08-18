@@ -50,7 +50,7 @@ class SaleController extends Controller
 
     public function show(Sale $sale): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($sale)) {
+        if ($response = $this->authorizeBranchAccess($sale->branch_id)) {
             return $response;
         }
 
@@ -69,7 +69,7 @@ class SaleController extends Controller
 
     public function update(UpdateSaleRequest $request, Sale $sale): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($sale)) {
+        if ($response = $this->authorizeBranchAccess($sale->branch_id)) {
             return $response;
         }
 
@@ -90,7 +90,7 @@ class SaleController extends Controller
 
     public function destroy(Sale $sale): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($sale)) {
+        if ($response = $this->authorizeBranchAccess($sale->branch_id)) {
             return $response;
         }
 

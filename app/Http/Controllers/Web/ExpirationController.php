@@ -48,6 +48,10 @@ class ExpirationController extends Controller
 
     public function show(Expiration $expiration): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($expiration->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_EXPIRATIONS->value)) {
             return $response;
         }
@@ -63,6 +67,10 @@ class ExpirationController extends Controller
 
     public function update(UpdateExpirationRequest $request, Expiration $expiration): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($expiration->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_EXPIRATIONS->value)) {
             return $response;
         }
@@ -78,6 +86,10 @@ class ExpirationController extends Controller
 
     public function destroy(Expiration $expiration): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($expiration->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_EXPIRATIONS->value)) {
             return $response;
         }
@@ -93,6 +105,10 @@ class ExpirationController extends Controller
 
     public function approve(Expiration $expiration): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($expiration->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::APPROVE_EXPIRATIONS->value)) {
             return $response;
         }

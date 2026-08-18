@@ -17,7 +17,11 @@ class WalletTransferService
 
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(WalletTransfer::class, $request)
+        $query = WalletTransfer::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->with(['fromWallet', 'toWallet'])
             ->allowedFilters(
                 AllowedFilter::exact('from_wallet_id'),

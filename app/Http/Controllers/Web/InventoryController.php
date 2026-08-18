@@ -48,7 +48,7 @@ class InventoryController extends Controller
 
     public function show(Inventory $inventory): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($inventory)) {
+        if ($response = $this->authorizeBranchAccess($inventory->branch_id)) {
             return $response;
         }
 
@@ -65,7 +65,7 @@ class InventoryController extends Controller
 
     public function update(UpdateInventoryRequest $request, Inventory $inventory): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($inventory)) {
+        if ($response = $this->authorizeBranchAccess($inventory->branch_id)) {
             return $response;
         }
 
@@ -86,7 +86,7 @@ class InventoryController extends Controller
 
     public function destroy(Inventory $inventory): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($inventory)) {
+        if ($response = $this->authorizeBranchAccess($inventory->branch_id)) {
             return $response;
         }
 

@@ -25,7 +25,11 @@ class InventoryTransferService
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(InventoryTransfer::class, $request)
+        $query = InventoryTransfer::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->with(['fromInventory', 'toInventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('from_inventory_id'),

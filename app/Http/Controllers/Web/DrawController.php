@@ -18,7 +18,7 @@ class DrawController extends Controller
 
     public function index(Request $request, Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 

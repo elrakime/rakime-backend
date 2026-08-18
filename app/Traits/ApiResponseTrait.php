@@ -106,14 +106,13 @@ trait ApiResponseTrait
     }
 
     /**
-     * Ensure the authenticated user has access to the given branch.
+     * Ensure the authenticated user has access to at least one of the given branches.
      * Admins bypass branch checks. Managers and Employees are limited to their assigned branches.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|int|null  $target  Model with branch_id or raw branch ID
-     * @param  string  $branchField  The field name holding the branch ID on the model
+     * @param  int|array|null  $allowed_branches  A branch ID or array of branch IDs the resource belongs to
      * @return JsonResponse|void
      */
-    protected function authorizeBranchAccess($target, string $branchField = 'branch_id')
+    protected function authorizeBranchAccess($allowed_branches)
     {
         $user = auth()->user();
 
@@ -126,15 +125,16 @@ trait ApiResponseTrait
             return;
         }
 
-        $branchId = $target instanceof \Illuminate\Database\Eloquent\Model
-            ? $target->{$branchField}
-            : $target;
+        $allowedBranches = array_filter(array_map(
+            fn ($id) => $id === null ? null : (int) $id,
+            (array) $allowed_branches,
+        ));
 
-        if ($branchId === null) {
+        if (empty($allowedBranches)) {
             return;
         }
 
-        if (! $user->branches()->where('branch_id', $branchId)->exists()) {
+        if (! $user->branches()->whereIn('branch_id', $allowedBranches)->exists()) {
             return $this->errorResponse(__('app.unauthorized'), 403);
         }
     }

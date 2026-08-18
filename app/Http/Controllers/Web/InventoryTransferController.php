@@ -46,6 +46,10 @@ class InventoryTransferController extends Controller
 
     public function show(InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
@@ -61,6 +65,10 @@ class InventoryTransferController extends Controller
 
     public function update(UpdateInventoryTransferRequest $request, InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
@@ -76,6 +84,10 @@ class InventoryTransferController extends Controller
 
     public function destroy(InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
@@ -91,6 +103,10 @@ class InventoryTransferController extends Controller
 
     public function dispatch(InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->fromInventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DISPATCH_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
@@ -108,6 +124,10 @@ class InventoryTransferController extends Controller
 
     public function receive(ReceiveInventoryTransferRequest $request, InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->toInventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::RECEIVE_INVENTORY_TRANSFERS->value)) {
             return $response;
         }
@@ -125,6 +145,10 @@ class InventoryTransferController extends Controller
 
     public function cancel(InventoryTransfer $inventory_transfer): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($inventory_transfer->branchIds())) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::CANCEL_INVENTORY_TRANSFERS->value)) {
             return $response;
         }

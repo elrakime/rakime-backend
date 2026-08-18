@@ -12,7 +12,11 @@ class WalletMovementService
 {
     public function list(): LengthAwarePaginator
     {
-        return QueryBuilder::for(WalletMovement::class)
+        $query = WalletMovement::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query)
             ->with(['source', 'wallet'])
             ->allowedFilters(
                 AllowedFilter::exact('wallet_id'),

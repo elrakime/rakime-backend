@@ -36,7 +36,7 @@ class ContractController extends Controller
 
     public function show(Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 
@@ -72,7 +72,7 @@ class ContractController extends Controller
 
     public function update(UpdateContractRequest $request, Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 
@@ -95,7 +95,7 @@ class ContractController extends Controller
 
     public function approve(ApproveContractRequest $request, Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 
@@ -118,7 +118,7 @@ class ContractController extends Controller
 
     public function reject(RejectContractRequest $request, Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 
@@ -141,7 +141,7 @@ class ContractController extends Controller
 
     public function configure(ConfigureContractRequest $request, Contract $contract): JsonResponse
     {
-        if ($response = $this->authorizeBranchAccess($contract)) {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
             return $response;
         }
 

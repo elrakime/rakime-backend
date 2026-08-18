@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PriceType;
+use App\Enums\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +34,21 @@ class Stock extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();
+    }
+
+    public function scopeByUserBranches(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchIds = $user->branches()->pluck('branch_id');
+
+        if ($branchIds->isNotEmpty()) {
+            $query->whereHas('inventory', fn (Builder $q) => $q->whereIn('branch_id', $branchIds));
+        }
     }
 
     public function inventory(): BelongsTo

@@ -19,7 +19,11 @@ class InventoryMovementService
 {
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(InventoryMovement::class, $request)
+        $query = InventoryMovement::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->with(['stock.product', 'inventory', 'product', 'source' => function ($morphTo) {
                 $morphTo->morphWith([
                     Expiration::class        => [],

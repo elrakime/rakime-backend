@@ -19,7 +19,11 @@ class ExpirationService
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
-        return QueryBuilder::for(Expiration::class, $request)
+        $query = Expiration::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->with(['user', 'inventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
