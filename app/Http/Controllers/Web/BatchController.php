@@ -19,6 +19,10 @@ class BatchController extends Controller
 
     public function index(Request $request, Stock $stock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($stock->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_BATCHES->value)) {
             return $response;
         }
@@ -30,6 +34,10 @@ class BatchController extends Controller
 
     public function store(StoreBatchRequest $request, Stock $stock): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($stock->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::CREATE_BATCHES->value)) {
             return $response;
         }
@@ -43,6 +51,10 @@ class BatchController extends Controller
 
     public function show(Stock $stock, Batch $batch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($stock->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_BATCHES->value)) {
             return $response;
         }
@@ -58,6 +70,10 @@ class BatchController extends Controller
 
     public function update(UpdateBatchRequest $request, Stock $stock, Batch $batch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($stock->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_BATCHES->value)) {
             return $response;
         }
@@ -75,6 +91,10 @@ class BatchController extends Controller
 
     public function destroy(Stock $stock, Batch $batch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($stock->inventory?->branch_id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_BATCHES->value)) {
             return $response;
         }

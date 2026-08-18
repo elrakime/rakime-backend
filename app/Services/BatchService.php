@@ -14,7 +14,11 @@ class BatchService
 {
     public function list(Request $request, Stock $stock): LengthAwarePaginator
     {
-        return QueryBuilder::for(Batch::class, $request)
+        $query = Batch::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->where('stock_id', $stock->id)
             ->allowedFilters(
                 AllowedFilter::partial('source_type'),

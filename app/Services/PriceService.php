@@ -14,7 +14,11 @@ class PriceService
 {
     public function list(Request $request, Stock $stock): LengthAwarePaginator
     {
-        return QueryBuilder::for(Price::class, $request)
+        $query = Price::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->where('stock_id', $stock->id)
             ->allowedFilters(
                 AllowedFilter::partial('type'),
