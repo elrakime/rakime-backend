@@ -14,7 +14,7 @@ class ApprovePurchaseReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'wallet_id' => ['required', 'integer', 'exists:wallets,id'],
+            'wallet_id' => ['nullable', 'integer', 'exists:wallets,id'],
         ];
     }
 }

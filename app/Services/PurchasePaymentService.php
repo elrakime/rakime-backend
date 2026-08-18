@@ -39,7 +39,7 @@ class PurchasePaymentService
                 'amount'      => $data['amount'],
             ]);
 
-            $wallet = Wallet::findOrFail($data['wallet_id']);
+            $wallet = Wallet::findOrFail($data['wallet_id'] ?? $this->branchWalletId($purchase));
 
             $this->walletService->purchasePayment(
                 wallet: $wallet,
@@ -83,5 +83,16 @@ class PurchasePaymentService
 
             return $payment->refresh();
         });
+    }
+
+    private function branchWalletId(Purchase $purchase): int
+    {
+        $wallet = $purchase->branch?->wallets()->first();
+
+        if (!$wallet) {
+            throw new Exception(__('wallets.branch_wallet_not_found'), 422);
+        }
+
+        return $wallet->id;
     }
 }

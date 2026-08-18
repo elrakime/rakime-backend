@@ -118,7 +118,7 @@ class PurchaseReturnService
         return $purchaseReturn->loadMissing(['purchase.inventory', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
     }
 
-    public function approve(PurchaseReturn $purchaseReturn, int $walletId): PurchaseReturn
+    public function approve(PurchaseReturn $purchaseReturn, ?int $walletId = null): PurchaseReturn
     {
         $purchaseReturn->load('items.purchaseItem');
 
@@ -168,13 +168,13 @@ class PurchaseReturnService
 
             // Refund only the portion of paid_amount that is now overpaid
             // after this return reduces the amount still owed.
-            $purchase = $purchaseReturn->purchase()->first();
+            $purchase = $purchaseReturn->purchase;
 
             $newNetAmount = $purchase->net_amount - $totalReturnAmount;
             $refundAmount = max(0, $purchase->paid_amount - $newNetAmount);
 
             if ($refundAmount > 0) {
-                $wallet = Wallet::findOrFail($walletId);
+                $wallet = Wallet::findOrFail($walletId ?? $this->branchWalletId($purchaseReturn));
 
                 $refund = PurchaseRefund::create([
                     'purchase_id'        => $purchaseReturn->purchase_id,
@@ -219,6 +219,17 @@ class PurchaseReturnService
         $purchaseReturn->update(['status' => PurchaseReturnStatus::CANCELED]);
 
         return $purchaseReturn->refresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
+    }
+
+    private function branchWalletId(PurchaseReturn $purchaseReturn): int
+    {
+        $wallet = $purchaseReturn->purchase?->branch?->wallets()->first();
+
+        if (!$wallet) {
+            throw new Exception(__('wallets.branch_wallet_not_found'), 422);
+        }
+
+        return $wallet->id;
     }
 
     /**

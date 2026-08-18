@@ -114,7 +114,7 @@ class SaleReturnService
         return $saleReturn->loadMissing(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
     }
 
-    public function approve(SaleReturn $saleReturn, int $walletId): SaleReturn
+    public function approve(SaleReturn $saleReturn, ?int $walletId = null): SaleReturn
     {
         $saleReturn->load('items.saleItem');
 
@@ -166,7 +166,7 @@ class SaleReturnService
             }
 
             if ($totalReturnAmount > 0) {
-                $wallet = Wallet::findOrFail($walletId);
+                $wallet = Wallet::findOrFail($walletId ?? $this->branchWalletId($saleReturn));
 
                 $this->walletService->saleReturn(
                     wallet: $wallet,
@@ -203,6 +203,17 @@ class SaleReturnService
         $saleReturn->update(['status' => SaleReturnStatus::CANCELED]);
 
         return $saleReturn->refresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+    }
+
+    private function branchWalletId(SaleReturn $saleReturn): int
+    {
+        $wallet = $saleReturn->sale?->branch?->wallets()->first();
+
+        if (!$wallet) {
+            throw new Exception(__('wallets.branch_wallet_not_found'), 422);
+        }
+
+        return $wallet->id;
     }
 
     /**
