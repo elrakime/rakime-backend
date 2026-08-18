@@ -7,4 +7,5 @@ return [
     'invalid_customer' => 'Le client spécifié est indisponible ou n\'est plus actif.',
     'no_items' => 'Au moins un article doit être ajouté à la vente.',
     'cannot_process_zero_amount' => 'Une vente ne peut pas être traitée avec un montant nul.',
+    'total_below_purchase_cost' => 'Le total de la vente (:total) ne peut pas être inférieur au coût d\'achat (:cost) des articles vendus.',
 ];

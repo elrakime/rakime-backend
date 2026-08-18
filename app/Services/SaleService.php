@@ -65,6 +65,8 @@ class SaleService
 
             [$taxAmount, $discountAmount, $totalAmount] = $this->calculateTotals($grossAmount, $data);
 
+            $this->validateSaleTotalAgainstPurchaseCost($resolvedItems, $totalAmount);
+
             $sale = Sale::create([
                 'branch_id'       => $data['branch_id'],
                 'client_id'       => $data['client_id'] ?? null,
@@ -161,6 +163,18 @@ class SaleService
                 $updateData['discount_value']  = $discountValue;
                 $updateData['discount_amount'] = $discountAmount;
                 $updateData['total_amount']    = $newTotalAmount;
+            }
+
+            // Validate final total against purchase cost after any items/totals change
+            if (isset($newTotalAmount)) {
+                $finalItems = isset($resolvedItems) ? $resolvedItems : null;
+                if ($finalItems === null) {
+                    $finalItems = $sale->items->map(fn ($item) => [
+                        'stock_id' => $item->stock_id,
+                        'quantity' => $item->quantity,
+                    ])->all();
+                }
+                $this->validateSaleTotalAgainstPurchaseCost($finalItems, $newTotalAmount);
             }
 
             // Reconcile wallet if total changed
@@ -399,6 +413,50 @@ class SaleService
         $totalAmount = $grossAmount + $taxAmount - $discountAmount;
 
         return [$taxAmount, $discountAmount, $totalAmount];
+    }
+
+    /**
+     * Ensures the sale total (after discount) is not less than the total
+     * purchase cost of the sold items, where each item's cost is derived from
+     * its batches' purchase_price (FIFO allocation).
+     *
+     * @param array $items items with stock_id and quantity
+     * @param int   $totalAmount final sale total after discounts/taxes
+     */
+    private function validateSaleTotalAgainstPurchaseCost(array $items, int $totalAmount): void
+    {
+        $stockIds = array_column($items, 'stock_id');
+
+        $batches = Batch::whereIn('stock_id', $stockIds)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('stock_id');
+
+        $purchaseCost = 0;
+
+        foreach ($items as $item) {
+            $remaining = $item['quantity'];
+            $stockBatches = $batches->get($item['stock_id']) ?? collect();
+
+            foreach ($stockBatches as $batch) {
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $deduct = min($remaining, $batch->current_quantity);
+                $purchaseCost += $deduct * $batch->purchase_price;
+                $remaining -= $deduct;
+            }
+        }
+
+        if ($totalAmount < $purchaseCost) {
+            throw new Exception(
+                __('sales.total_below_purchase_cost', [
+                    'total' => $totalAmount,
+                    'cost'  => $purchaseCost,
+                ]), 422
+            );
+        }
     }
 
     private function getBranchInventory(int $branchId): Inventory
