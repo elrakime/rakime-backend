@@ -640,6 +640,7 @@ Table contracts {
   max_amount     int             [null]
   advance_amount int             [null]
   months_count   int             [null]
+  draw_date      date            [null]
   total_amount   int             [null]
   monthly_amount int             [null]
   note           varchar         [null]
@@ -686,7 +687,6 @@ Table subscriptions {
   reference           varchar             [unique]
   subscription_number int
   amount              int
-  total_months        int
   status              subscription_status [default: 'active']
   created_by          bigint              [null, ref: > users.id]
   updated_by          bigint              [null, ref: > users.id]

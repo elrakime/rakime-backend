@@ -282,9 +282,7 @@ class ContractService
                     'reference'           => $contract->reference . '-SUB' . $subNumber,
                     'subscription_number' => $subNumber,
                     'amount'              => $perDrawAmount,
-                    'total_months'        => $monthsCount,
                     'status'              => SubscriptionStatus::ACTIVE,
-                    'draw_date'           => $drawDate,
                 ]);
 
                 foreach ($installments as $installment) {
@@ -300,7 +298,8 @@ class ContractService
             }
 
             $contract->update([
-                'status' => ContractStatus::CONFIGURED,
+                'status'     => ContractStatus::CONFIGURED,
+                'draw_date'  => $drawDate,
             ]);
 
             return $contract->fresh([

@@ -30,7 +30,6 @@ class SubscriptionService
                 AllowedSort::field('reference'),
                 AllowedSort::field('amount'),
                 AllowedSort::field('subscription_number'),
-                AllowedSort::field('total_months'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
