@@ -13,7 +13,6 @@ use App\Models\ContractItem;
 use App\Models\Draw;
 use App\Models\Installment;
 use App\Models\Subscription;
-use App\Traits\ScopesByUserBranches;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -25,13 +24,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ContractService
 {
-    use ScopesByUserBranches;
 
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Contract::query();
 
-        $this->scopeByUserBranches($query);
+        $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
             ->with(['client', 'account', 'branch', 'items.product', 'items.stock'])

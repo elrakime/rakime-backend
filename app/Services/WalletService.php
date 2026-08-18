@@ -7,7 +7,6 @@ use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Wallet;
 use App\Models\WalletMovement;
-use App\Traits\ScopesByUserBranches;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -18,13 +17,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class WalletService
 {
-    use ScopesByUserBranches;
 
     public function list(Request $request): Collection
     {
         $query = Wallet::query();
 
-        $this->scopeByUserBranches($query, 'owner');
+        $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
             ->with('owner')

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Enums\InventoryMovementType;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
-use App\Traits\ScopesByUserBranches;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -15,12 +14,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class InventoryService
 {
-    use ScopesByUserBranches;
     public function list(Request $request): Collection
     {
         $query = Inventory::query();
 
-        $this->scopeByUserBranches($query);
+        $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
             ->with('branch')

@@ -11,7 +11,6 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Stock;
 use App\Models\Wallet;
-use App\Traits\ScopesByUserBranches;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -22,7 +21,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class SaleService
 {
-    use ScopesByUserBranches;
 
     public function __construct(
         private readonly InventoryService $inventoryService,
@@ -32,7 +30,7 @@ class SaleService
     {
         $query = Sale::query();
 
-        $this->scopeByUserBranches($query);
+        $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
             ->with(['user', 'branch', 'client', 'items.product', 'items.stock', 'items.returnItems.saleReturn'])

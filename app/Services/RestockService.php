@@ -13,7 +13,6 @@ use App\Models\PurchaseItem;
 use App\Models\Restock;
 use App\Models\RestockItem;
 use App\Models\Stock;
-use App\Traits\ScopesByUserBranches;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -24,14 +23,13 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class RestockService
 {
-    use ScopesByUserBranches;
 
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
         $query = Restock::query();
 
-        $this->scopeByUserBranches($query);
+        $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
             ->with(['user', 'branch', 'items.product'])

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -35,6 +36,22 @@ class Wallet extends Model
     public function scopeCentral(Builder $query): void
     {
         $query->whereNull('owner_id');
+    }
+
+    public function scopeByUserBranches(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchIds = $user->branches()->pluck('branch_id');
+
+        if ($branchIds->isNotEmpty()) {
+            $query->where('owner_type', Branch::class)
+                ->whereIn('owner_id', $branchIds);
+        }
     }
 
     public function owner(): MorphTo
