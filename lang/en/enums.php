@@ -15,6 +15,7 @@ return [
         'TRANSFER_CANCEL'   => 'Transfer Cancel',
         'SALE_RETURN'       => 'Sale Return',
         'SALE_UPDATE'       => 'Sale Update',
+        'MANUAL'            => 'Manual',
     ],
 
     'wallet_movement_type' => [

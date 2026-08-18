@@ -311,6 +311,30 @@ class InventoryService
         );
     }
 
+    /**
+     * Record a manual adjustment (positive or negative), e.g. stock/batch creation or manual edits.
+     */
+    public function manual(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+        array $allocations = [],
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::MANUAL,
+            $oldQuantity,
+            $quantity,
+            $source,
+            $allocations,
+        );
+    }
+
     // ============================================================
     // INTERNAL
     // ============================================================

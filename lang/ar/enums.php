@@ -15,6 +15,7 @@ return [
         'TRANSFER_CANCEL'  => 'إلغاء التحويل',
         'SALE_RETURN'      => 'إرجاع مبيعات',
         'SALE_UPDATE'      => 'تحديث مبيعات',
+        'MANUAL'           => 'يدوي',
     ],
 
     'wallet_movement_type' => [

@@ -93,6 +93,7 @@ Enum inventory_movement_type {
   transfer_cancel
   sale_return
   sale_update
+  manual
 }
 
 Enum wallet_movement_type {

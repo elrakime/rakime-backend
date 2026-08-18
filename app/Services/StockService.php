@@ -66,6 +66,8 @@ class StockService
         }
 
         if (isset($data['initial_quantity'])) {
+            $oldQuantity = (int) $stock->batches()->sum('current_quantity');
+
             $batch = $stock->batches()->create([
                 'source_id'         => $data['source_id'] ?? null,
                 'source_type'       => $data['source_type'] ?? null,
@@ -73,6 +75,24 @@ class StockService
                 'initial_quantity'  => $data['initial_quantity'],
                 'current_quantity'  => $data['current_quantity'] ?? $data['initial_quantity'],
             ]);
+
+            $quantity = (int) ($data['current_quantity'] ?? $data['initial_quantity']);
+
+            if ($quantity > 0) {
+                app(InventoryService::class)->manual(
+                    $stock->id,
+                    $stock->inventory_id,
+                    $stock->product_id,
+                    $oldQuantity,
+                    $quantity,
+                    $batch,
+                    [[
+                        'batch_id'       => $batch->id,
+                        'quantity'       => $quantity,
+                        'purchase_price' => $batch->purchase_price,
+                    ]],
+                );
+            }
         }
 
         return $stock->load([

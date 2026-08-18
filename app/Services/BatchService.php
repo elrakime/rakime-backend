@@ -41,13 +41,35 @@ class BatchService
 
     public function create(Stock $stock, array $data): Batch
     {
-        return $stock->batches()->create([
+        $oldQuantity = $this->stockCurrentQuantity($stock);
+
+        $batch = $stock->batches()->create([
             'source_id'        => $data['source_id'] ?? null,
             'source_type'      => $data['source_type'] ?? null,
             'purchase_price'   => $data['purchase_price'],
             'initial_quantity' => $data['initial_quantity'],
             'current_quantity' => $data['current_quantity'] ?? $data['initial_quantity'],
         ]);
+
+        $quantity = (int) $batch->current_quantity;
+
+        if ($quantity > 0) {
+            app(InventoryService::class)->manual(
+                $stock->id,
+                $stock->inventory_id,
+                $stock->product_id,
+                $oldQuantity,
+                $quantity,
+                $batch,
+                [[
+                    'batch_id'       => $batch->id,
+                    'quantity'       => $quantity,
+                    'purchase_price' => $batch->purchase_price,
+                ]],
+            );
+        }
+
+        return $batch;
     }
 
     public function show(Batch $batch): Batch
@@ -57,6 +79,11 @@ class BatchService
 
     public function update(Batch $batch, array $data): Batch
     {
+        $stock = $batch->stock;
+
+        $oldStockQuantity = $this->stockCurrentQuantity($stock);
+        $oldQuantity      = (int) $batch->current_quantity;
+
         $batch->update(array_filter([
             'source_id'        => $data['source_id'] ?? null,
             'source_type'      => $data['source_type'] ?? null,
@@ -65,7 +92,33 @@ class BatchService
             'current_quantity' => $data['current_quantity'] ?? null,
         ], fn ($v) => $v !== null));
 
-        return $batch->refresh();
+        $batch->refresh();
+
+        $newQuantity = (int) $batch->current_quantity;
+        $difference  = $newQuantity - $oldQuantity;
+
+        if ($difference !== 0) {
+            app(InventoryService::class)->manual(
+                $stock->id,
+                $stock->inventory_id,
+                $stock->product_id,
+                $oldStockQuantity,
+                $difference,
+                $batch,
+                [[
+                    'batch_id'       => $batch->id,
+                    'quantity'       => $difference,
+                    'purchase_price' => $batch->purchase_price,
+                ]],
+            );
+        }
+
+        return $batch;
+    }
+
+    private function stockCurrentQuantity(Stock $stock): int
+    {
+        return (int) $stock->batches()->sum('current_quantity');
     }
 
     public function delete(Batch $batch): void
