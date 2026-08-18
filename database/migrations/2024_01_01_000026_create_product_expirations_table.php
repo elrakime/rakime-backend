@@ -11,7 +11,6 @@ return new class extends Migration
     {
         Schema::create('expirations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained();
             $table->foreignId('inventory_id')->constrained();
             $table->string('reference');
             $table->string('note')->nullable();

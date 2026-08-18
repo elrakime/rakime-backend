@@ -6,7 +6,7 @@ use App\Enums\ExpirationStatus;
 use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
-use App\Models\Inventory;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -74,12 +74,6 @@ class ExpirationService
                 'inventory_id' => $data['inventory_id'] ?? null,
                 'note'         => $data['note'] ?? null,
             ], fn ($v) => $v !== null));
-
-            if (array_key_exists('inventory_id', $data) && $data['inventory_id'] !== null) {
-                $expiration->update([
-                    'branch_id' => Inventory::findOrFail($data['inventory_id'])->branch_id,
-                ]);
-            }
 
             if (array_key_exists('items', $data)) {
                 $expiration->items()->delete();

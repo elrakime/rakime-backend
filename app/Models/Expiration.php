@@ -19,7 +19,6 @@ class Expiration extends Model
     use HasUserstamps;
 
     protected $fillable = [
-        'branch_id',
         'inventory_id',
         'reference',
         'note',
@@ -43,11 +42,6 @@ class Expiration extends Model
         return $this->belongsTo(Inventory::class);
     }
 
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
     public function items(): HasMany
     {
         return $this->hasMany(ExpirationItem::class, 'expiration_id');
@@ -62,10 +56,6 @@ class Expiration extends Model
     {
         static::creating(function (self $model) {
             $model->reference = '';
-
-            if ($model->branch_id === null && $model->inventory_id !== null) {
-                $model->branch_id = Inventory::whereKey($model->inventory_id)->value('branch_id');
-            }
         });
 
         static::created(function (self $model) {
