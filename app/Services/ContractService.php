@@ -91,10 +91,6 @@ class ContractService
                 }
             }
 
-            $contract->update([
-                'reference' => 'CTR-' . now()->format('Ym') . '-' . str_pad((string) $contract->id, 5, '0', STR_PAD_LEFT),
-            ]);
-
             $this->recalculateAmounts($contract);
 
             return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);

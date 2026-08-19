@@ -8,13 +8,18 @@ use App\Http\Requests\Web\Account\StoreAccountRequest;
 use App\Http\Requests\Web\Account\UpdateAccountRequest;
 use App\Http\Resources\Web\AccountResource;
 use App\Models\Account;
+use App\Services\AccountExportService;
 use App\Services\AccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountController extends Controller
 {
-    public function __construct(private readonly AccountService $accountService) {}
+    public function __construct(
+        private readonly AccountService $accountService,
+        private readonly AccountExportService $accountExportService,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -81,5 +86,14 @@ class AccountController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
         }
+    }
+
+    public function export(Account $account): StreamedResponse|JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+            return $response;
+        }
+
+        return $this->accountExportService->export($account);
     }
 }
