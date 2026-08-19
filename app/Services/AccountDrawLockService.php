@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\ContractStatus;
 use App\Models\Account;
 use App\Models\AccountDrawLock;
+use App\Models\Contract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -51,9 +54,19 @@ class AccountDrawLockService
             throw new \Exception(__('account_draw_locks.already_locked'), 422);
         }
 
-        return AccountDrawLock::create([
-            'account_id' => $account->id,
-            'month'      => $lockDate,
-        ]);
+        return DB::transaction(function () use ($account, $lockDate) {
+            $lock = AccountDrawLock::create([
+                'account_id' => $account->id,
+                'month'      => $lockDate,
+            ]);
+
+            Contract::query()
+                ->where('account_id', $account->id)
+                ->where('status', ContractStatus::CONFIGURED)
+                ->whereDate('draw_date', $lockDate)
+                ->update(['status' => ContractStatus::ACTIVE]);
+
+            return $lock;
+        });
     }
 }
