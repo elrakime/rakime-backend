@@ -12,30 +12,23 @@ use App\Http\Resources\Web\FinancialRecordResource;
 use App\Models\Client;
 use App\Models\Contract;
 use App\Models\FinancialRecord;
+use App\Services\FinancialRecordService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FinancialRecordController extends Controller
 {
+    public function __construct(private readonly FinancialRecordService $service)
+    {
+    }
+
     public function index(Request $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_FINANCIAL_RECORDS->value)) {
             return $response;
         }
 
-        $query = FinancialRecord::query()->with(['client', 'contract']);
-
-        if ($clientId = $request->integer('client_id')) {
-            $query->where('client_id', $clientId);
-        }
-
-        if ($contractId = $request->integer('contract_id')) {
-            $query->where('contract_id', $contractId);
-        }
-
-        $records = $query->orderByDesc('created_at')
-            ->paginate($request->integer('per_page', 15))
-            ->appends($request->query());
+        $records = $this->service->list($request);
 
         return $this->successResponse(FinancialRecordResource::collection($records));
     }
@@ -62,23 +55,11 @@ class FinancialRecordController extends Controller
             }
         }
 
-        $revenues = $data['revenues'] ?? [];
-        $expenses = $data['expenses'] ?? [];
-
-        $income = array_sum($revenues) - array_sum($expenses);
-
         try {
-            $record = FinancialRecord::create([
-                'client_id'   => $client->id,
-                'contract_id' => $data['contract_id'] ?? null,
-                'revenues'    => $revenues,
-                'expenses'    => $expenses,
-                'income'      => $income,
-                'note'        => $data['note'] ?? null,
-            ]);
+            $record = $this->service->create($data);
 
             return $this->successResponse(
-                new FinancialRecordResource($record->load(['client', 'contract'])),
+                new FinancialRecordResource($record),
                 statusCode: 201,
             );
         } catch (\Exception $e) {
@@ -98,21 +79,11 @@ class FinancialRecordController extends Controller
 
         $data = $this->validateRequest($request);
 
-        $revenues = $data['revenues'] ?? $financialRecord->revenues ?? [];
-        $expenses = $data['expenses'] ?? $financialRecord->expenses ?? [];
-
-        $income = array_sum($revenues) - array_sum($expenses);
-
         try {
-            $financialRecord->update([
-                'revenues' => $revenues,
-                'expenses' => $expenses,
-                'income'   => $income,
-                'note'     => $data['note'] ?? $financialRecord->note,
-            ]);
+            $record = $this->service->update($financialRecord, $data);
 
             return $this->successResponse(
-                new FinancialRecordResource($financialRecord->load(['client', 'contract'])),
+                new FinancialRecordResource($record),
             );
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
@@ -130,7 +101,7 @@ class FinancialRecordController extends Controller
         }
 
         try {
-            $financialRecord->delete();
+            $this->service->delete($financialRecord);
 
             return $this->successResponse(message: __('app.deleted'));
         } catch (\Exception $e) {

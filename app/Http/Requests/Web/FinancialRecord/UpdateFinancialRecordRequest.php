@@ -11,11 +11,13 @@ class UpdateFinancialRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'revenues'   => ['sometimes', 'nullable', 'array'],
-            'expenses'   => ['sometimes', 'nullable', 'array'],
-            'revenues.*' => ['numeric'],
-            'expenses.*' => ['numeric'],
-            'note'       => ['sometimes', 'nullable', 'string'],
+            'revenues'          => ['sometimes', 'nullable', 'array'],
+            'expenses'          => ['sometimes', 'nullable', 'array'],
+            'revenues.*.amount' => ['required_with:revenues', 'numeric'],
+            'revenues.*.count'  => ['nullable', 'integer', 'min:1'],
+            'expenses.*.amount' => ['required_with:expenses', 'numeric'],
+            'expenses.*.count'  => ['nullable', 'integer', 'min:1'],
+            'note'              => ['sometimes', 'nullable', 'string'],
         ];
     }
 }
