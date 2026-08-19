@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\DiscountType;
 use App\Models\Batch;
 use App\Models\Branch;
+use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Sale;
@@ -60,6 +61,14 @@ class SaleService
         return DB::transaction(function () use ($data) {
             $inventory = $this->getBranchInventory($data['branch_id']);
             $resolvedItems = $this->resolveItems($inventory->id, $data['items']);
+
+            if (! empty($data['client_id'])) {
+                $client = Client::find($data['client_id']);
+
+                if ($client && $client->is_banned) {
+                    throw new Exception(__('sales.client_banned'), 422);
+                }
+            }
 
             $grossAmount = collect($resolvedItems)->sum(fn ($item) => $item['quantity'] * $item['price']);
 

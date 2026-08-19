@@ -8,4 +8,5 @@ return [
     'no_items' => 'At least one item must be added to the sale.',
     'cannot_process_zero_amount' => 'A sale cannot be processed with a zero amount.',
     'total_below_purchase_cost' => 'The sale total (:total) cannot be less than the purchase cost (:cost) of the sold items.',
+    'client_banned' => 'This client is banned and cannot make sales.',
 ];
