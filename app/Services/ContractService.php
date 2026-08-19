@@ -254,13 +254,13 @@ class ContractService
             throw new Exception(__('contracts.draw_date_before_lock'), 422);
         }
 
-        if ($subscriptionCount >= $account->max_withdraw_count) {
+        if ($subscriptionCount > $account->max_withdraw_count) {
             throw new Exception(__('contracts.subscription_count_exceeds_limit'), 422);
         }
 
         $perDrawAmount = (int) ceil($monthlyAmount / $subscriptionCount);
 
-        if ($perDrawAmount <= $account->min_withdraw_amount) {
+        if ($perDrawAmount < $account->min_withdraw_amount) {
             throw new Exception(__('contracts.subscription_amount_below_minimum'), 422);
         }
 
