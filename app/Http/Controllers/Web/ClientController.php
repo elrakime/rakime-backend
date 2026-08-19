@@ -25,6 +25,17 @@ class ClientController extends Controller
         return $this->successResponse(ClientResource::collection($this->clientService->list($request)));
     }
 
+    public function find(string $keyword): JsonResponse
+    {
+        $client = $this->clientService->find($keyword);
+
+        if (! $client) {
+            return $this->errorResponse(statusCode: 404);
+        }
+
+        return $this->successResponse(new ClientResource($client));
+    }
+
     public function store(StoreClientRequest $request): JsonResponse
     {
         if ($response = $this->authorizeBranchAccess($request->input('branch_id'))) {

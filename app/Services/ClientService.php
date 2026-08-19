@@ -48,6 +48,15 @@ class ClientService
             ->appends($request->query());
     }
 
+    public function find(string $keyword): ?Client
+    {
+        return Client::query()
+            ->where('ccp_number', $keyword)
+            ->orWhere('nin', $keyword)
+            ->with(['branch', 'wilaya', 'financialRecords'])
+            ->first();
+    }
+
     public function create(array $data, Request $request): Client
     {
         $client = Client::create(collect($data)->except('image')->toArray());
