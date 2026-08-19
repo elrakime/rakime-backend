@@ -219,6 +219,34 @@ items:
               timeout: 0
               followRedirects: true
               maxRedirects: 5
+          - info:
+              name: export account
+              type: http
+              seq: 6
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts/{{account}}/export'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: draw_date
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
       - info:
           name: Account Draw Locks
           type: folder
@@ -1206,6 +1234,30 @@ items:
               variables:
                 - name: client
                   value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: find client
+              type: http
+              seq: 6
+            http:
+              method: GET
+              url: '{{url}}/v1/clients/find/{{keyword}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: keyword
+                  value: '0555123455'
             settings:
               encodeUrl: true
               timeout: 0
@@ -5948,6 +6000,145 @@ items:
               timeout: 0
               followRedirects: true
               maxRedirects: 5
+  - info:
+      name: Financial Records
+      type: folder
+      seq: 31
+    request:
+      auth: inherit
+    items:
+      - info:
+          name: list financial records
+          type: http
+          seq: 1
+        http:
+          method: GET
+          url: '{{url}}/v1/financial-records'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: web
+          params:
+            - name: client_id
+              value: ''
+              type: query
+            - name: contract_id
+              value: ''
+              type: query
+            - name: per_page
+              value: '15'
+              type: query
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: create financial record
+          type: http
+          seq: 2
+        http:
+          method: POST
+          url: '{{url}}/v1/financial-records'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: multipart/form-data
+            - name: X-Client-Type
+              value: web
+          body:
+            type: multipart-form
+            data:
+              - name: client_id
+                type: text
+                value: '1'
+              - name: contract_id
+                type: text
+                value: '1'
+              - name: revenues[0]
+                type: text
+                value: '5000'
+              - name: expenses[0]
+                type: text
+                value: '1000'
+              - name: note
+                type: text
+                value: ''
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: update financial record
+          type: http
+          seq: 3
+        http:
+          method: PUT
+          url: '{{url}}/v1/financial-records/{{financial_record}}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: multipart/form-data
+            - name: X-Client-Type
+              value: web
+          body:
+            type: multipart-form
+            data:
+              - name: revenues[0]
+                type: text
+                value: '5000'
+              - name: expenses[0]
+                type: text
+                value: '1000'
+              - name: note
+                type: text
+                value: ''
+          auth:
+            type: bearer
+            token: '{{token}}'
+        runtime:
+          variables:
+            - name: financial_record
+              value: '1'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: delete financial record
+          type: http
+          seq: 4
+        http:
+          method: DELETE
+          url: '{{url}}/v1/financial-records/{{financial_record}}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: web
+          auth:
+            type: bearer
+            token: '{{token}}'
+        runtime:
+          variables:
+            - name: financial_record
+              value: '1'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
   - info:
       name: Extras
       type: folder
