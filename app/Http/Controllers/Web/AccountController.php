@@ -88,12 +88,12 @@ class AccountController extends Controller
         }
     }
 
-    public function export(Account $account): StreamedResponse|JsonResponse
+    public function export(Account $account, Request $request): StreamedResponse|JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
             return $response;
         }
 
-        return $this->accountExportService->export($account);
+        return $this->accountExportService->export($account, $request->string('draw_date')->toString() ?: null);
     }
 }

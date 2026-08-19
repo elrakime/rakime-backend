@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\ContractStatus;
 use App\Models\Account;
+use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
@@ -16,8 +17,12 @@ class AccountExportService
     /**
      * Export all configured contracts' subscriptions for the given account
      * as an Excel (.xls) spreadsheet.
+     *
+     * @param string|null $drawDate Optional target draw date. When omitted, the
+     *                              next draw date after the account's last lock
+     *                              is used.
      */
-    public function export(Account $account): StreamedResponse
+    public function export(Account $account, ?string $drawDate = null): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
@@ -43,8 +48,11 @@ class AccountExportService
 
         $row = 2;
 
+        $targetDrawDate = $this->resolveTargetDrawDate($account, $drawDate);
+
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
+            ->whereDate('draw_date', $targetDrawDate)
             ->with(['client', 'subscriptions.draws'])
             ->get();
 
@@ -120,5 +128,35 @@ class AccountExportService
                 'Content-Type' => 'application/vnd.ms-excel',
             ]
         );
+    }
+
+    /**
+     * Resolve the target draw date for the export.
+     *
+     * When an explicit draw date is provided it is used as-is. Otherwise the
+     * next draw date after the account's last lock date is generated from the
+     * account's draw day.
+     */
+    private function resolveTargetDrawDate(Account $account, ?string $drawDate): Carbon
+    {
+        if ($drawDate !== null) {
+            return Carbon::parse($drawDate)->startOfDay();
+        }
+
+        $lastLock = $account->drawLocks()->latest('month')->first();
+
+        $candidate = $lastLock !== null
+            ? Carbon::parse($lastLock->month)->startOfDay()
+            : now()->startOfDay();
+
+        $month = $candidate->copy()->startOfMonth();
+
+        if ($lastLock === null || $month->lte($candidate)) {
+            $month = $candidate->copy()->addMonth()->startOfMonth();
+        }
+
+        $day = min($account->draw_day, $month->daysInMonth);
+
+        return $month->copy()->addDays($day - 1);
     }
 }

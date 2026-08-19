@@ -32,9 +32,16 @@ class AccountDrawLockService
     {
         $account = Account::findOrFail($data['account_id']);
 
-        $month = now()->startOfMonth();
-        $day   = min($account->draw_day, $month->daysInMonth);
-        $lockDate = $month->copy()->addDays($day - 1);
+        $today = now()->startOfDay();
+        $day   = min($account->draw_day, $today->daysInMonth);
+
+        $lockDate = $today->copy()->startOfMonth()->addDays($day - 1);
+
+        if ($lockDate->lt($today)) {
+            $lockDate = $today->copy()->addMonth()->startOfMonth();
+            $day      = min($account->draw_day, $lockDate->daysInMonth);
+            $lockDate->addDays($day - 1);
+        }
 
         $alreadyLocked = AccountDrawLock::where('account_id', $account->id)
             ->where('month', $lockDate->toDateString())
