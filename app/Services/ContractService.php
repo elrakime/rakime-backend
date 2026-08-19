@@ -10,6 +10,7 @@ use App\Enums\InstallmentPaymentMethod;
 use App\Enums\SubscriptionStatus;
 use App\Models\Contract;
 use App\Models\ContractItem;
+use App\Models\Client;
 use App\Models\Draw;
 use App\Models\Installment;
 use App\Models\Subscription;
@@ -69,6 +70,12 @@ class ContractService
     public function create(array $data): Contract
     {
         return DB::transaction(function () use ($data) {
+            $client = Client::find($data['client_id']);
+
+            if ($client && $client->is_banned) {
+                throw new Exception(__('contracts.client_banned'), 422);
+            }
+
             $contract = Contract::create([
                 'client_id'      => $data['client_id'],
                 'account_id'     => $data['account_id'],

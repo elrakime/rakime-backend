@@ -27,6 +27,7 @@ class ClientService
                 AllowedFilter::partial('ccp_number'),
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('wilaya_id'),
+                AllowedFilter::exact('is_banned'),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('firstname', 'like', "%{$value}%")
