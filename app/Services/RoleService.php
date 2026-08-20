@@ -38,7 +38,15 @@ class RoleService
 
     public function update(Role $role, array $data): Role
     {
-        $this->assertNotDefault($role, __('roles.cannot_update_default'));
+        $isDefault = $this->isDefault($role);
+
+        if ($role->name === RoleEnum::ADMIN->value) {
+            throw new Exception(__('roles.cannot_update_admin'), 422);
+        }
+
+        if ($isDefault && isset($data['name'])) {
+            throw new Exception(__('roles.cannot_update_default_name'), 422);
+        }
 
         if (isset($data['name'])) {
             $role->update(['name' => $data['name']]);
@@ -64,8 +72,13 @@ class RoleService
 
     private function assertNotDefault(Role $role, string $message): void
     {
-        if (in_array($role->name, RoleEnum::keys(), true)) {
+        if ($this->isDefault($role)) {
             throw new Exception($message, 422);
         }
+    }
+
+    private function isDefault(Role $role): bool
+    {
+        return in_array($role->name, RoleEnum::keys(), true);
     }
 }
