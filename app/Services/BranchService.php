@@ -15,7 +15,11 @@ class BranchService
 {
     public function list(Request $request): Collection
     {
-        return QueryBuilder::for(Branch::class, $request)
+        $query = Branch::query();
+
+        $query->byUserBranches();
+
+        return QueryBuilder::for($query, $request)
             ->with('accounts', 'managers', 'wilaya')
             ->allowedFilters(
                 AllowedFilter::partial('name'),

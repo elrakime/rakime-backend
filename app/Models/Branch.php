@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -40,6 +42,21 @@ class Branch extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();
+    }
+
+    public function scopeByUserBranches(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->hasRole(Role::ADMIN->value)) {
+            return;
+        }
+
+        $branchIds = $user->branches()->pluck('branch_id');
+
+        if ($branchIds->isNotEmpty()) {
+            $query->whereIn('id', $branchIds);
+        }
     }
 
     public function users(): BelongsToMany

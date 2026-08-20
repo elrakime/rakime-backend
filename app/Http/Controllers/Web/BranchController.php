@@ -42,6 +42,10 @@ class BranchController extends Controller
 
     public function show(Branch $branch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($branch->id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::VIEW_BRANCHES->value)) {
             return $response;
         }
@@ -55,6 +59,10 @@ class BranchController extends Controller
 
     public function update(UpdateBranchRequest $request, Branch $branch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($branch->id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::UPDATE_BRANCHES->value)) {
             return $response;
         }
@@ -70,6 +78,10 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch): JsonResponse
     {
+        if ($response = $this->authorizeBranchAccess($branch->id)) {
+            return $response;
+        }
+
         if ($response = $this->authorizePermission(Permission::DELETE_BRANCHES->value)) {
             return $response;
         }
