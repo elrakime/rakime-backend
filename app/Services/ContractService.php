@@ -139,17 +139,17 @@ class ContractService
         });
     }
 
-    public function update(Contract $contract, array $data, bool $isAdmin): Contract
+    public function update(Contract $contract, array $data): Contract
     {
         if (! in_array($contract->status, [ContractStatus::PENDING, ContractStatus::APPROVED], true)) {
             throw new Exception(__('contracts.cannot_update'), 422);
         }
 
-        return DB::transaction(function () use ($contract, $data, $isAdmin) {
+        return DB::transaction(function () use ($contract, $data) {
             $updates = [];
 
             if (array_key_exists('max_amount', $data)) {
-                if (! $isAdmin) {
+                if (auth()->user()->isAdmin() === false) {
                     throw new Exception(__('contracts.cannot_update_max_amount'), 403);
                 }
 

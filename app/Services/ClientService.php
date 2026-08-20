@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Client;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -76,7 +77,17 @@ class ClientService
 
     public function update(Client $client, array $data, Request $request): Client
     {
-        $client->update(collect($data)->except('image')->toArray());
+        $updates = $request->except('image','is_banned');
+
+        if (array_key_exists('is_banned', $data)) {
+                if (auth()->user()->isAdmin() === false) {
+                    throw new Exception(__('clients.cannot_update_is_banned'), 403);
+                }
+
+                $updates['is_banned'] = $data['is_banned'];
+            }
+
+        $client->update($updates);
 
         if ($request->hasFile('image')) {
             $client->clearMediaCollection('image');

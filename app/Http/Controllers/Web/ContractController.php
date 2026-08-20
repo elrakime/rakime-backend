@@ -82,10 +82,8 @@ class ContractController extends Controller
 
         $data = $this->validateRequest($request);
 
-        $isAdmin = auth()->user()->hasRole(Role::ADMIN->value);
-
         try {
-            $contract = $this->contractService->update($contract, $data, $isAdmin);
+            $contract = $this->contractService->update($contract, $data);
 
             return $this->successResponse(new ContractResource($contract));
         } catch (\Exception $e) {
