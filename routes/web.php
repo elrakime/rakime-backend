@@ -65,6 +65,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
     Route::get('accounts/{account}/export', [AccountController::class, 'export']);
+    Route::post('accounts/{account}/import', [AccountController::class, 'import']);
     Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
     Route::apiResource('wilayas', WilayaController::class);
     Route::apiResource('categories', CategoryController::class);

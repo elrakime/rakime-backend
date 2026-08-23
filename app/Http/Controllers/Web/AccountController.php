@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Account\ImportAccountRequest;
 use App\Http\Requests\Web\Account\StoreAccountRequest;
 use App\Http\Requests\Web\Account\UpdateAccountRequest;
 use App\Http\Resources\Web\AccountResource;
 use App\Models\Account;
 use App\Services\AccountExportService;
+use App\Services\AccountImportService;
 use App\Services\AccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ class AccountController extends Controller
     public function __construct(
         private readonly AccountService $accountService,
         private readonly AccountExportService $accountExportService,
+        private readonly AccountImportService $accountImportService,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -95,5 +98,24 @@ class AccountController extends Controller
         }
 
         return $this->accountExportService->export($account, $request->string('draw_date')->toString() ?: null);
+    }
+
+    public function import(ImportAccountRequest $request, Account $account): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+            return $response;
+        }
+
+        try {
+            $items = $this->accountImportService->import($request->file('file'));
+
+            return $this->successResponse([
+                'account' => $account->only(['id', 'name', 'ccp_number', 'ccp_key', 'draw_day']),
+                'items'   => $items,
+                'count'   => count($items),
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
     }
 }
