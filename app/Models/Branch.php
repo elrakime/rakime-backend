@@ -67,7 +67,7 @@ class Branch extends Model implements HasMedia
     public function managers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_branches')
-            ->role(\App\Enums\Role::MANAGER->value);
+            ->role(Role::MANAGER->value);
     }
 
     public function inventories(): HasMany
@@ -77,7 +77,7 @@ class Branch extends Model implements HasMedia
 
     public function wallets(): HasMany
     {
-        return $this->hasMany(Wallet::class, 'owner_id')->where('owner_type', 'branch');
+        return $this->hasMany(Wallet::class, 'owner_id')->where('owner_type', self::class);
     }
 
     public function restockOrders(): HasMany
