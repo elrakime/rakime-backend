@@ -14,7 +14,7 @@ class StoreAccountRequest extends FormRequest
             'ccp_number'          => ['required', 'string', 'max:255', 'unique:accounts,ccp_number'],
             'ccp_key'             => ['required', 'string', 'max:255', new CcpKey],
             'draw_day'            => ['required', 'integer', 'min:1', 'max:31'],
-            'min_withdraw_amount' => ['required', 'integer', 'min:0'],
+            'min_withdraw_amount' => ['required', 'numeric', 'min:0'],
             'max_withdraw_count'  => ['required', 'integer', 'min:1'],
         ];
     }

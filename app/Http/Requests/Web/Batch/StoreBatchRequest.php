@@ -16,7 +16,7 @@ class StoreBatchRequest extends FormRequest
         return [
             'source_id'        => ['nullable', 'integer'],
             'source_type'      => ['nullable', 'string', 'max:50'],
-            'purchase_price'   => ['required', 'integer', 'min:0'],
+            'purchase_price'   => ['required', 'numeric', 'min:0'],
             'initial_quantity' => ['required', 'integer', 'min:0'],
             'current_quantity' => ['nullable', 'integer', 'min:0'],
         ];

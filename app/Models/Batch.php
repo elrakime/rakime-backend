@@ -27,7 +27,7 @@ class Batch extends Model
     protected function casts(): array
     {
         return [
-            'purchase_price'   => 'integer',
+            'purchase_price'   => 'decimal:2',
             'initial_quantity' => 'integer',
             'current_quantity' => 'integer',
         ];

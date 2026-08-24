@@ -24,7 +24,7 @@ class ContractItem extends Model
     {
         return [
             'quantity' => 'integer',
-            'price'    => 'integer',
+            'price'    => 'decimal:2',
         ];
     }
 

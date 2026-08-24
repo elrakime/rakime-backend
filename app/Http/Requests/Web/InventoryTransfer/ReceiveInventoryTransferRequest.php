@@ -17,9 +17,9 @@ class ReceiveInventoryTransferRequest extends FormRequest
             'items'                        => ['nullable', 'array'],
             'items.*.stock_id'             => ['required_with:items', 'integer', 'exists:stocks,id', 'distinct:strict'],
             'items.*.selling_prices'       => ['nullable', 'array'],
-            'items.*.selling_prices.*'     => ['integer', 'gt:0'],
+            'items.*.selling_prices.*'     => ['numeric', 'gt:0'],
             'items.*.installment_prices'   => ['nullable', 'array'],
-            'items.*.installment_prices.*' => ['integer', 'gt:0'],
+            'items.*.installment_prices.*' => ['numeric', 'gt:0'],
         ];
     }
 }

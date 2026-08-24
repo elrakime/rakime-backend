@@ -20,13 +20,13 @@ class StoreContractRequest extends FormRequest
             'account_id' => ['required', 'integer', 'exists:accounts,id'],
             'branch_id'  => ['required', 'integer', 'exists:branches,id'],
             'note'       => ['nullable', 'string'],
-            'advance_amount'      => ['sometimes', 'integer', 'min:0'],
+            'advance_amount'      => ['sometimes', 'numeric', 'min:0'],
             'months_count'        => ['sometimes', 'integer', 'min:1'],
             'items'               => ['sometimes', 'array', 'min:1'],
             'items.*.product_id'  => ['required_with:items', 'integer', 'exists:products,id', 'distinct:strict'],
             'items.*.stock_id'    => ['required_with:items', 'integer', 'exists:stocks,id', 'distinct:strict'],
             'items.*.quantity'    => ['required_with:items', 'integer', 'min:1'],
-            'items.*.price'       => ['required_with:items', 'integer', 'min:0'],
+            'items.*.price'       => ['required_with:items', 'numeric', 'min:0'],
         ];
     }
 }

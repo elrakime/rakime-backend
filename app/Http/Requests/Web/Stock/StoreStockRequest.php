@@ -28,13 +28,13 @@ class StoreStockRequest extends FormRequest
             'source_type'            => ['nullable', 'string'],
             'initial_quantity'       => ['nullable', 'integer', 'min:0'],
             'current_quantity'       => ['nullable', 'integer', 'min:0'],
-            'purchase_price'         => ['required_with:initial_quantity', 'nullable', 'integer', 'min:0'],
+            'purchase_price'         => ['required_with:initial_quantity', 'nullable', 'numeric', 'min:0'],
             'selling_prices'            => ['nullable', 'array'],
-            'selling_prices.*'          => ['integer', 'min:0'],
+            'selling_prices.*'          => ['numeric', 'min:0'],
             'installment_prices'        => ['nullable', 'array'],
-            'installment_prices.*'      => ['integer', 'min:0'],
+            'installment_prices.*'      => ['numeric', 'min:0'],
             'wholesale_prices'          => ['nullable', 'array'],
-            'wholesale_prices.*'        => ['integer', 'min:0'],
+            'wholesale_prices.*'        => ['numeric', 'min:0'],
         ];
     }
 }

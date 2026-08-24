@@ -200,7 +200,7 @@ class RestockService
 
         foreach ($restock->items as $restockItem) {
             $quantity = $restockItem->requested_quantity;
-            $price = (int) ($pricing[$restockItem->product_id]['price'] ?? 0);
+            $price = (float) ($pricing[$restockItem->product_id]['price'] ?? 0);
 
             $totalAmount += $quantity * $price;
 

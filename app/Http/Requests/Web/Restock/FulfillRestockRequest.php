@@ -20,7 +20,7 @@ class FulfillRestockRequest extends FormRequest
             'note'              => ['nullable', 'string', 'max:65535'],
             'items'             => ['required_if:type,purchase', 'array', 'min:1'],
             'items.*.product_id' => ['required_if:type,purchase', 'integer', 'exists:products,id', 'distinct:strict'],
-            'items.*.price'      => ['required_if:type,purchase', 'integer', 'min:0'],
+            'items.*.price'      => ['required_if:type,purchase', 'numeric', 'min:0'],
         ];
     }
 }

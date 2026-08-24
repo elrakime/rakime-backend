@@ -43,13 +43,13 @@ class Contract extends Model
     {
         return [
             'status'         => ContractStatus::class,
-            'max_amount'     => 'integer',
-            'advance_amount' => 'integer',
+            'max_amount'     => 'decimal:2',
+            'advance_amount' => 'decimal:2',
             'months_count'   => 'integer',
             'draw_date'      => 'date',
-            'total_amount'   => 'integer',
-            'net_amount'     => 'integer',
-            'monthly_amount' => 'integer',
+            'total_amount'   => 'decimal:2',
+            'net_amount'     => 'decimal:2',
+            'monthly_amount' => 'decimal:2',
             'created_at'     => 'datetime',
         ];
     }

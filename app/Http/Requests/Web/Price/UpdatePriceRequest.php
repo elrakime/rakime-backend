@@ -17,7 +17,7 @@ class UpdatePriceRequest extends FormRequest
     {
         return [
             'type'   => ['sometimes', new Enum(PriceType::class)],
-            'amount' => ['sometimes', 'integer', 'min:0'],
+            'amount' => ['sometimes', 'numeric', 'min:0'],
         ];
     }
 }

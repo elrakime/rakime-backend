@@ -206,9 +206,9 @@ class ContractService
 
         $totalAmount = $items->isEmpty()
             ? null
-            : (int) $items->sum(fn ($item) => $item->quantity * $item->price);
+            : (float) $items->sum(fn ($item) => $item->quantity * $item->price);
 
-        $advanceAmount = (int) ($contract->advance_amount ?? 0);
+        $advanceAmount = (float) ($contract->advance_amount ?? 0);
         $monthsCount   = $contract->months_count;
 
         $netAmount = $totalAmount !== null
@@ -216,7 +216,7 @@ class ContractService
             : null;
 
         $monthlyAmount = ($netAmount !== null && $monthsCount > 0)
-            ? (int) ceil($netAmount / $monthsCount)
+            ? (float) ceil($netAmount / $monthsCount)
             : null;
 
         $contract->update([
@@ -258,7 +258,7 @@ class ContractService
             throw new Exception(__('contracts.subscription_count_exceeds_limit'), 422);
         }
 
-        $perDrawAmount = (int) ceil($monthlyAmount / $subscriptionCount);
+        $perDrawAmount = (float) ceil($monthlyAmount / $subscriptionCount);
 
         if ($perDrawAmount < $account->min_withdraw_amount) {
             throw new Exception(__('contracts.subscription_amount_below_minimum'), 422);

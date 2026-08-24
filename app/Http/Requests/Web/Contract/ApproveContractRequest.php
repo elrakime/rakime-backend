@@ -16,7 +16,7 @@ class ApproveContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'max_amount' => ['nullable', 'integer', 'min:1'],
+            'max_amount' => ['nullable', 'numeric', 'min:1'],
         ];
     }
 }

@@ -17,7 +17,7 @@ class StorePriceRequest extends FormRequest
     {
         return [
             'type'   => ['required', new Enum(PriceType::class)],
-            'amount' => ['required', 'integer', 'min:0'],
+            'amount' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

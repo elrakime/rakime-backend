@@ -44,9 +44,9 @@ class Purchase extends Model
     {
         return [
             'status'        => PurchaseStatus::class,
-            'total_amount'  => 'integer',
-            'net_amount'    => 'integer',
-            'paid_amount'   => 'integer',
+            'total_amount'  => 'decimal:2',
+            'net_amount'    => 'decimal:2',
+            'paid_amount'   => 'decimal:2',
             'inventory_id'  => 'integer',
             'branch_id'     => 'integer',
         ];
@@ -119,9 +119,9 @@ class Purchase extends Model
         $this->syncOriginal();
     }
 
-    private function completedReturnsAmount(): int
+    private function completedReturnsAmount(): float
     {
-        return (int) $this->returns()
+        return (float) $this->returns()
             ->where('status', PurchaseReturnStatus::COMPLETED->value)
             ->with('items.purchaseItem')
             ->get()
@@ -130,16 +130,16 @@ class Purchase extends Model
             ));
     }
 
-    private function paidPaymentsAmount(): int
+    private function paidPaymentsAmount(): float
     {
-        return (int) $this->payments()
+        return (float) $this->payments()
             ->where('status', PurchasePaymentStatus::PAID->value)
             ->sum('amount');
     }
 
-    private function paidRefundsAmount(): int
+    private function paidRefundsAmount(): float
     {
-        return (int) $this->refunds()
+        return (float) $this->refunds()
             ->where('status', PurchaseRefundStatus::PAID->value)
             ->sum('amount');
     }

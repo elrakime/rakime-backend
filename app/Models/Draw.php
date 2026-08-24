@@ -32,7 +32,7 @@ class Draw extends Model
         return [
             'status'         => DrawStatus::class,
             'month_number'   => 'integer',
-            'amount'         => 'integer',
+            'amount'         => 'decimal:2',
             'scheduled_date' => 'date',
         ];
     }

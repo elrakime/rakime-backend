@@ -27,7 +27,7 @@ class PurchaseRefund extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'integer',
+            'amount' => 'decimal:2',
             'status' => PurchaseRefundStatus::class,
         ];
     }

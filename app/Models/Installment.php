@@ -34,7 +34,7 @@ class Installment extends Model
         return [
             'status'         => InstallmentStatus::class,
             'month_number'   => 'integer',
-            'amount'         => 'integer',
+            'amount'         => 'decimal:2',
             'due_date'       => 'date',
         ];
     }

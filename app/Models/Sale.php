@@ -35,12 +35,12 @@ class Sale extends Model
     protected function casts(): array
     {
         return [
-            'gross_amount'    => 'integer',
-            'tax_rate'        => 'integer',
-            'tax_amount'      => 'integer',
-            'discount_value'  => 'integer',
-            'discount_amount' => 'integer',
-            'total_amount'    => 'integer',
+            'gross_amount'    => 'decimal:2',
+            'tax_rate'        => 'decimal:2',
+            'tax_amount'      => 'decimal:2',
+            'discount_value'  => 'decimal:2',
+            'discount_amount' => 'decimal:2',
+            'total_amount'    => 'decimal:2',
         ];
     }
 

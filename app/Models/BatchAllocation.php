@@ -23,7 +23,7 @@ class BatchAllocation extends Model
     {
         return [
             'quantity'       => 'integer',
-            'purchase_price' => 'integer',
+            'purchase_price' => 'decimal:2',
         ];
     }
 

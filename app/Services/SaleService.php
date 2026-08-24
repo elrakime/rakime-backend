@@ -206,7 +206,7 @@ class SaleService
         });
     }
 
-    private function creditBranchWallet(int $branchId, int $amount, Sale $sale): void
+    private function creditBranchWallet(int $branchId, float $amount, Sale $sale): void
     {
         $wallet = Wallet::where('owner_type', Branch::class)
             ->where('owner_id', $branchId)
@@ -330,7 +330,7 @@ class SaleService
      * Reconcile branch wallet when sale total changes.
      * Creates a SALE_UPDATE wallet movement for the difference.
      */
-    private function reconcileWalletForUpdate(Sale $sale, int $oldTotal, int $newTotal): void
+    private function reconcileWalletForUpdate(Sale $sale, float $oldTotal, float $newTotal): void
     {
         $netDiff = $newTotal - $oldTotal;
 
@@ -400,20 +400,20 @@ class SaleService
         }
     }
 
-    private function calculateTotals(int $grossAmount, array $data): array
+    private function calculateTotals(float $grossAmount, array $data): array
     {
         $taxAmount = 0;
         $discountAmount = 0;
 
         if (!empty($data['tax_rate'])) {
-            $taxAmount = (int) round($grossAmount * (int) $data['tax_rate'] / 100);
+            $taxAmount = (float) round($grossAmount * (float) $data['tax_rate'] / 100, 2);
         }
 
         if (!empty($data['discount_type']) && isset($data['discount_value'])) {
-            $discountValue = (int) $data['discount_value'];
+            $discountValue = (float) $data['discount_value'];
 
             if ($data['discount_type'] === DiscountType::PERCENTAGE->value) {
-                $discountAmount = (int) round($grossAmount * $discountValue / 100);
+                $discountAmount = (float) round($grossAmount * $discountValue / 100, 2);
             } elseif ($data['discount_type'] === DiscountType::FIXED->value) {
                 $discountAmount = $discountValue;
             }
@@ -430,9 +430,9 @@ class SaleService
      * its batches' purchase_price (FIFO allocation).
      *
      * @param array $items items with stock_id and quantity
-     * @param int   $totalAmount final sale total after discounts/taxes
+     * @param float $totalAmount final sale total after discounts/taxes
      */
-    private function validateSaleTotalAgainstPurchaseCost(array $items, int $totalAmount): void
+    private function validateSaleTotalAgainstPurchaseCost(array $items, float $totalAmount): void
     {
         $stockIds = array_column($items, 'stock_id');
 

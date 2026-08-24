@@ -32,7 +32,7 @@ class Subscription extends Model
         return [
             'status'              => SubscriptionStatus::class,
             'subscription_number' => 'integer',
-            'amount'              => 'integer',
+            'amount'              => 'decimal:2',
             'created_at'          => 'datetime',
         ];
     }

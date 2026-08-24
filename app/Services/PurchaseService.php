@@ -253,7 +253,7 @@ class PurchaseService
             ->groupBy('stocks.product_id')
             ->selectRaw('stocks.product_id, MAX(batches.purchase_price) as max_price')
             ->pluck('max_price', 'stocks.product_id')
-            ->map(fn($v) => (int) $v);
+            ->map(fn($v) => (float) $v);
 
         foreach ($purchase->items as $item) {
             $pricing = $pricingByProduct->get($item->product_id);
@@ -266,7 +266,7 @@ class PurchaseService
 
 
             foreach ($pricing['selling_prices'] ?? [] as $amount) {
-                $amount = (int) $amount;
+                $amount = (float) $amount;
 
                 if ($amount <= $item->price) {
                     throw new Exception(__('purchases.selling_price_below_purchase', [
@@ -281,7 +281,7 @@ class PurchaseService
             }
 
             foreach ($pricing['installment_prices'] ?? [] as $amount) {
-                $amount = (int) $amount;
+                $amount = (float) $amount;
 
                 if ($amount <= $item->price) {
                     throw new Exception(__('purchases.installment_price_below_purchase', [

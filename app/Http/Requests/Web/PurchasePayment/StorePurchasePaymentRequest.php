@@ -15,7 +15,7 @@ class StorePurchasePaymentRequest extends FormRequest
     {
         return [
             'wallet_id' => ['nullable', 'integer', 'exists:wallets,id'],
-            'amount'    => ['required', 'integer', 'min:1'],
+            'amount'    => ['required', 'numeric', 'min:0.01'],
             'note'      => ['nullable', 'string'],
         ];
     }

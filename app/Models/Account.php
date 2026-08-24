@@ -32,7 +32,7 @@ class Account extends Model
     {
         return [
             'draw_day'            => 'integer',
-            'min_withdraw_amount' => 'integer',
+            'min_withdraw_amount' => 'decimal:2',
             'max_withdraw_count'  => 'integer',
         ];
     }
