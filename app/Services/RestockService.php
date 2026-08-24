@@ -192,6 +192,7 @@ class RestockService
 
         // Create purchase as PENDING — no stock changes yet
         $purchase = Purchase::create([
+            'branch_id'    => $restock->branch_id,
             'supplier_id'  => $data['supplier_id'],
             'status'       => PurchaseStatus::PENDING,
             'total_amount' => 0,
