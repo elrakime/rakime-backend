@@ -41,7 +41,12 @@ class ContractService
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%")
-                          ->orWhere('note', 'like', "%{$value}%");
+                          ->orWhere('note', 'like', "%{$value}%")
+                          ->orWhereHas('client', function ($clientQuery) use ($value) {
+                              $clientQuery->where('firstname', 'like', "%{$value}%")
+                                  ->orWhere('lastname', 'like', "%{$value}%")
+                                  ->orWhere('ccp_number', 'like', "%{$value}%");
+                          });
                     });
                 }),
             )
