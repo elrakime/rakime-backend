@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\CcpController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ContractController;
 use App\Http\Controllers\Web\DrawController;
+use App\Http\Controllers\Web\ImportController;
 use App\Http\Controllers\Web\InstallmentController;
 use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\ColorController;
@@ -46,6 +47,9 @@ Route::get('/', function () {
 Route::get('/docs', function () {
     return response()->file(resource_path('views/docs.html'));
 });
+
+Route::get('/import', [ImportController::class, 'show']);
+Route::post('/import', [ImportController::class, 'store']);
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('guest');

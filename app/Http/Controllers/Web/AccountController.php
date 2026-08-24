@@ -107,7 +107,7 @@ class AccountController extends Controller
         }
 
         try {
-            $items = $this->accountImportService->import($request->file('file'));
+            $items = $this->accountImportService->import($request->file('file'), $account->draw_day);
 
             return $this->successResponse([
                 'account' => $account->only(['id', 'name', 'ccp_number', 'ccp_key', 'draw_day']),
