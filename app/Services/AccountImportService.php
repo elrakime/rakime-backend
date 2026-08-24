@@ -44,7 +44,7 @@ class AccountImportService
      *     offset: string,
      *     subscription_reference: string,
      *     status: string,
-     *     tax: int,
+     *     tax: string,
      *     cycle: string,
      * }>
      */
@@ -94,13 +94,13 @@ class AccountImportService
      *     offset: string,
      *     subscription_reference: string,
      *     status: string,
-     *     tax: int,
+     *     tax: string,
      *     cycle: string,
      * }
      */
     private function parseLine(string $line, int $drawDay): array
     {
-        $amount       = trim(substr($line, 37, 14));
+        $amount       = number_format((float) trim(substr($line, 37, 14)), 2, '.', '');
         $date         = trim(substr($line, 51, 10));
         $statusCode   = trim(substr($line, 71, 1));
         $offset       = trim(substr($line, 72, 2));
@@ -141,13 +141,13 @@ class AccountImportService
     /**
      * Compute the 5% late-payment tax. Only late payments are taxed.
      */
-    private function resolveTax(string $status, string $amount): int
+    private function resolveTax(string $status, string $amount): string
     {
         if ($status !== 'late_payment') {
-            return 0;
+            return '0.00';
         }
 
-        return (int) round(((float) $amount) * 0.05);
+        return number_format((float) $amount * 0.05, 2, '.', '');
     }
 
     /**
