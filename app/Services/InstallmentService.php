@@ -23,13 +23,12 @@ class InstallmentService
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('payment_method'),
                 AllowedFilter::callback('search', function ($query, string $value) {
-                    $query->where('month_number', 'like', "%{$value}%");
+                    $query->where('due_date', 'like', "%{$value}%");
                 }),
             )
             ->allowedSorts(
-                AllowedSort::field('month_number'),
-                AllowedSort::field('amount'),
                 AllowedSort::field('due_date'),
+                AllowedSort::field('amount'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')

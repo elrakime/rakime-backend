@@ -72,9 +72,9 @@ return [
     ],
 
     'installment_status' => [
-        'PENDING' => 'En attente',
-        'PAID'    => 'Payé',
-        'OVERDUE' => 'En retard',
+        'UNPAID'         => 'Non payé',
+        'PAID'           => 'Payé',
+        'PARTIALLY_PAID' => 'Partiellement payé',
     ],
 
     'installment_payment_method' => [
@@ -89,10 +89,10 @@ return [
     ],
 
     'draw_status' => [
-        'PENDING'   => 'En attente',
-        'RECEIVED'  => 'Reçu',
-        'CANCELLED' => 'Annulé',
-        'FAILED'    => 'Échoué',
+        'PAID_ON_TIME' => 'Payé à temps',
+        'LATE_PAYMENT' => 'Paiement tardif',
+        'POSTPONED'    => 'Reporté',
+        'FAILED'       => 'Échoué',
     ],
 
     'price_type' => [

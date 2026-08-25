@@ -108,11 +108,13 @@ class AccountController extends Controller
 
         try {
             $items = $this->accountImportService->import($request->file('file'), $account->draw_day);
+            $result = $this->accountImportService->process($items);
 
             return $this->successResponse([
                 'account' => $account->only(['id', 'name', 'ccp_number', 'ccp_key', 'draw_day']),
                 'items'   => $items,
                 'count'   => count($items),
+                'result'  => $result,
             ]);
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);

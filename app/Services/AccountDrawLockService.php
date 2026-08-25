@@ -63,7 +63,9 @@ class AccountDrawLockService
             Contract::query()
                 ->where('account_id', $account->id)
                 ->where('status', ContractStatus::CONFIGURED)
-                ->whereDate('draw_date', $lockDate)
+                ->whereHas('installments', function ($query) use ($lockDate) {
+                    $query->whereDate('due_date', $lockDate);
+                })
                 ->update(['status' => ContractStatus::ACTIVE]);
 
             return $lock;

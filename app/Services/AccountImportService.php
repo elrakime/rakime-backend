@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ContractStatus;
+use App\Enums\DrawStatus;
+use App\Enums\InstallmentPaymentMethod;
+use App\Enums\InstallmentStatus;
+use App\Models\Draw;
+use App\Models\Installment;
+use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class AccountImportService
@@ -194,5 +202,171 @@ class AccountImportService
         $day  = min($drawDay, $date->daysInMonth);
 
         return $date->setDay($day);
+    }
+
+    /**
+     * Persist parsed import items as draws, linking each to its subscription
+     * (by reference) and installment (by cycle == due_date).
+     *
+     * Exact duplicates (same subscription + installment + status +
+     * last_attempted_at + tax) are skipped. A later successful payment for a
+     * cycle whose draw already failed creates a NEW draw (failed is terminal).
+     *
+     * After processing, each affected installment's status is recomputed from
+     * its draws, and contracts whose installments are all paid are completed.
+     *
+     * @param  array<int, array<string, string>>  $items  Parsed items from import().
+     * @return array{created: int, skipped: int, failed: int, errors: array<int, string>}
+     */
+    public function process(array $items): array
+    {
+        $created = 0;
+        $skipped = 0;
+        $failed  = 0;
+        $errors  = [];
+        $touchedInstallmentIds = [];
+
+        foreach ($items as $item) {
+            try {
+                $subscription = Subscription::where('reference', $item['subscription_reference'])->first();
+
+                if ($subscription === null) {
+                    throw new RuntimeException(__('account_imports.subscription_not_found', ['reference' => $item['subscription_reference']]));
+                }
+
+                $installment = Installment::where('contract_id', $subscription->contract_id)
+                    ->whereDate('due_date', $item['cycle'])
+                    ->first();
+
+                if ($installment === null) {
+                    throw new RuntimeException(__('account_imports.installment_not_found', ['cycle' => $item['cycle']]));
+                }
+
+                $status = DrawStatus::tryFrom($item['status']);
+
+                if ($status === null) {
+                    throw new RuntimeException(__('account_imports.invalid_status', ['status' => $item['status']]));
+                }
+
+                $lastAttemptedAt = Carbon::createFromFormat('d/m/Y', $item['date'])->startOfDay();
+
+                if ($lastAttemptedAt === false) {
+                    throw new RuntimeException(__('account_imports.invalid_date', ['date' => $item['date']]));
+                }
+
+                $duplicate = Draw::where('subscription_id', $subscription->id)
+                    ->where('installment_id', $installment->id)
+                    ->where('status', $status)
+                    ->whereDate('last_attempted_at', $lastAttemptedAt)
+                    ->where('tax_amount', $item['tax'])
+                    ->exists();
+
+                if ($duplicate) {
+                    $skipped++;
+                    $touchedInstallmentIds[$installment->id] = true;
+                    continue;
+                }
+
+                Draw::create([
+                    'subscription_id'   => $subscription->id,
+                    'installment_id'    => $installment->id,
+                    'amount'            => $item['amount'],
+                    'status'            => $status,
+                    'due_date'          => $item['cycle'],
+                    'last_attempted_at' => $lastAttemptedAt,
+                    'tax_amount'        => $item['tax'],
+                    'metadata'          => $item,
+                ]);
+
+                $created++;
+                $touchedInstallmentIds[$installment->id] = true;
+            } catch (RuntimeException $e) {
+                $failed++;
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        if ($touchedInstallmentIds !== []) {
+            $this->recalculateInstallments(array_keys($touchedInstallmentIds));
+        }
+
+        return [
+            'created' => $created,
+            'skipped' => $skipped,
+            'failed'  => $failed,
+            'errors'  => $errors,
+        ];
+    }
+
+    /**
+     * Recompute the status of each touched installment from its draws, then
+     * mark any fully-paid contract as completed.
+     *
+     * @param  array<int, int>  $installmentIds
+     */
+    private function recalculateInstallments(array $installmentIds): void
+    {
+        $contractIds = [];
+
+        DB::transaction(function () use ($installmentIds, &$contractIds) {
+            foreach ($installmentIds as $installmentId) {
+                $installment = Installment::with('draws')->find($installmentId);
+
+                if ($installment === null) {
+                    continue;
+                }
+
+                $draws        = $installment->draws;
+                $settledCount = $draws->whereIn('status', [DrawStatus::PAID_ON_TIME->value, DrawStatus::LATE_PAYMENT->value])->count();
+                $totalDraws   = $draws->count();
+
+                $status = match (true) {
+                    $totalDraws === 0             => InstallmentStatus::UNPAID,
+                    $settledCount === $totalDraws => InstallmentStatus::PAID,
+                    $settledCount > 0             => InstallmentStatus::PARTIALLY_PAID,
+                    default                       => InstallmentStatus::UNPAID,
+                };
+
+                $installment->update([
+                    'status' => $status,
+                ]);
+
+                if ($status === InstallmentStatus::PAID) {
+                    $installment->update([
+                        'payment_method' => InstallmentPaymentMethod::BANK->value,
+                    ]);
+                }
+
+                $contractIds[$installment->contract_id] = true;
+            }
+        });
+
+        foreach (array_keys($contractIds) as $contractId) {
+            $this->completeContractIfFullyPaid($contractId);
+        }
+    }
+
+    /**
+     * Mark a contract as completed when all of its installments are paid.
+     */
+    private function completeContractIfFullyPaid(int $contractId): void
+    {
+        $contract = \App\Models\Contract::with('installments')->find($contractId);
+
+        if ($contract === null) {
+            return;
+        }
+
+        $installments = $contract->installments;
+
+        if ($installments->isEmpty()) {
+            return;
+        }
+
+        $allPaid = $installments->every(fn ($installment) => $installment->status === InstallmentStatus::PAID);
+
+        if ($allPaid && $contract->status !== ContractStatus::COMPLETED) {
+            $contract->update(['status' => ContractStatus::COMPLETED]);
+        }
     }
 }

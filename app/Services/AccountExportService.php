@@ -52,19 +52,21 @@ class AccountExportService
 
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
-            ->whereDate('draw_date', $targetDrawDate)
-            ->with(['client', 'subscriptions.draws'])
+            ->whereHas('installments', function ($query) use ($targetDrawDate) {
+                $query->whereDate('due_date', $targetDrawDate);
+            })
+            ->with(['client', 'subscriptions', 'installments'])
             ->get();
 
         foreach ($contracts as $contract) {
             $client = $contract->client;
 
+            $installments = $contract->installments->sortBy('due_date');
+
+            $firstDueDate = $installments->first()?->due_date;
+            $lastDueDate  = $installments->last()?->due_date;
+
             foreach ($contract->subscriptions as $subscription) {
-                $draws = $subscription->draws->sortBy('scheduled_date');
-
-                $firstDraw = $draws->first()?->scheduled_date;
-                $lastDraw  = $draws->last()?->scheduled_date;
-
                 $sheet->fromArray([
                     $client?->ccp_number,
                     $client?->ccp_key,
@@ -73,9 +75,9 @@ class AccountExportService
                     $subscription->amount,
                     $account->ccp_number,
                     $account->ccp_key,
-                    $firstDraw,
-                    $lastDraw,
-                    $firstDraw,
+                    $firstDueDate,
+                    $lastDueDate,
+                    $firstDueDate,
                     null, // MoisTraite (K) — set explicitly below.
                     $contract->months_count,
                     $account->draw_day,

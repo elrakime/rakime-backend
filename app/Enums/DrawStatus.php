@@ -6,10 +6,10 @@ namespace App\Enums;
 
 enum DrawStatus: string
 {
-    case PENDING   = 'pending';
-    case RECEIVED  = 'received';
-    case CANCELLED = 'cancelled';
-    case FAILED    = 'failed';
+    case PAID_ON_TIME = 'paid_on_time';
+    case LATE_PAYMENT = 'late_payment';
+    case POSTPONED    = 'postponed';
+    case FAILED       = 'failed';
 
     public static function keys(): array
     {
@@ -40,23 +40,22 @@ enum DrawStatus: string
     public function get_color(): string
     {
         return match ($this) {
-            self::PENDING   => 'amber',
-            self::RECEIVED  => 'green',
-            self::CANCELLED => 'red',
-            self::FAILED    => 'rose',
+            self::PAID_ON_TIME => 'green',
+            self::LATE_PAYMENT => 'amber',
+            self::POSTPONED    => 'blue',
+            self::FAILED       => 'rose',
         };
     }
 
-    public static function default(): self
+    public static function default(): ?self
     {
-        return self::PENDING;
+        return null;
     }
 
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::PENDING => [self::RECEIVED, self::CANCELLED, self::FAILED],
-            self::RECEIVED, self::CANCELLED, self::FAILED => [],
+            self::PAID_ON_TIME, self::LATE_PAYMENT, self::POSTPONED, self::FAILED => [],
         };
     }
 

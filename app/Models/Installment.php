@@ -22,7 +22,6 @@ class Installment extends Model
 
     protected $fillable = [
         'contract_id',
-        'month_number',
         'amount',
         'status',
         'payment_method',
@@ -33,15 +32,14 @@ class Installment extends Model
     {
         return [
             'status'         => InstallmentStatus::class,
-            'month_number'   => 'integer',
             'amount'         => 'decimal:2',
             'due_date'       => 'date',
         ];
     }
 
-    public function scopePending(Builder $query): void
+    public function scopeUnpaid(Builder $query): void
     {
-        $query->where('status', InstallmentStatus::PENDING);
+        $query->where('status', InstallmentStatus::UNPAID);
     }
 
     public function scopePaid(Builder $query): void
@@ -49,9 +47,9 @@ class Installment extends Model
         $query->where('status', InstallmentStatus::PAID);
     }
 
-    public function scopeOverdue(Builder $query): void
+    public function scopePartiallyPaid(Builder $query): void
     {
-        $query->where('status', InstallmentStatus::OVERDUE);
+        $query->where('status', InstallmentStatus::PARTIALLY_PAID);
     }
 
     public function scopeBankMethod(Builder $query): void

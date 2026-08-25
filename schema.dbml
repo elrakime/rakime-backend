@@ -59,9 +59,9 @@ Enum contract_status {
 }
 
 Enum installment_status {
-  pending
+  unpaid
   paid
-  overdue
+  partially_paid
 }
 
 Enum installment_payment_method {
@@ -76,9 +76,9 @@ Enum subscription_status {
 }
 
 Enum draw_status {
-  pending
-  received
-  cancelled
+  paid_on_time
+  late_payment
+  postponed
   failed
 }
 
@@ -640,7 +640,6 @@ Table contracts {
   max_amount     int             [null]
   advance_amount int             [null]
   months_count   int             [null]
-  draw_date      date            [null]
   total_amount   int             [null]
   monthly_amount int             [null]
   note           varchar         [null]
@@ -670,9 +669,8 @@ Table contract_items {
 Table installments {
   id             bigint               [pk, increment]
   contract_id    bigint               [ref: > contracts.id]
-  month_number   int
   amount         int
-  status         installment_status   [default: 'pending']
+  status         installment_status   [default: 'unpaid']
   payment_method varchar              [note: "bank|cash"]
   due_date       date
   created_by     bigint               [null, ref: > users.id]
@@ -695,17 +693,19 @@ Table subscriptions {
 }
 
 Table draws {
-  id              bigint      [pk, increment]
-  subscription_id bigint      [ref: > subscriptions.id]
-  installment_id  bigint      [ref: > installments.id]
-  month_number    int
-  amount          int
-  status          draw_status [default: 'pending']
-  scheduled_date  date
-  created_by      bigint      [null, ref: > users.id]
-  updated_by      bigint      [null, ref: > users.id]
-  created_at      timestamp
-  updated_at      timestamp
+  id                bigint      [pk, increment]
+  subscription_id   bigint      [ref: > subscriptions.id]
+  installment_id    bigint      [ref: > installments.id]
+  amount            int
+  status            draw_status [null]
+  due_date          date
+  last_attempted_at date        [null]
+  tax_amount        int         [default: 0]
+  metadata          json        [null]
+  created_by        bigint      [null, ref: > users.id]
+  updated_by        bigint      [null, ref: > users.id]
+  created_at        timestamp
+  updated_at        timestamp
 }
 
 Table installment_payments {

@@ -25,15 +25,15 @@ class DrawService
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('installment_id'),
                 AllowedFilter::exact('subscription_id'),
-                AllowedFilter::exact('month_number'),
+                AllowedFilter::exact('due_date'),
             )
             ->allowedSorts(
-                AllowedSort::field('month_number'),
+                AllowedSort::field('due_date'),
                 AllowedSort::field('amount'),
-                AllowedSort::field('scheduled_date'),
+                AllowedSort::field('last_attempted_at'),
                 AllowedSort::field('created_at'),
             )
-            ->defaultSort('scheduled_date')
+            ->defaultSort('due_date')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());
     }

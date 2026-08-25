@@ -6,9 +6,9 @@ namespace App\Enums;
 
 enum InstallmentStatus: string
 {
-    case PENDING = 'pending';
-    case PAID    = 'paid';
-    case OVERDUE = 'overdue';
+    case UNPAID         = 'unpaid';
+    case PAID           = 'paid';
+    case PARTIALLY_PAID = 'partially_paid';
 
     public static function keys(): array
     {
@@ -39,23 +39,23 @@ enum InstallmentStatus: string
     public function get_color(): string
     {
         return match ($this) {
-            self::PENDING => 'amber',
-            self::PAID    => 'green',
-            self::OVERDUE => 'red',
+            self::UNPAID         => 'amber',
+            self::PAID           => 'green',
+            self::PARTIALLY_PAID => 'blue',
         };
     }
 
     public static function default(): self
     {
-        return self::PENDING;
+        return self::UNPAID;
     }
 
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::PENDING => [self::PAID, self::OVERDUE],
-            self::OVERDUE => [self::PAID],
-            self::PAID => [],
+            self::UNPAID         => [self::PAID, self::PARTIALLY_PAID],
+            self::PARTIALLY_PAID => [self::PAID],
+            self::PAID           => [],
         };
     }
 

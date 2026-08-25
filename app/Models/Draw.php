@@ -21,30 +21,39 @@ class Draw extends Model
     protected $fillable = [
         'subscription_id',
         'installment_id',
-        'month_number',
         'amount',
         'status',
-        'scheduled_date',
+        'due_date',
+        'last_attempted_at',
+        'tax_amount',
+        'metadata',
     ];
 
     protected function casts(): array
     {
         return [
-            'status'         => DrawStatus::class,
-            'month_number'   => 'integer',
-            'amount'         => 'decimal:2',
-            'scheduled_date' => 'date',
+            'status'            => DrawStatus::class,
+            'amount'            => 'decimal:2',
+            'due_date'          => 'date',
+            'last_attempted_at' => 'date',
+            'tax_amount'        => 'decimal:2',
+            'metadata'          => 'array',
         ];
     }
 
-    public function scopePending(Builder $query): void
+    public function scopePaidOnTime(Builder $query): void
     {
-        $query->where('status', DrawStatus::PENDING);
+        $query->where('status', DrawStatus::PAID_ON_TIME);
     }
 
-    public function scopeReceived(Builder $query): void
+    public function scopeLatePayment(Builder $query): void
     {
-        $query->where('status', DrawStatus::RECEIVED);
+        $query->where('status', DrawStatus::LATE_PAYMENT);
+    }
+
+    public function scopePostponed(Builder $query): void
+    {
+        $query->where('status', DrawStatus::POSTPONED);
     }
 
     public function scopeFailed(Builder $query): void
@@ -52,14 +61,14 @@ class Draw extends Model
         $query->where('status', DrawStatus::FAILED);
     }
 
-    public function scopeCancelled(Builder $query): void
+    public function scopeSettled(Builder $query): void
     {
-        $query->where('status', DrawStatus::CANCELLED);
+        $query->whereIn('status', [DrawStatus::PAID_ON_TIME, DrawStatus::LATE_PAYMENT]);
     }
 
     public function scopeScheduledBefore(Builder $query, string $date): void
     {
-        $query->where('scheduled_date', '<=', $date);
+        $query->where('due_date', '<=', $date);
     }
 
     public function subscription(): BelongsTo

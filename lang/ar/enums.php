@@ -72,9 +72,9 @@ return [
     ],
 
     'installment_status' => [
-        'PENDING' => 'قيد الانتظار',
-        'PAID'    => 'مدفوع',
-        'OVERDUE' => 'متأخر',
+        'UNPAID'         => 'غير مدفوع',
+        'PAID'           => 'مدفوع',
+        'PARTIALLY_PAID' => 'مدفوع جزئياً',
     ],
 
     'installment_payment_method' => [
@@ -89,10 +89,10 @@ return [
     ],
 
     'draw_status' => [
-        'PENDING'   => 'قيد الانتظار',
-        'RECEIVED'  => 'مستلم',
-        'CANCELLED' => 'ملغى',
-        'FAILED'    => 'فاشل',
+        'PAID_ON_TIME' => 'مدفوع في الوقت',
+        'LATE_PAYMENT' => 'دفع متأخر',
+        'POSTPONED'    => 'مؤجل',
+        'FAILED'       => 'فاشل',
     ],
 
     'price_type' => [

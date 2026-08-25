@@ -13,7 +13,6 @@ class InstallmentResource extends JsonResource
         return [
             'id'             => $this->id,
             'contract_id'    => $this->contract_id,
-            'month_number'   => $this->month_number,
             'amount'         => $this->amount,
             'status'         => [
                 'value' => $this->status->value,
