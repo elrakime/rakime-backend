@@ -7,7 +7,6 @@ use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
-use App\Http\Controllers\Web\CcpController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ContractController;
 use App\Http\Controllers\Web\DrawController;
@@ -39,6 +38,7 @@ use App\Http\Controllers\Web\TypeController;
 use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\WilayaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CcpController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +50,7 @@ Route::get('/docs', function () {
 
 Route::get('/import', [ImportController::class, 'show']);
 Route::post('/import', [ImportController::class, 'store']);
+Route::post('v1/ccp/info', [CcpController::class, 'info']);
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('guest');
@@ -129,7 +130,5 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('financial-records', [FinancialRecordController::class, 'store']);
     Route::put('financial-records/{financial_record}', [FinancialRecordController::class, 'update']);
     Route::delete('financial-records/{financial_record}', [FinancialRecordController::class, 'destroy']);
-
-    Route::post('ccp/info', [CcpController::class, 'info']);
 
 });
