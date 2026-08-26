@@ -60,37 +60,44 @@ class AccountExportService
             ->with(['client', 'subscriptions', 'installments'])
             ->get();
 
-        foreach ($contracts as $contract) {
-            $client = $contract->client;
+        $subscriptions = $contracts
+            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
+                'subscription' => $subscription,
+                'contract'     => $contract,
+            ]))
+            ->sortBy(fn ($item) => $item['subscription']->reference);
+
+        foreach ($subscriptions as $item) {
+            $contract     = $item['contract'];
+            $subscription = $item['subscription'];
+            $client       = $contract->client;
 
             $installments = $contract->installments->sortBy('due_date');
 
             $firstDueDate = $installments->first()?->due_date;
             $lastDueDate  = $installments->last()?->due_date;
 
-            foreach ($contract->subscriptions as $subscription) {
-                $sheet->fromArray([
-                    $client?->ccp_number,
-                    $client?->ccp_key,
-                    $client?->firstname,
-                    $client?->lastname,
-                    $subscription->amount,
-                    $account->ccp_number,
-                    $account->ccp_key,
-                    $firstDueDate,
-                    $lastDueDate,
-                    $firstDueDate,
-                    null, // MoisTraite (K) — set explicitly below.
-                    $contract->months_count,
-                    $account->draw_day,
-                    $subscription->reference,
-                ], null, 'A' . $row);
+            $sheet->fromArray([
+                $client?->ccp_number,
+                $client?->ccp_key,
+                $client?->firstname,
+                $client?->lastname,
+                $subscription->amount,
+                $account->ccp_number,
+                $account->ccp_key,
+                $firstDueDate,
+                $lastDueDate,
+                $firstDueDate,
+                null, // MoisTraite (K) — set explicitly below.
+                $contract->months_count,
+                $account->draw_day,
+                $subscription->reference,
+            ], null, 'A' . $row);
 
-                // MoisTraite (K) is always 0 for now.
-                $sheet->setCellValue('K' . $row, 0);
+            // MoisTraite (K) is always 0 for now.
+            $sheet->setCellValue('K' . $row, 0);
 
-                $row++;
-            }
+            $row++;
         }
 
         $lastRow = max($row - 1, 1);
