@@ -101,6 +101,10 @@
                                 <dd class="font-mono text-zinc-200">{{ $item['tax'] }}</dd>
                             </div>
                             <div class="flex justify-between gap-4">
+                                <dt class="text-zinc-500">Status code</dt>
+                                <dd class="font-mono text-zinc-200">{{ $item['status_code'] }}</dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
                                 <dt class="text-zinc-500">Offset</dt>
                                 <dd class="font-mono text-zinc-200">{{ $item['offset'] }}</dd>
                             </div>
