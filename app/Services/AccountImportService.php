@@ -39,8 +39,9 @@ class AccountImportService
      * `000000001234.50`). The date is formatted as `dd/mm/yyyy`.
      *
      * In addition to the raw fields, each item is enriched with a
-     * normalized `status`, a late-payment `tax`, and the resolved `cycle`
-     * date derived from the account's draw day.
+     * normalized `status`, a `tax` (applied only to postponed/failed draws,
+     * capped at 2 per reference+cycle), and the resolved `cycle` date derived
+     * from the account's draw day.
      *
      * @return array<int, array{
      *     client_ccp_number: string,
@@ -86,7 +87,7 @@ class AccountImportService
             throw new RuntimeException(__('account_imports.empty_file'), 422);
         }
 
-        return $items;
+        return $this->applyTaxes($items);
     }
 
     /**
@@ -125,7 +126,7 @@ class AccountImportService
             'offset'                 => $offset,
             'subscription_reference' => trim(substr($line, 74)),
             'status'                 => $status,
-            'tax'                    => $this->resolveTax($status, $amount),
+            'tax'                    => '0.00',
             'cycle'                  => $this->resolveCycle($date, $offset, $drawDay),
         ];
     }
@@ -147,15 +148,46 @@ class AccountImportService
     }
 
     /**
-     * Compute the 5% late-payment tax. Only late payments are taxed.
+     * Compute the 5% tax. Only postponed and failed draws are taxed.
      */
     private function resolveTax(string $status, string $amount): string
     {
-        if ($status !== 'late_payment') {
+        if (! in_array($status, ['postponed', 'failed'], true)) {
             return '0.00';
         }
 
         return number_format((float) $amount * 0.05, 2, '.', '');
+    }
+
+    /**
+     * Apply tax to each item, capping taxable draws at 2 per reference+cycle.
+     *
+     * Only postponed and failed draws are taxable. For a given subscription
+     * reference and cycle, at most two draws are taxed; any further taxable
+     * draws resolve to zero tax.
+     *
+     * @param  array<int, array<string, string>>  $items
+     * @return array<int, array<string, string>>
+     */
+    private function applyTaxes(array $items): array
+    {
+        $taxCounts = [];
+
+        foreach ($items as $index => $item) {
+            if (! in_array($item['status'], ['postponed', 'failed'], true)) {
+                continue;
+            }
+
+            $key = $item['subscription_reference'] . '|' . $item['cycle'];
+
+            $taxCounts[$key] = ($taxCounts[$key] ?? 0) + 1;
+
+            $items[$index]['tax'] = $taxCounts[$key] <= 2
+                ? $this->resolveTax($item['status'], $item['amount'])
+                : '0.00';
+        }
+
+        return $items;
     }
 
     /**
