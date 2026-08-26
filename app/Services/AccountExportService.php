@@ -21,8 +21,9 @@ class AccountExportService
      * @param string|null $drawDate Optional target draw date. When omitted, the
      *                              next draw date after the account's last lock
      *                              is used.
+     * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
-    public function export(Account $account, ?string $drawDate = null): StreamedResponse
+    public function export(Account $account, ?string $drawDate = null, ?array $branchIds = null): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
@@ -52,6 +53,7 @@ class AccountExportService
 
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
+            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
             ->whereHas('installments', function ($query) use ($targetDrawDate) {
                 $query->whereDate('due_date', $targetDrawDate);
             })

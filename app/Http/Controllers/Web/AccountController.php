@@ -97,7 +97,21 @@ class AccountController extends Controller
             return $response;
         }
 
-        return $this->accountExportService->export($account, $request->string('draw_date')->toString() ?: null);
+        $branchIds = $request->filled('branch_ids')
+            ? array_map('intval', (array) $request->input('branch_ids'))
+            : $this->getUserBranchIds();
+
+        if (! empty($branchIds)) {
+            if ($response = $this->authorizeBranchAccess($branchIds)) {
+                return $response;
+            }
+        }
+
+        return $this->accountExportService->export(
+            $account,
+            $request->string('draw_date')->toString() ?: null,
+            $branchIds,
+        );
     }
 
     public function import(ImportAccountRequest $request, Account $account): JsonResponse
