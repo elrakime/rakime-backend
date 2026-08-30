@@ -87,6 +87,7 @@ return [
 
     // Contrats
     'update_contracts' => 'Modifier les contrats',
+    'cancel_contracts' => 'Annuler les contrats',
 
     // Relevés financiers
     'view_financial_records'   => 'Voir les relevés financiers',

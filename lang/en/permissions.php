@@ -87,6 +87,7 @@ return [
 
     // Contracts
     'update_contracts' => 'Update Contracts',
+    'cancel_contracts' => 'Cancel Contracts',
 
     // Financial Records
     'view_financial_records'   => 'View Financial Records',

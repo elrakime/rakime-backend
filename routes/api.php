@@ -111,6 +111,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
     Route::post('contracts/{contract}/payments', [ContractPaymentController::class, 'store']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
+    Route::post('contracts/{contract}/cancel', [ContractController::class, 'cancel']);
 
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
     Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);

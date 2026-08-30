@@ -87,6 +87,7 @@ return [
 
     // العقود
     'update_contracts' => 'تعديل العقود',
+    'cancel_contracts' => 'إلغاء العقود',
 
     // السجلات المالية
     'view_financial_records'   => 'عرض السجلات المالية',

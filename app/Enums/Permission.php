@@ -190,6 +190,7 @@ enum Permission: string
     case CONFIRM_CONTRACTS    = 'contracts.confirm';
     case CONFIGURE_CONTRACTS = 'contracts.configure';
     case UPDATE_CONTRACTS   = 'contracts.update';
+    case CANCEL_CONTRACTS   = 'contracts.cancel';
 
     // Installments
     case VIEW_INSTALLMENTS = 'installments.view';

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
 use App\Models\Contract;
+use App\Models\ContractEarlyCancelation;
 use App\Models\ContractItem;
 use App\Models\Client;
 use App\Models\Installment;
@@ -316,5 +317,56 @@ class ContractService
         $day  = min($drawDay, $date->daysInMonth);
 
         return $date->setDay($day);
+    }
+
+    /**
+     * Cancel a configured/active contract, triggering an early cancellation
+     * scheduled on the account's next draw day.
+     */
+    public function cancel(Contract $contract): Contract
+    {
+        if (! in_array($contract->status, [ContractStatus::CONFIGURED, ContractStatus::ACTIVE], true)) {
+            throw new Exception(__('contracts.cannot_cancel'), 422);
+        }
+
+        return DB::transaction(function () use ($contract) {
+            $contract->update([
+                'status' => ContractStatus::CANCELLED,
+            ]);
+
+            ContractEarlyCancelation::create([
+                'contract_id' => $contract->id,
+                'payment_id'  => null,
+                'end_date'    => $this->resolveNextDrawDate($contract),
+            ]);
+
+            return $contract->fresh([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'installments', 'subscriptions.draws',
+                'earlyCancelations',
+            ]);
+        });
+    }
+
+    /**
+     * Resolve the account's next draw day (the next occurrence of draw_day).
+     */
+    private function resolveNextDrawDate(Contract $contract): Carbon
+    {
+        $account = $contract->account;
+
+        $today = now()->startOfDay();
+        $day   = min($account->draw_day, $today->daysInMonth);
+
+        $drawDate = $today->copy()->startOfMonth()->addDays($day - 1);
+
+        if ($drawDate->lt($today)) {
+            $drawDate = $today->copy()->addMonth()->startOfMonth();
+            $day      = min($account->draw_day, $drawDate->daysInMonth);
+            $drawDate->addDays($day - 1);
+        }
+
+        return $drawDate;
     }
 }

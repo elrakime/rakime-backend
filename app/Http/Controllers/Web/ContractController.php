@@ -159,4 +159,25 @@ class ContractController extends Controller
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }
     }
+
+    public function cancel(Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::CANCEL_CONTRACTS->value)) {
+            return $response;
+        }
+
+        try {
+            $contract->assertCanTransitionTo(ContractStatus::CANCELLED->value);
+
+            $contract = $this->contractService->cancel($contract);
+
+            return $this->successResponse(new ContractResource($contract));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
 }
