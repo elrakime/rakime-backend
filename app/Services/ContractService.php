@@ -431,11 +431,13 @@ class ContractService
                 'status' => ContractStatus::CANCELLED,
             ]);
 
-            ContractEarlyCancelation::create([
-                'contract_id' => $contract->id,
-                'payment_id'  => null,
-                'end_date'    => $this->resolveNextDrawDate($contract),
-            ]);
+            if ($contract->subscriptions()->exists()) {
+                ContractEarlyCancelation::create([
+                    'contract_id' => $contract->id,
+                    'payment_id'  => null,
+                    'end_date'    => $this->resolveNextDrawDate($contract),
+                ]);
+            }
 
             return $contract->fresh([
                 'client', 'account', 'branch',
