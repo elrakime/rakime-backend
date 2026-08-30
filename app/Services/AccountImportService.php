@@ -375,34 +375,6 @@ class AccountImportService
                 $contractIds[$installment->contract_id] = true;
             }
         });
-
-        foreach (array_keys($contractIds) as $contractId) {
-            $this->completeContractIfFullyPaid($contractId);
-        }
-    }
-
-    /**
-     * Mark a contract as completed when all of its installments are paid.
-     */
-    private function completeContractIfFullyPaid(int $contractId): void
-    {
-        $contract = \App\Models\Contract::with('installments')->find($contractId);
-
-        if ($contract === null) {
-            return;
-        }
-
-        $installments = $contract->installments;
-
-        if ($installments->isEmpty()) {
-            return;
-        }
-
-        $allPaid = $installments->every(fn ($installment) => $installment->status === InstallmentStatus::PAID);
-
-        if ($allPaid && $contract->status !== ContractStatus::COMPLETED) {
-            $contract->update(['status' => ContractStatus::COMPLETED]);
-        }
     }
 
     /**

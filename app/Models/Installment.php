@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ContractStatus;
 use App\Enums\InstallmentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -76,5 +77,32 @@ class Installment extends Model
     public function draws(): HasMany
     {
         return $this->hasMany(Draw::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::updated(function (self $installment) {
+            if (! $installment->wasChanged('status')) {
+                return;
+            }
+
+            if ($installment->status !== InstallmentStatus::PAID) {
+                return;
+            }
+
+            $contract = $installment->contract;
+
+            if ($contract === null || $contract->status !== ContractStatus::ACTIVE) {
+                return;
+            }
+
+            $allPaid = $contract->installments()
+                ->where('status', '!=', InstallmentStatus::PAID)
+                ->doesntExist();
+
+            if ($allPaid) {
+                $contract->update(['status' => ContractStatus::COMPLETED]);
+            }
+        });
     }
 }
