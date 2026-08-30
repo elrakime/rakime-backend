@@ -23,7 +23,7 @@ class AccountExportService
      *                              is used.
      * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
-    public function export(Account $account, ?string $drawDate = null, ?array $branchIds = null): StreamedResponse
+    public function exportRegistrations(Account $account, ?string $drawDate = null, ?array $branchIds = null): StreamedResponse
     {
         $targetDrawDate = $this->resolveTargetDrawDate($account, $drawDate);
 

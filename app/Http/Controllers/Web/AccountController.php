@@ -91,7 +91,7 @@ class AccountController extends Controller
         }
     }
 
-    public function export(Account $account, Request $request): StreamedResponse|JsonResponse
+    public function exportRegistrations(Account $account, Request $request): StreamedResponse|JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
             return $response;
@@ -107,7 +107,7 @@ class AccountController extends Controller
             }
         }
 
-        return $this->accountExportService->export(
+        return $this->accountExportService->exportRegistrations(
             $account,
             $request->string('draw_date')->toString() ?: null,
             $branchIds,

@@ -574,12 +574,12 @@ items:
               followRedirects: true
               maxRedirects: 5
           - info:
-              name: export account
+              name: export registrations account
               type: http
               seq: 6
             http:
               method: GET
-              url: '{{url}}/v1/accounts/{{account}}/export'
+              url: '{{url}}/v1/accounts/{{account}}/export-registrations'
               headers:
                 - name: Accept
                   value: application/json
@@ -587,6 +587,34 @@ items:
                   value: web
               params:
                 - name: draw_date
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: export cancellations account
+              type: http
+              seq: 7
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts/{{account}}/export-cancellations'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: web
+              params:
+                - name: month
                   value: ''
                   type: query
               auth:

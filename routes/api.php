@@ -57,7 +57,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::get('permissions', [PermissionController::class, 'index']);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
-    Route::get('accounts/{account}/export', [AccountController::class, 'export']);
+    Route::get('accounts/{account}/export-registrations', [AccountController::class, 'exportRegistrations']);
     Route::get('accounts/{account}/export-cancellations', [AccountController::class, 'exportCancellations']);
     Route::post('accounts/{account}/import', [AccountController::class, 'import']);
     Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
