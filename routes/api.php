@@ -57,8 +57,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::get('permissions', [PermissionController::class, 'index']);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
-    Route::get('accounts/{account}/export-registrations', [AccountController::class, 'exportRegistrations']);
-    Route::get('accounts/{account}/export-cancellations', [AccountController::class, 'exportCancellations']);
+    Route::get('accounts/{account}/export/registrations', [AccountController::class, 'exportRegistrations']);
+    Route::get('accounts/{account}/export/cancellations', [AccountController::class, 'exportCancellations']);
     Route::post('accounts/{account}/import', [AccountController::class, 'import']);
     Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
     Route::apiResource('wilayas', WilayaController::class);
@@ -109,10 +109,10 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::apiResource('contracts', ContractController::class)->only(['index', 'store', 'show', 'update']);
     Route::post('contracts/{contract}/approve', [ContractController::class, 'approve']);
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
-    Route::post('contracts/{contract}/payments', [ContractPaymentController::class, 'store']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
     Route::post('contracts/{contract}/cancel', [ContractController::class, 'cancel']);
 
+    Route::apiResource('contracts.payments', ContractPaymentController::class)->parameters(['payments' => 'contract_payment'])->only(['index', 'store']);
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
     Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);
     Route::apiResource('contracts.draws', DrawController::class)->only(['index']);

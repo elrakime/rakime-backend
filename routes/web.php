@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ContractController;
+use App\Http\Controllers\Web\ContractPaymentController;
 use App\Http\Controllers\Web\DrawController;
 use App\Http\Controllers\Web\ImportController;
 use App\Http\Controllers\Web\InstallmentController;
@@ -124,6 +125,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
     Route::post('contracts/{contract}/cancel', [ContractController::class, 'cancel']);
 
+    Route::apiResource('contracts.payments', ContractPaymentController::class)->parameters(['payments' => 'contract_payment'])->only(['index', 'store']);
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
     Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);
     Route::apiResource('contracts.draws', DrawController::class)->only(['index']);

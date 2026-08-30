@@ -11,10 +11,26 @@ use App\Http\Resources\Web\ContractPaymentResource;
 use App\Models\Contract;
 use App\Services\ContractPaymentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ContractPaymentController extends Controller
 {
     public function __construct(private readonly ContractPaymentService $contractPaymentService) {}
+
+    public function index(Request $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::VIEW_PAYMENTS->value)) {
+            return $response;
+        }
+
+        return $this->successResponse(
+            ContractPaymentResource::collection($this->contractPaymentService->list($request, $contract)),
+        );
+    }
 
     public function store(StorePaymentRequest $request, Contract $contract): JsonResponse
     {

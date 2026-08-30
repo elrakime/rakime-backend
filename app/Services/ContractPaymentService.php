@@ -13,11 +13,40 @@ use App\Models\ContractEarlyCancelation;
 use App\Models\ContractPayment;
 use App\Models\Wallet;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ContractPaymentService
 {
     public function __construct(private readonly WalletService $walletService) {}
+
+    /**
+     * List a contract's payments.
+     */
+    public function list(Request $request, Contract $contract): LengthAwarePaginator
+    {
+        $query = $contract->payments()->getQuery();
+
+        return QueryBuilder::for($query, $request)
+            ->with(['contract.client', 'installments'])
+            ->allowedFilters(
+                AllowedFilter::exact('amount'),
+                AllowedFilter::callback('search', function ($query, string $value) {
+                    $query->where('note', 'like', "%{$value}%");
+                }),
+            )
+            ->allowedSorts(
+                AllowedSort::field('amount'),
+                AllowedSort::field('created_at'),
+            )
+            ->defaultSort('-created_at')
+            ->paginate($request->integer('per_page', 15))
+            ->appends($request->query());
+    }
 
     /**
      * Record a cash payment against a configured/active contract.
