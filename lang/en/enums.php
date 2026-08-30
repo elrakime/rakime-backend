@@ -82,12 +82,6 @@ return [
         'CASH' => 'Cash',
     ],
 
-    'subscription_status' => [
-        'ACTIVE'    => 'Active',
-        'CANCELLED' => 'Cancelled',
-        'COMPLETED' => 'Completed',
-    ],
-
     'draw_status' => [
         'PAID_ON_TIME' => 'Paid On Time',
         'LATE_PAYMENT' => 'Late Payment',

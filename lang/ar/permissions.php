@@ -100,6 +100,10 @@ return [
     'update_installments' => 'تعديل الأقساط',
     'delete_installments' => 'حذف الأقساط',
 
+    // المدفوعات
+    'view_payments'   => 'عرض المدفوعات',
+    'create_payments' => 'إنشاء مدفوعات',
+
     // التقارير
     'view_reports' => 'عرض التقارير',
 

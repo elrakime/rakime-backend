@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\SubscriptionStatus;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Traits\HasStatusHistory;
-use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
 
 class Subscription extends Model
 {
-    use HasStatusHistory;
-    use HasStatusGuard;
     use HasUserstamps;
 
     protected $fillable = [
@@ -24,32 +18,15 @@ class Subscription extends Model
         'reference',
         'subscription_number',
         'amount',
-        'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'status'              => SubscriptionStatus::class,
             'subscription_number' => 'integer',
             'amount'              => 'decimal:2',
             'created_at'          => 'datetime',
         ];
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('status', SubscriptionStatus::ACTIVE);
-    }
-
-    public function scopeCancelled(Builder $query): void
-    {
-        $query->where('status', SubscriptionStatus::CANCELLED);
-    }
-
-    public function scopeCompleted(Builder $query): void
-    {
-        $query->where('status', SubscriptionStatus::COMPLETED);
     }
 
     public function contract(): BelongsTo

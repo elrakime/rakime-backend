@@ -8,8 +8,8 @@ use App\Enums\InstallmentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Traits\HasStatusHistory;
 use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
@@ -67,9 +67,10 @@ class Installment extends Model
         return $this->belongsTo(Contract::class, 'contract_id');
     }
 
-    public function cashPayment(): HasOne
+    public function payments(): BelongsToMany
     {
-        return $this->hasOne(InstallmentPayment::class);
+        return $this->belongsToMany(ContractPayment::class, 'installment_payments')
+            ->withTimestamps();
     }
 
     public function draws(): HasMany

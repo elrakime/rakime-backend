@@ -194,6 +194,10 @@ enum Permission: string
     // Installments
     case VIEW_INSTALLMENTS = 'installments.view';
 
+    // Payments
+    case VIEW_PAYMENTS   = 'payments.view';
+    case CREATE_PAYMENTS = 'payments.create';
+
     // Subscriptions
     case VIEW_SUBSCRIPTIONS = 'subscriptions.view';
 
@@ -246,7 +250,7 @@ enum Permission: string
             'sales', 'sale_returns'                            => 'green',
             'inventory_transfers', 'restocks', 'expirations' => 'cyan',
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
-            'contracts', 'installments', 'subscriptions', 'draws' => 'amber',
+            'contracts', 'installments', 'subscriptions', 'draws', 'payments' => 'amber',
             'financial_records' => 'lime',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',

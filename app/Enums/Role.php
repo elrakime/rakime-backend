@@ -193,6 +193,9 @@ enum Role: string
                 Permission::REJECT_CONTRACTS->value,
                 Permission::CONFIRM_CONTRACTS->value,
                 Permission::CONFIGURE_CONTRACTS->value,
+                // Payments
+                Permission::VIEW_PAYMENTS->value,
+                Permission::CREATE_PAYMENTS->value,
                 // Financial Records
                 Permission::VIEW_FINANCIAL_RECORDS->value,
                 Permission::CREATE_FINANCIAL_RECORDS->value,
@@ -266,6 +269,9 @@ enum Role: string
                 Permission::VIEW_CONTRACTS->value,
                 Permission::CREATE_CONTRACTS->value,
                 Permission::UPDATE_CONTRACTS->value,
+                // Payments
+                Permission::VIEW_PAYMENTS->value,
+                Permission::CREATE_PAYMENTS->value,
                 // Financial Records
                 Permission::VIEW_FINANCIAL_RECORDS->value,
                 Permission::CREATE_FINANCIAL_RECORDS->value,

@@ -100,6 +100,10 @@ return [
     'update_installments' => 'Modifier les mensualités',
     'delete_installments' => 'Supprimer les mensualités',
 
+    // Paiements
+    'view_payments'   => 'Voir les paiements',
+    'create_payments' => 'Créer des paiements',
+
     // Rapports
     'view_reports' => 'Voir les rapports',
 

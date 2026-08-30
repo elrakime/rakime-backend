@@ -18,7 +18,7 @@ class InstallmentService
         $query = $contract->installments()->getQuery();
 
         return QueryBuilder::for($query, $request)
-            ->with(['contract.client', 'contract.account', 'contract.branch', 'cashPayment', 'draws'])
+            ->with(['contract.client', 'contract.account', 'contract.branch', 'payments', 'draws'])
             ->allowedFilters(
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('payment_method'),

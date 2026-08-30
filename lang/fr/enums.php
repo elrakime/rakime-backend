@@ -82,12 +82,6 @@ return [
         'CASH' => 'Espèces',
     ],
 
-    'subscription_status' => [
-        'ACTIVE'    => 'Actif',
-        'CANCELLED' => 'Annulé',
-        'COMPLETED' => 'Terminé',
-    ],
-
     'draw_status' => [
         'PAID_ON_TIME' => 'Payé à temps',
         'LATE_PAYMENT' => 'Paiement tardif',

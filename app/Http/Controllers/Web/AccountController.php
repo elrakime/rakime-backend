@@ -114,6 +114,29 @@ class AccountController extends Controller
         );
     }
 
+    public function exportCancellations(Account $account, Request $request): StreamedResponse|JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+            return $response;
+        }
+
+        $branchIds = $request->filled('branch_ids')
+            ? array_map('intval', (array) $request->input('branch_ids'))
+            : $this->getUserBranchIds();
+
+        if (! empty($branchIds)) {
+            if ($response = $this->authorizeBranchAccess($branchIds)) {
+                return $response;
+            }
+        }
+
+        return $this->accountExportService->exportCancellations(
+            $account,
+            $request->string('month')->toString() ?: null,
+            $branchIds,
+        );
+    }
+
     public function import(ImportAccountRequest $request, Account $account): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {

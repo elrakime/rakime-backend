@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
-use App\Enums\SubscriptionStatus;
 use App\Models\Contract;
 use App\Models\ContractItem;
 use App\Models\Client;
@@ -262,21 +261,30 @@ class ContractService
         }
 
         $perDrawAmount = (float) ceil($monthlyAmount / $subscriptionCount);
+        $perDrawAmount = (float) ceil($monthlyAmount / $subscriptionCount);
 
         if ($perDrawAmount < $account->min_withdraw_amount) {
             throw new Exception(__('contracts.subscription_amount_below_minimum'), 422);
         }
 
         return DB::transaction(function () use ($contract, $subscriptionCount, $monthsCount, $monthlyAmount, $perDrawAmount, $drawDay, $drawDate) {
+            $firstDueDate = null;
+            $lastDueDate  = null;
+
             foreach (range(1, $monthsCount) as $monthNumber) {
                 $month = Carbon::create($drawDate->year, $drawDate->month + ($monthNumber - 1), 1);
+
+                $dueDate = $this->resolveDrawDate($month, $drawDay);
 
                 Installment::create([
                     'contract_id'    => $contract->id,
                     'amount'         => $monthlyAmount,
                     'payment_method' => InstallmentPaymentMethod::BANK->value,
-                    'due_date'       => $this->resolveDrawDate($month, $drawDay),
+                    'due_date'       => $dueDate,
                 ]);
+
+                $firstDueDate ??= $dueDate;
+                $lastDueDate = $dueDate;
             }
 
             foreach (range(1, $subscriptionCount) as $subNumber) {
@@ -285,12 +293,13 @@ class ContractService
                     'contract_id'         => $contract->id,
                     'subscription_number' => $subNumber,
                     'amount'              => $perDrawAmount,
-                    'status'              => SubscriptionStatus::ACTIVE,
                 ]);
             }
 
             $contract->update([
-                'status' => ContractStatus::CONFIGURED,
+                'status'     => ContractStatus::CONFIGURED,
+                'start_date' => $firstDueDate,
+                'end_date'   => $lastDueDate,
             ]);
 
             return $contract->fresh([

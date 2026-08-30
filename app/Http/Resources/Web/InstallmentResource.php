@@ -30,8 +30,8 @@ class InstallmentResource extends JsonResource
             'created_by'     => new AvatarResource($this->whenLoaded('creator')),
             'updated_by'     => new AvatarResource($this->whenLoaded('updater')),
 
-            'cashPayment' => new InstallmentPaymentResource($this->whenLoaded('cashPayment')),
-            'draws'       => DrawResource::collection($this->whenLoaded('draws')),
+            'payments' => InstallmentPaymentResource::collection($this->whenLoaded('payments')),
+            'draws'    => DrawResource::collection($this->whenLoaded('draws')),
 
             'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];

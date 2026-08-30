@@ -100,6 +100,10 @@ return [
     'update_installments' => 'Update Installments',
     'delete_installments' => 'Delete Installments',
 
+    // Payments
+    'view_payments'   => 'View Payments',
+    'create_payments' => 'Create Payments',
+
     // Reports
     'view_reports' => 'View Reports',
 

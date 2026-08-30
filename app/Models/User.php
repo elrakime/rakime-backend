@@ -80,11 +80,6 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany(Restock::class, 'created_by');
     }
 
-    public function cashPaymentsReceived(): HasMany
-    {
-        return $this->hasMany(InstallmentPayment::class, 'received_by');
-    }
-
     public function installmentContracts(): HasMany
     {
         return $this->hasMany(Contract::class, 'created_by');

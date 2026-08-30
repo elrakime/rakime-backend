@@ -6,33 +6,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Traits\HasUserstamps;
 
 class InstallmentPayment extends Model
 {
-    use HasUserstamps;
-
     protected $fillable = [
+        'payment_id',
         'installment_id',
-        'amount',
-        'received_by',
-        'note',
     ];
 
-    protected function casts(): array
+    public function payment(): BelongsTo
     {
-        return [
-            'amount'  => 'decimal:2',
-        ];
+        return $this->belongsTo(ContractPayment::class);
     }
 
     public function installment(): BelongsTo
     {
         return $this->belongsTo(Installment::class);
-    }
-
-    public function receivedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'received_by');
     }
 }

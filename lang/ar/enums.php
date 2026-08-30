@@ -82,12 +82,6 @@ return [
         'CASH' => 'نقداً',
     ],
 
-    'subscription_status' => [
-        'ACTIVE'    => 'نشط',
-        'CANCELLED' => 'ملغى',
-        'COMPLETED' => 'مكتمل',
-    ],
-
     'draw_status' => [
         'PAID_ON_TIME' => 'مدفوع في الوقت',
         'LATE_PAYMENT' => 'دفع متأخر',

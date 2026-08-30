@@ -35,6 +35,8 @@ class Contract extends Model
         'total_amount',
         'net_amount',
         'monthly_amount',
+        'start_date',
+        'end_date',
         'note',
     ];
 
@@ -48,6 +50,8 @@ class Contract extends Model
             'total_amount'   => 'decimal:2',
             'net_amount'     => 'decimal:2',
             'monthly_amount' => 'decimal:2',
+            'start_date'     => 'date',
+            'end_date'       => 'date',
             'created_at'     => 'datetime',
         ];
     }
@@ -140,6 +144,16 @@ class Contract extends Model
     public function financialRecords(): HasMany
     {
         return $this->hasMany(FinancialRecord::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(ContractPayment::class, 'contract_id');
+    }
+
+    public function earlyCancelations(): HasMany
+    {
+        return $this->hasMany(ContractEarlyCancelation::class, 'contract_id');
     }
 
     protected static function booted(): void

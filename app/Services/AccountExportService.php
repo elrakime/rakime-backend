@@ -25,6 +25,75 @@ class AccountExportService
      */
     public function export(Account $account, ?string $drawDate = null, ?array $branchIds = null): StreamedResponse
     {
+        $targetDrawDate = $this->resolveTargetDrawDate($account, $drawDate);
+
+        $contracts = $account->installmentContracts()
+            ->where('status', ContractStatus::CONFIGURED)
+            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
+            ->whereHas('installments', function ($query) use ($targetDrawDate) {
+                $query->whereDate('due_date', $targetDrawDate);
+            })
+            ->with(['client', 'subscriptions', 'installments'])
+            ->get();
+
+        $subscriptions = $contracts
+            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
+                'subscription' => $subscription,
+                'contract'     => $contract,
+            ]))
+            ->sortBy(fn ($item) => $item['subscription']->reference);
+
+        $filename = 'account-' . $account->id . '-subscriptions-' . now()->format('Ymd-His') . '.xls';
+
+        return $this->buildSpreadsheet($account, $subscriptions, $filename);
+    }
+
+    /**
+     * Export subscriptions that must be cancelled in a given month.
+     *
+     * A subscription is included when its contract's EARLIEST early-cancellation
+     * end_date falls within the target month (the contract's original end_date
+     * does not count — it is cancelled automatically at the bank).
+     *
+     * @param string|null $month Optional target month (Y-m). When omitted, the
+     *                           next month after the account's last lock is used.
+     * @param array|null $branchIds Optional branch IDs to filter contracts by.
+     */
+    public function exportCancellations(Account $account, ?string $month = null, ?array $branchIds = null): StreamedResponse
+    {
+        $targetMonth = $this->resolveTargetMonth($account, $month);
+
+        $start = $targetMonth->copy()->startOfMonth();
+        $end   = $targetMonth->copy()->endOfMonth();
+
+        $contracts = $account->installmentContracts()
+            ->where('status', ContractStatus::CONFIGURED)
+            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
+            ->whereHas('earlyCancelations', function ($query) use ($start, $end) {
+                $query->whereBetween('end_date', [$start->toDateString(), $end->toDateString()]);
+            })
+            ->with(['client', 'subscriptions', 'earlyCancelations'])
+            ->get();
+
+        $subscriptions = $contracts
+            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
+                'subscription' => $subscription,
+                'contract'     => $contract,
+            ]))
+            ->sortBy(fn ($item) => $item['subscription']->reference);
+
+        $filename = 'account-' . $account->id . '-cancellations-' . now()->format('Ymd-His') . '.xls';
+
+        return $this->buildSpreadsheet($account, $subscriptions, $filename);
+    }
+
+    /**
+     * Build the .xls spreadsheet from the flattened subscription list.
+     *
+     * @param  \Illuminate\Support\Collection<int, array>  $subscriptions
+     */
+    private function buildSpreadsheet(Account $account, $subscriptions, string $filename): StreamedResponse
+    {
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
 
@@ -49,33 +118,13 @@ class AccountExportService
 
         $row = 2;
 
-        $targetDrawDate = $this->resolveTargetDrawDate($account, $drawDate);
-
-        $contracts = $account->installmentContracts()
-            ->where('status', ContractStatus::CONFIGURED)
-            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('installments', function ($query) use ($targetDrawDate) {
-                $query->whereDate('due_date', $targetDrawDate);
-            })
-            ->with(['client', 'subscriptions', 'installments'])
-            ->get();
-
-        $subscriptions = $contracts
-            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
-                'subscription' => $subscription,
-                'contract'     => $contract,
-            ]))
-            ->sortBy(fn ($item) => $item['subscription']->reference);
-
         foreach ($subscriptions as $item) {
             $contract     = $item['contract'];
             $subscription = $item['subscription'];
             $client       = $contract->client;
 
-            $installments = $contract->installments->sortBy('due_date');
-
-            $firstDueDate = $installments->first()?->due_date;
-            $lastDueDate  = $installments->last()?->due_date;
+            $firstDueDate = $contract->start_date;
+            $lastDueDate  = $contract->end_date;
 
             $sheet->fromArray([
                 $client?->ccp_number,
@@ -128,8 +177,6 @@ class AccountExportService
             ->getNumberFormat()
             ->setFormatCode('m/d/yyyy');
 
-        $filename = 'account-' . $account->id . '-subscriptions-' . now()->format('Ymd-His') . '.xls';
-
         return response()->streamDownload(
             function () use ($spreadsheet) {
                 (new Xls($spreadsheet))->save('php://output');
@@ -169,5 +216,23 @@ class AccountExportService
         $day = min($account->draw_day, $month->daysInMonth);
 
         return $month->copy()->addDays($day - 1);
+    }
+
+    /**
+     * Resolve the target month for the cancellation export.
+     */
+    private function resolveTargetMonth(Account $account, ?string $month): Carbon
+    {
+        if ($month !== null) {
+            return Carbon::parse($month)->startOfMonth();
+        }
+
+        $lastLock = $account->drawLocks()->latest('month')->first();
+
+        $candidate = $lastLock !== null
+            ? Carbon::parse($lastLock->month)->startOfDay()
+            : now()->startOfDay();
+
+        return $candidate->copy()->addMonth()->startOfMonth();
     }
 }

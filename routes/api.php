@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\InstallmentController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\InventoryMovementController;
 use App\Http\Controllers\Web\InventoryTransferController;
+use App\Http\Controllers\Web\ContractPaymentController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\PriceController;
 use App\Http\Controllers\Web\ProductController;
@@ -57,6 +58,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
     Route::get('accounts/{account}/export', [AccountController::class, 'export']);
+    Route::get('accounts/{account}/export-cancellations', [AccountController::class, 'exportCancellations']);
     Route::post('accounts/{account}/import', [AccountController::class, 'import']);
     Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
     Route::apiResource('wilayas', WilayaController::class);
@@ -107,6 +109,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::apiResource('contracts', ContractController::class)->only(['index', 'store', 'show', 'update']);
     Route::post('contracts/{contract}/approve', [ContractController::class, 'approve']);
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
+    Route::post('contracts/{contract}/payments', [ContractPaymentController::class, 'store']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
 
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
