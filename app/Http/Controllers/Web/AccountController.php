@@ -4,24 +4,18 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Web\Account\ImportAccountRequest;
 use App\Http\Requests\Web\Account\StoreAccountRequest;
 use App\Http\Requests\Web\Account\UpdateAccountRequest;
 use App\Http\Resources\Web\AccountResource;
 use App\Models\Account;
-use App\Services\AccountExportService;
-use App\Services\AccountImportService;
 use App\Services\AccountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountController extends Controller
 {
     public function __construct(
         private readonly AccountService $accountService,
-        private readonly AccountExportService $accountExportService,
-        private readonly AccountImportService $accountImportService,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -88,73 +82,6 @@ class AccountController extends Controller
             return $this->successResponse(message: __('app.deleted'));
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
-        }
-    }
-
-    public function exportRegistrations(Account $account, Request $request): StreamedResponse|JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
-            return $response;
-        }
-
-        $branchIds = $request->filled('branch_ids')
-            ? array_map('intval', (array) $request->input('branch_ids'))
-            : $this->getUserBranchIds();
-
-        if (! empty($branchIds)) {
-            if ($response = $this->authorizeBranchAccess($branchIds)) {
-                return $response;
-            }
-        }
-
-        return $this->accountExportService->exportRegistrations(
-            $account,
-            $request->string('date')->toString() ?: null,
-            $branchIds,
-        );
-    }
-
-    public function exportCancellations(Account $account, Request $request): StreamedResponse|JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
-            return $response;
-        }
-
-        $branchIds = $request->filled('branch_ids')
-            ? array_map('intval', (array) $request->input('branch_ids'))
-            : $this->getUserBranchIds();
-
-        if (! empty($branchIds)) {
-            if ($response = $this->authorizeBranchAccess($branchIds)) {
-                return $response;
-            }
-        }
-
-        return $this->accountExportService->exportCancellations(
-            $account,
-            $request->string('date')->toString() ?: null,
-            $branchIds,
-        );
-    }
-
-    public function import(ImportAccountRequest $request, Account $account): JsonResponse
-    {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
-            return $response;
-        }
-
-        try {
-            $items = $this->accountImportService->import($request->file('file'), $account->draw_day);
-            $result = $this->accountImportService->process($items);
-
-            return $this->successResponse([
-                'account' => $account->only(['id', 'name', 'ccp_number', 'ccp_key', 'draw_day']),
-                'items'   => $items,
-                'count'   => count($items),
-                'result'  => $result,
-            ]);
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }
     }
 }

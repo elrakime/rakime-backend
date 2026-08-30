@@ -192,97 +192,6 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: export cancellations account
-              type: http
-              seq: 7
-            http:
-              method: GET
-              url: '{{url}}/v1/accounts/{{account}}/export-cancellations'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: date
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: export registrations account
-              type: http
-              seq: 6
-            http:
-              method: GET
-              url: '{{url}}/v1/accounts/{{account}}/export-registrations'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: date
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: import account
-              type: http
-              seq: 8
-            http:
-              method: POST
-              url: '{{url}}/v1/accounts/{{account}}/import'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: file
-                    type: file
-                    value: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
               name: list accounts
               type: http
               seq: 1
@@ -6523,6 +6432,100 @@ items:
           followRedirects: true
           maxRedirects: 5
           forwardAuthorizationHeader: true
+      - info:
+          name: export registrations
+          type: http
+          seq: 2
+        http:
+          method: GET
+          url: '{{url}}/v1/export/registrations'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          params:
+            - name: account_id
+              value: '1'
+              type: query
+            - name: branch_ids[]
+              value: ''
+              type: query
+            - name: date
+              value: ''
+              type: query
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: export cancellations
+          type: http
+          seq: 3
+        http:
+          method: GET
+          url: '{{url}}/v1/export/cancellations'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          params:
+            - name: account_id
+              value: '1'
+              type: query
+            - name: branch_ids[]
+              value: ''
+              type: query
+            - name: date
+              value: ''
+              type: query
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: import account
+          type: http
+          seq: 4
+        http:
+          method: POST
+          url: '{{url}}/v1/import'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: multipart/form-data
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          body:
+            type: multipart-form
+            data:
+              - name: account_id
+                type: text
+                value: '1'
+              - name: file
+                type: file
+                value: []
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
   - info:
       name: Api
       type: folder
@@ -6537,68 +6540,6 @@ items:
         request:
           auth: inherit
         items:
-          - info:
-              name: export registrations account
-              type: http
-              seq: 6
-            http:
-              method: GET
-              url: '{{url}}/v1/accounts/{{account}}/export-registrations'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: date
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: import account
-              type: http
-              seq: 8
-            http:
-              method: POST
-              url: '{{url}}/v1/accounts/{{account}}/import'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: file
-                    type: file
-                    value: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
           - info:
               name: create account
               type: http
@@ -6695,35 +6636,6 @@ items:
                   value: application/json
                 - name: X-Client-Type
                   value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: export cancellations account
-              type: http
-              seq: 7
-            http:
-              method: GET
-              url: '{{url}}/v1/accounts/{{account}}/export-cancellations'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: date
-                  value: ''
-                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'

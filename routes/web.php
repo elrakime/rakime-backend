@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\ContractController;
 use App\Http\Controllers\Web\ContractPaymentController;
+use App\Http\Controllers\Web\AccountExportImportController;
 use App\Http\Controllers\Web\DrawController;
 use App\Http\Controllers\Web\ImportController;
 use App\Http\Controllers\Web\InstallmentController;
@@ -51,7 +52,13 @@ Route::get('/docs', function () {
 
 Route::get('/import', [ImportController::class, 'show']);
 Route::post('/import', [ImportController::class, 'store']);
-Route::post('v1/ccp/info', [CcpController::class, 'info']);
+Route::prefix('v1')->middleware(['auth:sanctum','user.active'])->group(function () {
+    Route::get('export/registrations', [AccountExportImportController::class, 'exportRegistrations']);
+    Route::get('export/cancellations', [AccountExportImportController::class, 'exportCancellations']);
+    Route::post('import', [AccountExportImportController::class, 'import']);
+    Route::post('ccp/info', [CcpController::class, 'info']);
+});
+
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('guest');
@@ -70,9 +77,6 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::get('permissions', [PermissionController::class, 'index']);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('accounts', AccountController::class);
-    Route::get('accounts/{account}/export/registrations', [AccountController::class, 'exportRegistrations']);
-    Route::get('accounts/{account}/export/cancellations', [AccountController::class, 'exportCancellations']);
-    Route::post('accounts/{account}/import', [AccountController::class, 'import']);
     Route::apiResource('account-draw-locks', AccountDrawLockController::class)->only(['index', 'store']);
     Route::apiResource('wilayas', WilayaController::class);
     Route::apiResource('categories', CategoryController::class);
