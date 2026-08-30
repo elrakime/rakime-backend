@@ -144,6 +144,12 @@ class ContractService
 
     public function update(Contract $contract, array $data): Contract
     {
+        $isConfigured = in_array($contract->status, [ContractStatus::CONFIGURED, ContractStatus::ACTIVE], true);
+
+        if ($isConfigured) {
+            return $this->updateConfigured($contract, $data);
+        }
+
         if (! in_array($contract->status, [ContractStatus::PENDING, ContractStatus::APPROVED], true)) {
             throw new Exception(__('contracts.cannot_update'), 422);
         }
@@ -201,6 +207,97 @@ class ContractService
 
             return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
         });
+    }
+
+    /**
+     * Update a configured/active contract (admin only).
+     *
+     * Allows changing items, advance_amount and max_amount. The months_count
+     * and subscription count are preserved; amounts are recalculated and
+     * propagated to the existing installments and subscriptions.
+     */
+    private function updateConfigured(Contract $contract, array $data): Contract
+    {
+        if (auth()->user()->isAdmin() === false) {
+            throw new Exception(__('contracts.cannot_update'), 403);
+        }
+
+        if (array_key_exists('months_count', $data)) {
+            throw new Exception(__('contracts.cannot_update_months_count'), 422);
+        }
+
+        return DB::transaction(function () use ($contract, $data) {
+            $updates = [];
+
+            if (array_key_exists('advance_amount', $data)) {
+                $updates['advance_amount'] = $data['advance_amount'];
+            }
+
+            if (array_key_exists('max_amount', $data)) {
+                $updates['max_amount'] = $data['max_amount'];
+            }
+
+            if (array_key_exists('items', $data)) {
+                $contract->items()->delete();
+
+                foreach ($data['items'] as $item) {
+                    ContractItem::create([
+                        'contract_id' => $contract->id,
+                        'product_id'  => $item['product_id'],
+                        'stock_id'    => $item['stock_id'],
+                        'quantity'    => $item['quantity'],
+                        'price'       => $item['price'],
+                    ]);
+                }
+            }
+
+            if ($updates !== []) {
+                $contract->update($updates);
+            }
+
+            if (
+                array_key_exists('items', $data)
+                || array_key_exists('advance_amount', $data)
+            ) {
+                $this->recalculateAmounts($contract);
+                $this->recalculateInstallmentsAndSubscriptions($contract);
+            }
+
+            $maxAmount = $updates['max_amount'] ?? $contract->max_amount;
+
+            if ($maxAmount !== null && $contract->net_amount !== null && $contract->net_amount > $maxAmount) {
+                throw new Exception(__('contracts.net_exceeds_max_amount'), 422);
+            }
+
+            return $contract->fresh([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'installments', 'subscriptions.draws',
+            ]);
+        });
+    }
+
+    /**
+     * Propagate the recalculated monthly amount to the existing installments
+     * and subscriptions (their counts are preserved).
+     */
+    private function recalculateInstallmentsAndSubscriptions(Contract $contract): void
+    {
+        $monthlyAmount = (float) $contract->monthly_amount;
+
+        $subscriptionCount = $contract->subscriptions()->count();
+
+        $perDrawAmount = $subscriptionCount > 0
+            ? (float) ceil($monthlyAmount / $subscriptionCount)
+            : 0.0;
+
+        $contract->installments()->update([
+            'amount' => $monthlyAmount,
+        ]);
+
+        $contract->subscriptions()->update([
+            'amount' => $perDrawAmount,
+        ]);
     }
 
     private function recalculateAmounts(Contract $contract): void
