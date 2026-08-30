@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('installment_id')->constrained();
             $table->unsignedSmallInteger('month_number');
             $table->unsignedInteger('amount');
-            $table->enum('status', DrawStatus::keys())->default(DrawStatus::default()->value);
+            $table->enum('status', DrawStatus::keys());
             $table->date('scheduled_date');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
