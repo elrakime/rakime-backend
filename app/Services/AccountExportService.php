@@ -18,14 +18,14 @@ class AccountExportService
      * Export all configured contracts' subscriptions for the given account
      * as an Excel (.xls) spreadsheet.
      *
-     * @param string|null $drawDate Optional target draw date. When omitted, the
-     *                              next draw date after the account's last lock
-     *                              is used.
+     * @param string|null $date Optional target draw date. When omitted, the
+     *                          next draw date after the account's last lock
+     *                          is used.
      * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
-    public function exportRegistrations(Account $account, ?string $drawDate = null, ?array $branchIds = null): StreamedResponse
+    public function exportRegistrations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
-        $targetDrawDate = $this->resolveTargetDrawDate($account, $drawDate);
+        $targetDrawDate = $this->resolveTargetDrawDate($account, $date);
 
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
@@ -49,28 +49,25 @@ class AccountExportService
     }
 
     /**
-     * Export subscriptions that must be cancelled in a given month.
+     * Export subscriptions that must be cancelled on a given date.
      *
      * A subscription is included when its contract's EARLIEST early-cancellation
-     * end_date falls within the target month (the contract's original end_date
+     * end_date matches the target date (the contract's original end_date
      * does not count — it is cancelled automatically at the bank).
      *
-     * @param string|null $month Optional target month (Y-m). When omitted, the
-     *                           next month after the account's last lock is used.
+     * @param string|null $date Optional target date. When omitted, the next
+     *                          draw date after the account's last lock is used.
      * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
-    public function exportCancellations(Account $account, ?string $month = null, ?array $branchIds = null): StreamedResponse
+    public function exportCancellations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
-        $targetMonth = $this->resolveTargetMonth($account, $month);
-
-        $start = $targetMonth->copy()->startOfMonth();
-        $end   = $targetMonth->copy()->endOfMonth();
+        $targetDate = $this->resolveTargetDrawDate($account, $date);
 
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('earlyCancelations', function ($query) use ($start, $end) {
-                $query->whereBetween('end_date', [$start->toDateString(), $end->toDateString()]);
+            ->whereHas('earlyCancelations', function ($query) use ($targetDate) {
+                $query->whereDate('end_date', $targetDate);
             })
             ->with(['client', 'subscriptions', 'earlyCancelations'])
             ->get();
@@ -216,23 +213,5 @@ class AccountExportService
         $day = min($account->draw_day, $month->daysInMonth);
 
         return $month->copy()->addDays($day - 1);
-    }
-
-    /**
-     * Resolve the target month for the cancellation export.
-     */
-    private function resolveTargetMonth(Account $account, ?string $month): Carbon
-    {
-        if ($month !== null) {
-            return Carbon::parse($month)->startOfMonth();
-        }
-
-        $lastLock = $account->drawLocks()->latest('month')->first();
-
-        $candidate = $lastLock !== null
-            ? Carbon::parse($lastLock->month)->startOfDay()
-            : now()->startOfDay();
-
-        return $candidate->copy()->addMonth()->startOfMonth();
     }
 }

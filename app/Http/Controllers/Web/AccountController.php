@@ -109,7 +109,7 @@ class AccountController extends Controller
 
         return $this->accountExportService->exportRegistrations(
             $account,
-            $request->string('draw_date')->toString() ?: null,
+            $request->string('date')->toString() ?: null,
             $branchIds,
         );
     }
@@ -132,7 +132,7 @@ class AccountController extends Controller
 
         return $this->accountExportService->exportCancellations(
             $account,
-            $request->string('month')->toString() ?: null,
+            $request->string('date')->toString() ?: null,
             $branchIds,
         );
     }

@@ -586,7 +586,7 @@ items:
                 - name: X-Client-Type
                   value: web
               params:
-                - name: draw_date
+                - name: date
                   value: ''
                   type: query
               auth:
@@ -614,9 +614,41 @@ items:
                 - name: X-Client-Type
                   value: web
               params:
-                - name: month
+                - name: date
                   value: ''
                   type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: import account
+              type: http
+              seq: 8
+            http:
+              method: POST
+              url: '{{url}}/v1/accounts/{{account}}/import'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: file
+                    type: file
+                    value: []
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -1561,6 +1593,35 @@ items:
               followRedirects: true
               maxRedirects: 5
           - info:
+              name: cancel contract
+              type: http
+              seq: 11
+            http:
+              method: POST
+              url: '{{url}}/v1/contracts/{{contract}}/cancel'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data: []
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
               name: create contract
               type: http
               seq: 2
@@ -1652,6 +1713,44 @@ items:
               auth:
                 type: bearer
                 token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+          - info:
+              name: create contract payment
+              type: http
+              seq: 12
+            http:
+              method: POST
+              url: '{{url}}/v1/contracts/{{contract}}/payments'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: web
+              body:
+                type: multipart-form
+                data:
+                  - name: amount
+                    type: text
+                    value: '5000'
+                  - name: note
+                    type: text
+                    value: ''
+                  - name: wallet_id
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
