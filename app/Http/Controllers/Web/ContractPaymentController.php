@@ -33,6 +33,7 @@ class ContractPaymentController extends Controller
                 $contract,
                 (float) $data['amount'],
                 $data['note'] ?? null,
+                isset($data['wallet_id']) ? (int) $data['wallet_id'] : null,
             );
 
             return $this->successResponse(new ContractPaymentResource($payment), statusCode: 201);

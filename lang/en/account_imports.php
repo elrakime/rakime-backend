@@ -8,4 +8,6 @@ return [
     'installment_not_found'  => 'No installment found for cycle date ":cycle".',
     'invalid_status'         => 'Unknown draw status ":status".',
     'invalid_date'           => 'Invalid payment date ":date".',
+    'draw_payment_note'      => 'Draw payment for subscription :reference',
+    'draw_tax_note'          => 'Draw tax for subscription :reference',
 ];

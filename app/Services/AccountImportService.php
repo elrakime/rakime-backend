@@ -18,6 +18,7 @@ use RuntimeException;
 
 class AccountImportService
 {
+    public function __construct(private readonly WalletService $walletService) {}
     /**
      * Parse a bank return .txt file into an array of items.
      *
@@ -299,7 +300,7 @@ class AccountImportService
                     continue;
                 }
 
-                Draw::create([
+                $draw = Draw::create([
                     'subscription_id'   => $subscription->id,
                     'installment_id'    => $installment->id,
                     'amount'            => $item['amount'],
@@ -309,6 +310,8 @@ class AccountImportService
                     'tax_amount'        => $item['tax'],
                     'metadata'          => $item,
                 ]);
+
+                $this->recordDrawWalletMovement($subscription, $draw);
 
                 $created++;
                 $touchedInstallmentIds[$installment->id] = true;
@@ -399,6 +402,51 @@ class AccountImportService
 
         if ($allPaid && $contract->status !== ContractStatus::COMPLETED) {
             $contract->update(['status' => ContractStatus::COMPLETED]);
+        }
+    }
+
+    /**
+     * Record a wallet movement for a newly created draw.
+     *
+     * - paid (on time or late) draws credit the account wallet with the draw amount.
+     * - postponed/failed draws deduct the draw tax from the account wallet.
+     */
+    private function recordDrawWalletMovement(Subscription $subscription, Draw $draw): void
+    {
+        $account = $subscription->contract?->account;
+
+        if ($account === null) {
+            return;
+        }
+
+        $wallet = $account->wallets()->first();
+
+        if ($wallet === null) {
+            return;
+        }
+
+        if (in_array($draw->status, [DrawStatus::PAID_ON_TIME, DrawStatus::LATE_PAYMENT], true)) {
+            $this->walletService->drawPayment(
+                wallet: $wallet,
+                amount: $draw->amount,
+                source: $draw,
+                note: __('account_imports.draw_payment_note', ['reference' => $subscription->reference]),
+            );
+
+            return;
+        }
+
+        if (in_array($draw->status, [DrawStatus::POSTPONED, DrawStatus::FAILED], true)) {
+            $tax = (float) $draw->tax_amount;
+
+            if ($tax > 0) {
+                $this->walletService->drawTax(
+                    wallet: $wallet,
+                    amount: $tax,
+                    source: $draw,
+                    note: __('account_imports.draw_tax_note', ['reference' => $subscription->reference]),
+                );
+            }
         }
     }
 }

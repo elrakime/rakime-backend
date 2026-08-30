@@ -361,6 +361,62 @@ class WalletService
         );
     }
 
+    /**
+     * Record a contract cash payment credit (inflow).
+     */
+    public function contractPayment(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::CONTRACT_PAYMENT,
+            abs((float) $amount),
+            $note,
+            $source,
+        );
+    }
+
+    /**
+     * Record a settled draw payment credit (inflow).
+     */
+    public function drawPayment(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::DRAW_PAYMENT,
+            abs((float) $amount),
+            $note,
+            $source,
+        );
+    }
+
+    /**
+     * Record a draw tax deduction (outflow).
+     */
+    public function drawTax(
+        Wallet $wallet,
+        int|float|string $amount,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::DRAW_TAX,
+            -abs((float) $amount),
+            $note,
+            $source,
+        );
+    }
+
     // ============================================================
     // INTERNAL
     // ============================================================

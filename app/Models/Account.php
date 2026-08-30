@@ -56,4 +56,9 @@ class Account extends Model
     {
         return $this->hasMany(AccountDrawLock::class);
     }
+
+    public function wallets(): MorphMany
+    {
+        return $this->morphMany(Wallet::class, 'owner');
+    }
 }
