@@ -6495,7 +6495,7 @@ items:
           maxRedirects: 5
           forwardAuthorizationHeader: true
       - info:
-          name: import account
+          name: import draws
           type: http
           seq: 4
         http:

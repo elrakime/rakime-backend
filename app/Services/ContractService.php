@@ -144,10 +144,12 @@ class ContractService
 
     public function update(Contract $contract, array $data): Contract
     {
-        $isConfigured = in_array($contract->status, [ContractStatus::CONFIGURED, ContractStatus::ACTIVE], true);
-
-        if ($isConfigured) {
+        if ($contract->status === ContractStatus::CONFIGURED) {
             return $this->updateConfigured($contract, $data);
+        }
+
+        if ($contract->status === ContractStatus::ACTIVE) {
+            return $this->updateActive($contract, $data);
         }
 
         if (! in_array($contract->status, [ContractStatus::PENDING, ContractStatus::APPROVED], true)) {
@@ -210,20 +212,21 @@ class ContractService
     }
 
     /**
-     * Update a configured/active contract (admin only).
+     * Update a configured contract (any user with update permission).
      *
-     * Allows changing items, advance_amount and max_amount. The months_count
-     * and subscription count are preserved; amounts are recalculated and
-     * propagated to the existing installments and subscriptions.
+     * Allows changing items and advance_amount. Only admins may change
+     * max_amount. The months_count and subscription count are preserved;
+     * amounts are recalculated and propagated to the existing installments
+     * and subscriptions.
      */
     private function updateConfigured(Contract $contract, array $data): Contract
     {
-        if (auth()->user()->isAdmin() === false) {
-            throw new Exception(__('contracts.cannot_update'), 403);
-        }
-
         if (array_key_exists('months_count', $data)) {
             throw new Exception(__('contracts.cannot_update_months_count'), 422);
+        }
+
+        if (array_key_exists('max_amount', $data) && auth()->user()->isAdmin() === false) {
+            throw new Exception(__('contracts.cannot_update_max_amount'), 403);
         }
 
         return DB::transaction(function () use ($contract, $data) {
@@ -267,6 +270,67 @@ class ContractService
 
             if ($maxAmount !== null && $contract->net_amount !== null && $contract->net_amount > $maxAmount) {
                 throw new Exception(__('contracts.net_exceeds_max_amount'), 422);
+            }
+
+            return $contract->fresh([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'installments', 'subscriptions.draws',
+            ]);
+        });
+    }
+
+    /**
+     * Update an active contract (admin only).
+     *
+     * Allows changing items and advance_amount before the start date, as long
+     * as the net amount remains unchanged. max_amount and months_count cannot
+     * be changed on an active contract. Since the net amount is preserved, the
+     * installments and subscriptions are not recalculated.
+     */
+    private function updateActive(Contract $contract, array $data): Contract
+    {
+        if (auth()->user()->isAdmin() === false) {
+            throw new Exception(__('contracts.cannot_update'), 403);
+        }
+
+        if (array_key_exists('months_count', $data) || array_key_exists('max_amount', $data)) {
+            throw new Exception(__('contracts.cannot_update_months_count'), 422);
+        }
+
+        if (! array_key_exists('items', $data)) {
+            throw new Exception(__('contracts.cannot_update_active'), 422);
+        }
+
+        if ($contract->start_date !== null && $contract->start_date->lte(now()->startOfDay())) {
+            throw new Exception(__('contracts.cannot_update_after_start_date'), 422);
+        }
+
+        return DB::transaction(function () use ($contract, $data) {
+            $originalNetAmount = $contract->net_amount;
+
+            if (array_key_exists('advance_amount', $data)) {
+                $contract->update([
+                    'advance_amount' => $data['advance_amount'],
+                ]);
+            }
+
+            $contract->items()->delete();
+
+            foreach ($data['items'] as $item) {
+                ContractItem::create([
+                    'contract_id' => $contract->id,
+                    'product_id'  => $item['product_id'],
+                    'stock_id'    => $item['stock_id'],
+                    'quantity'    => $item['quantity'],
+                    'price'       => $item['price'],
+                ]);
+            }
+
+            $this->recalculateAmounts($contract);
+
+            if ($originalNetAmount !== null && $contract->net_amount !== $originalNetAmount) {
+                throw new Exception(__('contracts.cannot_change_net_amount'), 422);
             }
 
             return $contract->fresh([
