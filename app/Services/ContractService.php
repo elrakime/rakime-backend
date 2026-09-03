@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
+use App\Enums\InstallmentStatus;
 use App\Models\Contract;
 use App\Models\ContractEarlyCancelation;
 use App\Models\ContractItem;
@@ -537,5 +538,79 @@ class ContractService
         }
 
         return $drawDate;
+    }
+
+    /**
+     * Sync the status of active contracts whose effective end date has passed.
+     *
+     * The effective end date is the earliest of the contract's own end_date and
+     * any early-cancellation end_date. A fully-paid contract becomes COMPLETED;
+     * any other expired contract becomes CLOSED.
+     *
+     * @return array{completed: int, closed: int}
+     */
+    public function syncExpiredStatuses(): array
+    {
+        $completed = 0;
+        $closed    = 0;
+
+        $contracts = Contract::query()
+            ->where('status', ContractStatus::ACTIVE)
+            ->with(['installments', 'earlyCancelations'])
+            ->get();
+
+        DB::transaction(function () use ($contracts, &$completed, &$closed) {
+            $today = now()->startOfDay();
+
+            foreach ($contracts as $contract) {
+                $effectiveEndDate = $this->resolveEffectiveEndDate($contract);
+
+                if ($effectiveEndDate === null || $effectiveEndDate->gte($today)) {
+                    continue;
+                }
+
+                $allPaid = $contract->installments->isNotEmpty()
+                    && $contract->installments->every(
+                        fn (Installment $installment) => $installment->status === InstallmentStatus::PAID
+                    );
+
+                if ($allPaid) {
+                    $contract->assertCanTransitionTo(ContractStatus::COMPLETED->value);
+                    $contract->update(['status' => ContractStatus::COMPLETED]);
+                    $completed++;
+                } else {
+                    $contract->assertCanTransitionTo(ContractStatus::CLOSED->value);
+                    $contract->update(['status' => ContractStatus::CLOSED]);
+                    $closed++;
+                }
+            }
+        });
+
+        return ['completed' => $completed, 'closed' => $closed];
+    }
+
+    /**
+     * Resolve the earliest effective end date of a contract, considering both
+     * its own end_date and any early-cancellation end_date.
+     */
+    private function resolveEffectiveEndDate(Contract $contract): ?Carbon
+    {
+        $dates = [];
+
+        if ($contract->end_date !== null) {
+            $dates[] = $contract->end_date->copy()->startOfDay();
+        }
+
+        foreach ($contract->earlyCancelations as $cancelation) {
+            if ($cancelation->end_date !== null) {
+                $dates[] = $cancelation->end_date->copy()->startOfDay();
+            }
+        }
+
+        if ($dates === []) {
+            return null;
+        }
+
+        return collect($dates)->min();
     }
 }
