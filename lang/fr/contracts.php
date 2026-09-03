@@ -11,4 +11,5 @@ return [
     'cannot_update_active' => 'Seuls les articles peuvent être modifiés sur un contrat actif.',
     'cannot_update_after_start_date' => 'Les articles d\'un contrat actif ne peuvent être modifiés qu\'avant la date de début.',
     'cannot_change_net_amount' => 'Le montant net d\'un contrat actif ne peut pas être modifié.',
+    'net_exceeds_max_amount' => 'Le montant net dépasse le montant maximum autorisé pour ce contrat.',
 ];

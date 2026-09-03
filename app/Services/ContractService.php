@@ -422,6 +422,12 @@ class ContractService
             throw new Exception(__('contracts.subscription_count_exceeds_limit'), 422);
         }
 
+        $maxAmount = $contract->max_amount;
+
+        if ($maxAmount !== null && $contract->net_amount !== null && $contract->net_amount > $maxAmount) {
+            throw new Exception(__('contracts.net_exceeds_max_amount'), 422);
+        }
+
         $perDrawAmount = (float) ceil($monthlyAmount / $subscriptionCount);
         $perDrawAmount = (float) ceil($monthlyAmount / $subscriptionCount);
 

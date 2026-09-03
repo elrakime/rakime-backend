@@ -11,4 +11,5 @@ return [
     'cannot_update_active' => 'Only the items can be updated on an active contract.',
     'cannot_update_after_start_date' => 'The items of an active contract can only be updated before the start date.',
     'cannot_change_net_amount' => 'The net amount of an active contract cannot be changed.',
+    'net_exceeds_max_amount' => 'The net amount exceeds the maximum amount allowed for this contract.',
 ];
