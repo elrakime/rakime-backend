@@ -65,6 +65,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::apiResource('types', TypeController::class);
     Route::apiResource('colors', ColorController::class);
     Route::apiResource('clients', ClientController::class);
+    Route::get('clients/delinquent', [ClientController::class, 'delinquent']);
     Route::get('clients/find/{keyword}', [ClientController::class, 'find']);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('inventories', InventoryController::class);

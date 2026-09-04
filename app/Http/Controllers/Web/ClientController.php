@@ -25,6 +25,17 @@ class ClientController extends Controller
         return $this->successResponse(ClientResource::collection($this->clientService->list($request)));
     }
 
+    public function delinquent(Request $request): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_CLIENTS->value)) {
+            return $response;
+        }
+
+        return $this->successResponse(
+            ClientResource::collection($this->clientService->delinquent($request)),
+        );
+    }
+
     public function find(string $keyword): JsonResponse
     {
         $client = $this->clientService->find($keyword);
