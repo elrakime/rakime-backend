@@ -84,6 +84,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::apiResource('types', TypeController::class);
     Route::apiResource('colors', ColorController::class);
     Route::apiResource('clients', ClientController::class);
+    Route::get('clients/delinquent', [ClientController::class, 'delinquent']);
     Route::get('clients/find/{keyword}', [ClientController::class, 'find']);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('inventories', InventoryController::class);
@@ -128,6 +129,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
     Route::post('contracts/{contract}/cancel', [ContractController::class, 'cancel']);
+    Route::post('contracts/{contract}/extend', [ContractController::class, 'extend']);
 
     Route::apiResource('contracts.payments', ContractPaymentController::class)->parameters(['payments' => 'contract_payment'])->only(['index', 'store']);
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
