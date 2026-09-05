@@ -12,4 +12,7 @@ return [
     'cannot_update_after_start_date' => 'Les articles d\'un contrat actif ne peuvent être modifiés qu\'avant la date de début.',
     'cannot_change_net_amount' => 'Le montant net d\'un contrat actif ne peut pas être modifié.',
     'net_exceeds_max_amount' => 'Le montant net dépasse le montant maximum autorisé pour ce contrat.',
+    'cannot_extend' => 'Seuls les contrats clôturés ou annulés peuvent être prolongés.',
+    'cannot_extend_items' => 'Les contrats de prolongation ne peuvent pas contenir d\'articles.',
+    'missing_remaining_amount' => 'Le contrat n\'a aucun montant restant à prolonger.',
 ];

@@ -191,6 +191,7 @@ enum Permission: string
     case CONFIGURE_CONTRACTS = 'contracts.configure';
     case UPDATE_CONTRACTS   = 'contracts.update';
     case CANCEL_CONTRACTS   = 'contracts.cancel';
+    case EXTEND_CONTRACTS   = 'contracts.extend';
 
     // Installments
     case VIEW_INSTALLMENTS = 'installments.view';

@@ -6,10 +6,10 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\ContractStatus;
 use App\Enums\Permission;
-use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Contract\ApproveContractRequest;
 use App\Http\Requests\Web\Contract\ConfigureContractRequest;
+use App\Http\Requests\Web\Contract\ExtendContractRequest;
 use App\Http\Requests\Web\Contract\RejectContractRequest;
 use App\Http\Requests\Web\Contract\StoreContractRequest;
 use App\Http\Requests\Web\Contract\UpdateContractRequest;
@@ -176,6 +176,27 @@ class ContractController extends Controller
             $contract = $this->contractService->cancel($contract);
 
             return $this->successResponse(new ContractResource($contract));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
+        }
+    }
+
+    public function extend(ExtendContractRequest $request, Contract $contract): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($contract->branch_id)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::EXTEND_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $data = $this->validateRequest($request);
+
+        try {
+            $contract = $this->contractService->extend($contract, (int) $data['months_count']);
+
+            return $this->successResponse(new ContractResource($contract), statusCode: 201);
         } catch (\Exception $e) {
             return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?: 400);
         }

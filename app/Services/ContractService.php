@@ -31,8 +31,19 @@ class ContractService
 
         $query->byUserBranches();
 
+        // By default hide superseded contracts (those that have been extended),
+        // so a contract chain appears as a single entry (the newest one).
+        if (! $request->boolean('include_superseded')) {
+            $query->whereDoesntHave('extension');
+        }
+
         return QueryBuilder::for($query, $request)
-            ->with(['client', 'account', 'branch', 'items.product', 'items.stock', 'financialRecords'])
+            ->with([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'financialRecords',
+                'parentContract', 'parentContract.parentContract',
+            ])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
@@ -68,6 +79,7 @@ class ContractService
             'subscriptions.draws',
             'account.drawLocks',
             'financialRecords',
+            'parentContract', 'parentContract.parentContract',
         ]);
     }
 
@@ -108,6 +120,58 @@ class ContractService
         });
     }
 
+    /**
+     * Extend a closed or cancelled contract into a new contract carrying the
+     * remaining unpaid amount, with no items.
+     *
+     * The new contract is created as PENDING and linked to the source contract
+     * via parent_contract_id. It then follows the normal approve -> configure
+     * flow. The source contract's status is left unchanged.
+     */
+    public function extend(Contract $contract, int $monthsCount): Contract
+    {
+        if (! in_array($contract->status, [ContractStatus::CLOSED, ContractStatus::CANCELLED], true)) {
+            throw new Exception(__('contracts.cannot_extend'), 422);
+        }
+
+        $netAmount    = (float) $contract->net_amount;
+        $paidAmount   = $contract->paidAmount();
+        $remaining    = $netAmount - $paidAmount;
+
+        if ($remaining <= 0) {
+            throw new Exception(__('contracts.missing_remaining_amount'), 422);
+        }
+
+        if ($monthsCount < 1) {
+            throw new Exception(__('contracts.cannot_update_months_count'), 422);
+        }
+
+        $monthlyAmount = (float) ceil($remaining / $monthsCount);
+
+        return DB::transaction(function () use ($contract, $monthsCount, $remaining, $monthlyAmount) {
+            $extension = Contract::create([
+                'parent_contract_id' => $contract->id,
+                'client_id'          => $contract->client_id,
+                'account_id'         => $contract->account_id,
+                'branch_id'          => $contract->branch_id,
+                'status'             => ContractStatus::PENDING,
+                'months_count'       => $monthsCount,
+                'net_amount'         => $remaining,
+                'monthly_amount'     => $monthlyAmount,
+                'note'               => $contract->note,
+            ]);
+
+            $contract->update([
+                'extended_at' => now(),
+            ]);
+
+            return $extension->fresh([
+                'client', 'account', 'branch',
+                'parentContract', 'parentContract.parentContract',
+            ]);
+        });
+    }
+
     public function approve(Contract $contract, ?float $maxAmount = null): Contract
     {
         if ($contract->status !== ContractStatus::PENDING) {
@@ -145,6 +209,10 @@ class ContractService
 
     public function update(Contract $contract, array $data): Contract
     {
+        if ($contract->isExtension() && array_key_exists('items', $data)) {
+            throw new Exception(__('contracts.cannot_extend_items'), 422);
+        }
+
         if ($contract->status === ContractStatus::CONFIGURED) {
             return $this->updateConfigured($contract, $data);
         }

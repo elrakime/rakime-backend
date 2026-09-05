@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ContractStatus;
+use App\Enums\DrawStatus;
 use App\Enums\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
@@ -24,6 +27,8 @@ class Contract extends Model
     use HasUserstamps;
 
     protected $fillable = [
+        'parent_contract_id',
+        'extended_at',
         'client_id',
         'account_id',
         'branch_id',
@@ -52,6 +57,7 @@ class Contract extends Model
             'monthly_amount' => 'decimal:2',
             'start_date'     => 'date',
             'end_date'       => 'date',
+            'extended_at'    => 'datetime',
             'created_at'     => 'datetime',
         ];
     }
@@ -154,6 +160,48 @@ class Contract extends Model
     public function earlyCancelations(): HasMany
     {
         return $this->hasMany(ContractEarlyCancelation::class, 'contract_id');
+    }
+
+    public function parentContract(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_contract_id');
+    }
+
+    public function extension(): HasOne
+    {
+        return $this->hasOne(self::class, 'parent_contract_id');
+    }
+
+    public function isExtension(): bool
+    {
+        return $this->parent_contract_id !== null;
+    }
+
+    public function isSuperseded(): bool
+    {
+        return $this->extension()->exists();
+    }
+
+    /**
+     * Total amount already paid on this contract.
+     *
+     * Sums settled draws (paid on time or late) and cash payments. These two
+     * sources are mutually exclusive per installment, so summing both is safe.
+     */
+    public function paidAmount(): float
+    {
+        $drawsPaid = (float) $this->draws()
+            ->whereIn('status', [DrawStatus::PAID_ON_TIME->value, DrawStatus::LATE_PAYMENT->value])
+            ->sum('amount');
+
+        $cashPaid = (float) $this->payments()->sum('amount');
+
+        return $drawsPaid + $cashPaid;
+    }
+
+    public function draws(): HasManyThrough
+    {
+        return $this->hasManyThrough(Draw::class, Subscription::class, 'contract_id', 'subscription_id');
     }
 
     protected static function booted(): void

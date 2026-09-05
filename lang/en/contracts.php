@@ -12,4 +12,7 @@ return [
     'cannot_update_after_start_date' => 'The items of an active contract can only be updated before the start date.',
     'cannot_change_net_amount' => 'The net amount of an active contract cannot be changed.',
     'net_exceeds_max_amount' => 'The net amount exceeds the maximum amount allowed for this contract.',
+    'cannot_extend' => 'Only closed or cancelled contracts can be extended.',
+    'cannot_extend_items' => 'Extension contracts cannot have items.',
+    'missing_remaining_amount' => 'The contract has no remaining amount to extend.',
 ];

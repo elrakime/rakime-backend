@@ -11,6 +11,8 @@ class ContractResource extends JsonResource
     {
         return [
             'id'             => $this->id,
+            'parent_contract_id' => $this->parent_contract_id,
+            'extended_at'    => $this->extended_at,
             'client_id'      => $this->client_id,
             'account_id'     => $this->account_id,
             'branch_id'      => $this->branch_id,
@@ -40,6 +42,9 @@ class ContractResource extends JsonResource
             'installments'  => InstallmentResource::collection($this->whenLoaded('installments')),
             'subscriptions' => SubscriptionResource::collection($this->whenLoaded('subscriptions')),
             'financial_records' => FinancialRecordResource::collection($this->whenLoaded('financialRecords')),
+
+            'parent_contract' => new self($this->whenLoaded('parentContract')),
+            'extension'       => new self($this->whenLoaded('extension')),
 
             'status_histories' => StatusHistoryResource::collection($this->whenLoaded('statusHistories')),
         ];

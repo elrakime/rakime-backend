@@ -110,6 +110,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::post('contracts/{contract}/reject', [ContractController::class, 'reject']);
     Route::post('contracts/{contract}/configure', [ContractController::class, 'configure']);
     Route::post('contracts/{contract}/cancel', [ContractController::class, 'cancel']);
+    Route::post('contracts/{contract}/extend', [ContractController::class, 'extend']);
 
     Route::apiResource('contracts.payments', ContractPaymentController::class)->parameters(['payments' => 'contract_payment'])->only(['index', 'store']);
     Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
