@@ -23,6 +23,9 @@ enum Permission: string
     case CREATE_ACCOUNTS = 'accounts.create';
     case UPDATE_ACCOUNTS = 'accounts.update';
     case DELETE_ACCOUNTS = 'accounts.delete';
+    case IMPORT_ACCOUNTS = 'accounts.import';
+    case EXPORT_REGISTRATIONS = 'accounts.export_registrations';
+    case EXPORT_CANCELATIONS = 'accounts.export_cancelations';
 
     // Account Draw Locks
     case VIEW_ACCOUNT_DRAW_LOCKS   = 'account_draw_locks.view';
@@ -190,6 +193,8 @@ enum Permission: string
     case CONFIRM_CONTRACTS    = 'contracts.confirm';
     case CONFIGURE_CONTRACTS = 'contracts.configure';
     case UPDATE_CONTRACTS   = 'contracts.update';
+    case UPDATE_CONFIGURED_CONTRACTS = 'contracts.update_configured';
+    case UPDATE_ACTIVE_CONTRACTS = 'contracts.update_active';
     case CANCEL_CONTRACTS   = 'contracts.cancel';
     case EXTEND_CONTRACTS   = 'contracts.extend';
 

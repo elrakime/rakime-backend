@@ -87,7 +87,14 @@ return [
 
     // العقود
     'update_contracts' => 'تعديل العقود',
+    'update_configured_contracts' => 'تعديل العقود المهيأة',
+    'update_active_contracts' => 'تعديل العقود النشطة',
     'cancel_contracts' => 'إلغاء العقود',
+
+    // استيراد وتصدير الحسابات
+    'import_accounts' => 'استيراد بيانات الحسابات',
+    'export_registrations' => 'تصدير التسجيلات',
+    'export_cancelations' => 'تصدير الإلغاءات',
 
     // السجلات المالية
     'view_financial_records'   => 'عرض السجلات المالية',

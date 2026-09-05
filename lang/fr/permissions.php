@@ -87,7 +87,14 @@ return [
 
     // Contrats
     'update_contracts' => 'Modifier les contrats',
+    'update_configured_contracts' => 'Modifier les contrats configurés',
+    'update_active_contracts' => 'Modifier les contrats actifs',
     'cancel_contracts' => 'Annuler les contrats',
+
+    // Importations et exportations des comptes
+    'import_accounts' => 'Importer les données des comptes',
+    'export_registrations' => 'Exporter les inscriptions',
+    'export_cancelations' => 'Exporter les annulations',
 
     // Relevés financiers
     'view_financial_records'   => 'Voir les relevés financiers',

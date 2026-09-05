@@ -69,6 +69,9 @@ enum Role: string
                 Permission::CREATE_ACCOUNTS->value,
                 Permission::UPDATE_ACCOUNTS->value,
                 Permission::DELETE_ACCOUNTS->value,
+                Permission::IMPORT_ACCOUNTS->value,
+                Permission::EXPORT_REGISTRATIONS->value,
+                Permission::EXPORT_CANCELATIONS->value,
                 // Account Draw Locks
                 Permission::VIEW_ACCOUNT_DRAW_LOCKS->value,
                 Permission::CREATE_ACCOUNT_DRAW_LOCKS->value,
@@ -193,6 +196,8 @@ enum Role: string
                 Permission::REJECT_CONTRACTS->value,
                 Permission::CONFIRM_CONTRACTS->value,
                 Permission::CONFIGURE_CONTRACTS->value,
+                Permission::UPDATE_CONFIGURED_CONTRACTS->value,
+                Permission::UPDATE_ACTIVE_CONTRACTS->value,
                 Permission::CANCEL_CONTRACTS->value,
                 // Payments
                 Permission::VIEW_PAYMENTS->value,
@@ -209,6 +214,9 @@ enum Role: string
                 Permission::VIEW_BRANCHES->value,
                 Permission::VIEW_ACCOUNTS->value,
                 Permission::VIEW_ACCOUNT_DRAW_LOCKS->value,
+                Permission::IMPORT_ACCOUNTS->value,
+                Permission::EXPORT_REGISTRATIONS->value,
+                Permission::EXPORT_CANCELATIONS->value,
                 Permission::VIEW_WILAYAS->value,
                 Permission::VIEW_CATEGORIES->value,
                 Permission::VIEW_TYPES->value,
@@ -270,6 +278,8 @@ enum Role: string
                 Permission::VIEW_CONTRACTS->value,
                 Permission::CREATE_CONTRACTS->value,
                 Permission::UPDATE_CONTRACTS->value,
+                Permission::UPDATE_CONFIGURED_CONTRACTS->value,
+                Permission::UPDATE_ACTIVE_CONTRACTS->value,
                 // Payments
                 Permission::VIEW_PAYMENTS->value,
                 Permission::CREATE_PAYMENTS->value,

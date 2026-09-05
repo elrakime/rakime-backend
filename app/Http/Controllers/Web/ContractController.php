@@ -76,7 +76,13 @@ class ContractController extends Controller
             return $response;
         }
 
-        if ($response = $this->authorizePermission(Permission::UPDATE_CONTRACTS->value)) {
+        $updatePermission = match ($contract->status) {
+            ContractStatus::CONFIGURED => Permission::UPDATE_CONFIGURED_CONTRACTS,
+            ContractStatus::ACTIVE => Permission::UPDATE_ACTIVE_CONTRACTS,
+            default => Permission::UPDATE_CONTRACTS,
+        };
+
+        if ($response = $this->authorizePermission($updatePermission->value)) {
             return $response;
         }
 

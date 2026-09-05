@@ -87,7 +87,14 @@ return [
 
     // Contracts
     'update_contracts' => 'Update Contracts',
+    'update_configured_contracts' => 'Update Configured Contracts',
+    'update_active_contracts' => 'Update Active Contracts',
     'cancel_contracts' => 'Cancel Contracts',
+
+    // Account exports and imports
+    'import_accounts' => 'Import Account Data',
+    'export_registrations' => 'Export Registrations',
+    'export_cancelations' => 'Export Cancelations',
 
     // Financial Records
     'view_financial_records'   => 'View Financial Records',

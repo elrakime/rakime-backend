@@ -21,7 +21,7 @@ class AccountExportImportController extends Controller
 
     public function exportRegistrations(ExportAccountRequest $request): StreamedResponse|JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+        if ($response = $this->authorizePermission(Permission::EXPORT_REGISTRATIONS->value)) {
             return $response;
         }
 
@@ -46,7 +46,7 @@ class AccountExportImportController extends Controller
 
     public function exportCancellations(ExportAccountRequest $request): StreamedResponse|JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+        if ($response = $this->authorizePermission(Permission::EXPORT_CANCELATIONS->value)) {
             return $response;
         }
 
@@ -71,7 +71,7 @@ class AccountExportImportController extends Controller
 
     public function import(ImportAccountRequest $request): JsonResponse
     {
-        if ($response = $this->authorizePermission(Permission::VIEW_ACCOUNTS->value)) {
+        if ($response = $this->authorizePermission(Permission::IMPORT_ACCOUNTS->value)) {
             return $response;
         }
 
