@@ -14,6 +14,7 @@ class ProductService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Product::class, $request)
+            ->with(['type', 'color', 'brand'])
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('barcode'),
@@ -53,12 +54,12 @@ class ProductService
             $product->update(['image' => $media->getUrl()]);
         }
 
-        return $product;
+        return $product->load(['type', 'color', 'brand']);
     }
 
     public function show(Product $product): Product
     {
-        return $product;
+        return $product->loadMissing(['type', 'color', 'brand']);
     }
 
     public function update(Product $product, array $data, Request $request): Product
@@ -77,7 +78,7 @@ class ProductService
             $product->addMediaFromRequest('image')->toMediaCollection('image');
         }
 
-        return $product->refresh();
+        return $product->refresh()->loadMissing(['type', 'color', 'brand']);
     }
 
     public function delete(Product $product): void

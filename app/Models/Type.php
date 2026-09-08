@@ -19,10 +19,6 @@ class Type extends Model
 
     protected $fillable = ['category_id', 'name'];
 
-    protected $with = [
-        'category',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();

@@ -34,6 +34,7 @@ class SaleService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
+            ->with(['user', 'branch', 'client', 'items.product', 'items.stock', 'items.returnItems.saleReturn'])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
@@ -102,13 +103,13 @@ class SaleService
 
             $this->creditBranchWallet($data['branch_id'], $totalAmount, $sale);
 
-            return $sale;
+            return $sale->load(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
     }
 
     public function show(Sale $sale): Sale
     {
-        return $sale;
+        return $sale->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
     }
 
     public function update(Sale $sale, array $data): Sale
@@ -192,7 +193,7 @@ class SaleService
 
             $sale->update($updateData);
 
-            return $sale->fresh();
+            return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
     }
 

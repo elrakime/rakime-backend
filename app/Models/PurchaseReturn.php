@@ -25,12 +25,6 @@ class PurchaseReturn extends Model
         'status',
     ];
 
-    protected $with = [
-        'purchase',
-        'items.purchaseItem.product',
-        'items.purchaseItem.returnItems.purchaseReturn',
-    ];
-
     protected function casts(): array
     {
         return [

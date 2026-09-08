@@ -40,17 +40,6 @@ class Purchase extends Model
 
     protected $appends = ['payment_status'];
 
-    protected $with = [
-        'supplier',
-        'branch',
-        'items.product',
-        'items.returnItems.purchaseReturn',
-        'inventory',
-        'returns.items.purchaseItem',
-        'payments',
-        'refunds',
-    ];
-
     protected function casts(): array
     {
         return [

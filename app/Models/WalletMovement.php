@@ -28,10 +28,6 @@ class WalletMovement extends Model
         'note',
     ];
 
-    protected $with = [
-        'wallet',
-    ];
-
     protected function casts(): array
     {
         return [

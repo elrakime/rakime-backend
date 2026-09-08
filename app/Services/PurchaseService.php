@@ -32,6 +32,7 @@ class PurchaseService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
+            ->with(['supplier', 'branch', 'items.product', 'items.returnItems.purchaseReturn', 'inventory', 'returns.items.purchaseItem', 'payments', 'refunds'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('supplier_id'),
@@ -89,13 +90,13 @@ class PurchaseService
 
             $purchase->recalculateAmounts();
 
-            return $purchase;
+            return $purchase->loadMissing(['supplier', 'items.product', 'returns.items.purchaseItem']);
         });
     }
 
     public function show(Purchase $purchase): Purchase
     {
-        return $purchase;
+        return $purchase->loadMissing(['supplier', 'items.product', 'payments', 'refunds', 'inventory', 'returns.items.purchaseItem']);
     }
 
     public function update(Purchase $purchase, array $data): Purchase
@@ -130,7 +131,7 @@ class PurchaseService
                 $purchase->recalculateAmounts();
             }
 
-            return $purchase->refresh();
+            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
         });
     }
 
@@ -151,7 +152,7 @@ class PurchaseService
 
         $purchase->update(['status' => PurchaseStatus::CANCELED]);
 
-        return $purchase->refresh();
+        return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
     }
 
     public function receive(Purchase $purchase, array $data): Purchase
@@ -234,7 +235,7 @@ class PurchaseService
                 }
             }
 
-            return $purchase->refresh();
+            return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
         });
     }
 

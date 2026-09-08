@@ -32,15 +32,6 @@ class Sale extends Model
         'note',
     ];
 
-    protected $with = [
-        'user',
-        'branch',
-        'client',
-        'items.product',
-        'items.stock',
-        'items.returnItems.saleReturn',
-    ];
-
     protected function casts(): array
     {
         return [

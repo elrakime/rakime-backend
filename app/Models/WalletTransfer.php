@@ -21,11 +21,6 @@ class WalletTransfer extends Model
         'note',
     ];
 
-    protected $with = [
-        'fromWallet',
-        'toWallet',
-    ];
-
     protected function casts(): array
     {
         return [

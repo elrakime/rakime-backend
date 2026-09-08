@@ -16,6 +16,12 @@ class StockService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Stock::class, $request)
+            ->with([
+                'inventory', 'product',
+                'batches', 'prices',
+                'sellingPrice', 'installmentPrice', 'wholesalePrice',
+                'currentQuantity', 'initialQuantity',
+            ])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('product_id'),
@@ -92,12 +98,20 @@ class StockService
             }
         }
 
-        return $stock;
+        return $stock->load([
+            'inventory', 'product', 'batches', 'prices',
+            'sellingPrice', 'installmentPrice', 'wholesalePrice',
+            'currentQuantity', 'initialQuantity',
+        ]);
     }
 
     public function show(Stock $stock): Stock
     {
-        return $stock;
+        return $stock->loadMissing([
+            'inventory', 'product', 'batches', 'prices',
+            'sellingPrice', 'installmentPrice', 'wholesalePrice',
+            'currentQuantity', 'initialQuantity',
+        ]);
     }
 
     public function delete(Stock $stock): void

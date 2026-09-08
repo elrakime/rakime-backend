@@ -12,7 +12,7 @@ class FinancialRecordService
 {
     public function list(Request $request): LengthAwarePaginator
     {
-        $query = FinancialRecord::query();
+        $query = FinancialRecord::query()->with(['client', 'contract']);
 
         if ($clientId = $request->integer('client_id')) {
             $query->where('client_id', $clientId);
@@ -41,7 +41,7 @@ class FinancialRecordService
             'note'        => $data['note'] ?? null,
         ]);
 
-        return $record;
+        return $record->load(['client', 'contract']);
     }
 
     public function update(FinancialRecord $financialRecord, array $data): FinancialRecord
@@ -61,7 +61,7 @@ class FinancialRecordService
             'note'     => $data['note'] ?? $financialRecord->note,
         ]);
 
-        return $financialRecord;
+        return $financialRecord->load(['client', 'contract']);
     }
 
     public function delete(FinancialRecord $financialRecord): void

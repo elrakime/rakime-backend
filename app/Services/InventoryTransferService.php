@@ -30,6 +30,7 @@ class InventoryTransferService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
+            ->with(['fromInventory', 'toInventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('from_inventory_id'),
                 AllowedFilter::exact('to_inventory_id'),
@@ -72,13 +73,13 @@ class InventoryTransferService
                 ]);
             }
 
-            return $transfer->fresh();
+            return $transfer->fresh()->load(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
     public function show(InventoryTransfer $transfer): InventoryTransfer
     {
-        return $transfer;
+        return $transfer->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
     }
 
     public function update(InventoryTransfer $transfer, array $data): InventoryTransfer
@@ -106,7 +107,7 @@ class InventoryTransferService
                 }
             }
 
-            return $transfer->fresh();
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
@@ -170,7 +171,7 @@ class InventoryTransferService
 
             $transfer->update(['status' => InventoryTransferStatus::DISPATCHED]);
 
-            return $transfer->fresh();
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
@@ -256,7 +257,7 @@ class InventoryTransferService
 
             $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);
 
-            return $transfer->fresh();
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 
@@ -359,7 +360,7 @@ class InventoryTransferService
 
             $transfer->update(['status' => InventoryTransferStatus::CANCELED]);
 
-            return $transfer->fresh();
+            return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
 

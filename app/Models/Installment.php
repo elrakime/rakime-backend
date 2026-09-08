@@ -29,14 +29,6 @@ class Installment extends Model
         'due_date',
     ];
 
-    protected $with = [
-        'contract.client',
-        'contract.account',
-        'contract.branch',
-        'payments',
-        'draws',
-    ];
-
     protected function casts(): array
     {
         return [

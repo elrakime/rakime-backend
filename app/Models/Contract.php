@@ -26,16 +26,6 @@ class Contract extends Model
     use HasStatusGuard;
     use HasUserstamps;
 
-    protected $with = [
-        'client',
-        'account',
-        'branch',
-        'items.product',
-        'items.stock',
-        'financialRecords',
-        'parentContract',
-    ];
-
     protected $fillable = [
         'parent_contract_id',
         'extended_at',

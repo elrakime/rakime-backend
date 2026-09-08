@@ -24,6 +24,7 @@ class ExpirationService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
+            ->with(['user', 'inventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::callback('branch_id', function ($query, $value) {
@@ -64,13 +65,13 @@ class ExpirationService
                 }
             }
 
-            return $expiration->fresh();
+            return $expiration->fresh()->load(['user', 'inventory', 'items.stock.product']);
         });
     }
 
     public function show(Expiration $expiration): Expiration
     {
-        return $expiration;
+        return $expiration->loadMissing(['user', 'inventory', 'items.stock.product']);
     }
 
     public function update(Expiration $expiration, array $data): Expiration
@@ -94,12 +95,14 @@ class ExpirationService
                 }
             }
 
-            return $expiration->fresh();
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });
     }
 
     public function approve(Expiration $expiration): Expiration
     {
+        $expiration->loadMissing(['items.stock.product']);
+
         return DB::transaction(function () use ($expiration) {
             foreach ($expiration->items as $item) {
                 $remaining = $item->quantity;
@@ -152,7 +155,7 @@ class ExpirationService
 
             $expiration->update(['status' => ExpirationStatus::APPROVED]);
 
-            return $expiration->fresh();
+            return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });
     }
 

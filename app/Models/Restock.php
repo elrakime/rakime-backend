@@ -33,12 +33,6 @@ class Restock extends Model
         'fulfilled_with_type',
     ];
 
-    protected $with = [
-        'user',
-        'branch',
-        'items.product',
-    ];
-
     protected function casts(): array
     {
         return [

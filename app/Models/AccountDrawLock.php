@@ -17,10 +17,6 @@ class AccountDrawLock extends Model
         'month',
     ];
 
-    protected $with = [
-        'account',
-    ];
-
     protected function casts(): array
     {
         return [

@@ -38,6 +38,12 @@ class ContractService
         }
 
         return QueryBuilder::for($query, $request)
+            ->with([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'financialRecords',
+                'parentContract', 'parentContract.parentContract',
+            ])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
@@ -66,7 +72,15 @@ class ContractService
 
     public function show(Contract $contract): Contract
     {
-        return $contract;
+        return $contract->loadMissing([
+            'client', 'account', 'branch',
+            'items.product',
+            'installments',
+            'subscriptions.draws',
+            'account.drawLocks',
+            'financialRecords',
+            'parentContract', 'parentContract.parentContract',
+        ]);
     }
 
     public function create(array $data): Contract
@@ -610,6 +624,7 @@ class ContractService
 
         $contracts = Contract::query()
             ->where('status', ContractStatus::ACTIVE)
+            ->with(['installments', 'earlyCancelations'])
             ->get();
 
         DB::transaction(function () use ($contracts, &$completed, &$closed) {
