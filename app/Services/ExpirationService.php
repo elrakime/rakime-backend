@@ -27,6 +27,9 @@ class ExpirationService
             ->with(['user', 'inventory', 'items.stock.product'])
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->whereHas('inventory', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%")

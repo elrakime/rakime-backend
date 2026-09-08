@@ -39,6 +39,9 @@ class InventoryMovementService
                 AllowedFilter::exact('stock_id'),
                 AllowedFilter::exact('product_id'),
                 AllowedFilter::exact('movement_type'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->whereHas('inventory', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::callback('from_date', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),

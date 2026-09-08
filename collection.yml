@@ -1693,6 +1693,9 @@ items:
                 - name: filter[inventory_id]
                   value: '1'
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
@@ -2745,6 +2748,9 @@ items:
                 - name: filter[to_inventory_id]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
@@ -2900,6 +2906,9 @@ items:
                   value: ''
                   type: query
                 - name: filter[product_id]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
                   value: ''
                   type: query
                 - name: filter[movement_type]
@@ -5243,6 +5252,9 @@ items:
                 - name: filter[product_id]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
@@ -5903,6 +5915,12 @@ items:
                 - name: filter[to_date]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
+                  value: ''
+                  type: query
                 - name: sort
                   value: '-created_at'
                   type: query
@@ -6062,6 +6080,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[owner_type]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
                   value: ''
                   type: query
               auth:
@@ -6266,6 +6290,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[to_wallet_id]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
                   value: ''
                   type: query
                 - name: sort
@@ -8157,6 +8187,9 @@ items:
                 - name: filter[product_id]
                   value: ''
                   type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
                 - name: filter[movement_type]
                   value: ''
                   type: query
@@ -8223,6 +8256,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[to_date]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
                   value: ''
                   type: query
                 - name: sort
@@ -8384,6 +8423,12 @@ items:
                   value: ''
                   type: query
                 - name: filter[owner_type]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
                   value: ''
                   type: query
               auth:

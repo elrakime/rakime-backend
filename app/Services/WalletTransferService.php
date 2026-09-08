@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Account;
+use App\Models\Branch;
 use App\Models\Wallet;
 use App\Models\WalletTransfer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -26,6 +28,22 @@ class WalletTransferService
             ->allowedFilters(
                 AllowedFilter::exact('from_wallet_id'),
                 AllowedFilter::exact('to_wallet_id'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->where(function ($q) use ($value) {
+                        $walletBranch = fn ($sub) => $sub->where('owner_type', Branch::class)
+                            ->where('owner_id', $value);
+                        $q->whereHas('fromWallet', $walletBranch)
+                          ->orWhereHas('toWallet', $walletBranch);
+                    });
+                }),
+                AllowedFilter::callback('account_id', function ($query, $value) {
+                    $query->where(function ($q) use ($value) {
+                        $walletAccount = fn ($sub) => $sub->where('owner_type', Account::class)
+                            ->where('owner_id', $value);
+                        $q->whereHas('fromWallet', $walletAccount)
+                          ->orWhereHas('toWallet', $walletAccount);
+                    });
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('note', 'like', "%{$value}%");
                 }),

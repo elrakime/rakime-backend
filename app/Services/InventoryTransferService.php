@@ -34,6 +34,12 @@ class InventoryTransferService
             ->allowedFilters(
                 AllowedFilter::exact('from_inventory_id'),
                 AllowedFilter::exact('to_inventory_id'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->where(function ($q) use ($value) {
+                        $q->whereHas('fromInventory', fn ($sub) => $sub->where('branch_id', $value))
+                          ->orWhereHas('toInventory', fn ($sub) => $sub->where('branch_id', $value));
+                    });
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('note', 'like', "%{$value}%");

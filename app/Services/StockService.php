@@ -25,6 +25,9 @@ class StockService
             ->allowedFilters(
                 AllowedFilter::exact('inventory_id'),
                 AllowedFilter::exact('product_id'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->whereHas('inventory', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->whereHas('product', function ($q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")

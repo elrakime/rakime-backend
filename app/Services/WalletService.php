@@ -30,6 +30,14 @@ class WalletService
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('owner_type'),
                 AllowedFilter::exact('owner_id'),
+                AllowedFilter::callback('branch_id', function ($query, $value) {
+                    $query->where('owner_type', Branch::class)
+                          ->where('owner_id', $value);
+                }),
+                AllowedFilter::callback('account_id', function ($query, $value) {
+                    $query->where('owner_type', Account::class)
+                          ->where('owner_id', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('name', 'like', "%{$value}%");
                 }),
