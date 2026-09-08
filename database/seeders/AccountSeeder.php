@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Account;
-use App\Models\Wallet;
+use App\Services\AccountService;
 use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
@@ -29,14 +28,11 @@ class AccountSeeder extends Seeder
             ],
         ];
 
+        $service = app(AccountService::class);
+
         foreach ($accounts as $data) {
-            $account = Account::firstOrCreate(['ccp_number' => $data['ccp_number']], $data);
-            Wallet::create([
-                'owner_type' => Account::class,
-                'owner_id'   => $account->id,
-                'name'       => $data['name'],
-                'balance'    => 0,
-            ]);
+            // The service creates the account and its wallet together.
+            $service->create($data);
         }
     }
 }

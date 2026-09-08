@@ -4,38 +4,41 @@ namespace Database\Seeders;
 
 use App\Models\Inventory;
 use App\Models\InventoryTransfer;
-use App\Models\InventoryTransferItem;
 use App\Models\Stock;
+use App\Services\InventoryTransferService;
 use Illuminate\Database\Seeder;
 
 class InventoryTransferSeeder extends Seeder
 {
     public function run(): void
     {
-        $fromInventory = Inventory::where('name', 'Main Warehouse')->first();
-        $toInventory   = Inventory::where('name', 'Second Branch Warehouse')->first();
+        $fromInventory = Inventory::whereHas('branch', fn ($q) => $q->where('code', 'M'))->first();
+        $toInventory   = Inventory::whereHas('branch', fn ($q) => $q->where('code', 'S'))->first();
         $stock         = Stock::where('inventory_id', $fromInventory?->id)->first();
 
-        if (!$fromInventory || !$toInventory || !$stock) {
+        if (! $fromInventory || ! $toInventory || ! $stock) {
             return;
         }
 
-        $transfer = InventoryTransfer::create([
+        if (InventoryTransfer::where('from_inventory_id', $fromInventory->id)->exists()) {
+            return;
+        }
+
+        $service = app(InventoryTransferService::class);
+
+        // The service creates the transfer and its items together.
+        $transfer = $service->create([
             'from_inventory_id' => $fromInventory->id,
             'to_inventory_id'   => $toInventory->id,
             'note'              => 'Stock transfer to second branch',
+            'items' => [[
+                'stock_id' => $stock->id,
+                'quantity' => 2,
+            ]],
         ]);
 
-        // Ensure stock exists in destination inventory
-        $destStock = Stock::firstOrCreate([
-            'inventory_id' => $toInventory->id,
-            'product_id'   => $stock->product_id,
-        ]);
-
-        InventoryTransferItem::create([
-            'inventory_transfer_id' => $transfer->id,
-            'stock_id'              => $destStock->id,
-            'quantity'              => 2,
-        ]);
+        // Dispatch and receive — this moves stock and records movements.
+        $service->dispatch($transfer);
+        $service->receive($transfer);
     }
 }

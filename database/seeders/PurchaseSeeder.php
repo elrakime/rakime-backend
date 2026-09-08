@@ -2,17 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Enums\PurchaseStatus;
-use App\Models\Batch;
+use App\Models\Branch;
 use App\Models\Inventory;
 use App\Models\Product;
-use App\Models\Purchase;
-use App\Models\PurchaseItem;
-use App\Models\PurchasePayment;
-use App\Models\PurchaseReturn;
-use App\Models\PurchaseReturnItem;
-use App\Models\Stock;
 use App\Models\Supplier;
+use App\Models\Wallet;
+use App\Services\PurchasePaymentService;
+use App\Services\PurchaseReturnService;
+use App\Services\PurchaseService;
+use App\Services\WalletService;
 use Illuminate\Database\Seeder;
 
 class PurchaseSeeder extends Seeder
@@ -20,120 +18,102 @@ class PurchaseSeeder extends Seeder
     public function run(): void
     {
         $supplier  = Supplier::first();
-        $inventory = Inventory::where('name', 'Main Warehouse')->first();
+        $inventory = Inventory::whereHas('branch', fn ($q) => $q->where('code', 'M'))->first();
         $products  = Product::take(3)->get();
 
         if (! $supplier || ! $inventory || $products->isEmpty()) {
             return;
         }
 
-        // ------ Purchase 1: completed & fully paid ------
-        $purchase1 = Purchase::create([
-            'supplier_id'  => $supplier->id,
-            'branch_id'    => $inventory->branch_id,
-            'inventory_id' => $inventory->id,
-            'reference'    => 'PO-2024-001',
-            'status'       => PurchaseStatus::COMPLETED,
-            'total_amount' => 150000,
-            'note'         => 'First purchase order',
-        ]);
+        $purchaseService = app(PurchaseService::class);
+        $paymentService  = app(PurchasePaymentService::class);
+        $returnService   = app(PurchaseReturnService::class);
+        $walletService   = app(WalletService::class);
 
-        foreach ($products as $i => $product) {
-            $price    = 50000 + ($i * 25000);
-            $quantity = 5 + $i;
+        // Fund the branch wallet so payments can be made.
+        $wallet = Wallet::where('owner_type', Branch::class)
+            ->where('owner_id', $inventory->branch_id)
+            ->first();
 
-            $item = PurchaseItem::create([
-                'purchase_id' => $purchase1->id,
-                'product_id'  => $product->id,
-                'quantity'    => $quantity,
-                'price'       => $price,
-            ]);
-
-            $stock = Stock::firstOrCreate([
-                'inventory_id' => $inventory->id,
-                'product_id'   => $product->id,
-            ]);
-
-            Batch::firstOrCreate(
-                [
-                    'stock_id'    => $stock->id,
-                    'source_id'   => $item->id,
-                    'source_type' => PurchaseItem::class,
-                ],
-                [
-                    'purchase_price'   => $price,
-                    'initial_quantity'  => $quantity,
-                    'current_quantity'  => $quantity,
-                ]
-            );
+        if ($wallet) {
+            // Deposit enough to cover purchase 1 (1,400,000) + purchase 2 (100,000).
+            $walletService->deposit($wallet, 2000000, 'Initial funding for purchases');
         }
 
-        // Full bank payment
-        PurchasePayment::create([
-            'purchase_id' => $purchase1->id,
-            'amount'      => 150000,
+        // ------ Purchase 1: received & fully paid ------
+        $purchase1 = $purchaseService->create([
+            'supplier_id' => $supplier->id,
+            'branch_id'   => $inventory->branch_id,
+            'note'        => 'First purchase order',
+            'items' => $products->map(fn ($product, $i) => [
+                'product_id' => $product->id,
+                'quantity'   => 5 + $i,
+                'price'      => 50000 + ($i * 25000),
+            ])->all(),
         ]);
 
-        $purchase1->recalculateAmounts();
-
-        // ------ Purchase 2: completed & partially paid ------
-        $purchase2 = Purchase::create([
-            'supplier_id'  => $supplier->id,
-            'branch_id'    => $inventory->branch_id,
+        // "Receive" the purchase — this creates batches, prices,
+        // batch allocations and inventory movements via the service.
+        $purchaseService->receive($purchase1, [
             'inventory_id' => $inventory->id,
-            'reference'    => 'PO-2024-002',
-            'status'       => PurchaseStatus::COMPLETED,
-            'total_amount' => 200000,
-            'note'         => 'Second purchase order',
+            'items' => $products->map(fn ($product, $i) => [
+                'product_id'         => $product->id,
+                'selling_prices'     => [2 * (50000 + ($i * 25000))],
+                'installment_prices' => [3 * (50000 + ($i * 25000))],
+            ])->all(),
         ]);
 
-        $p2Product = $products->last();
-
-        $p2Item = PurchaseItem::create([
-            'purchase_id' => $purchase2->id,
-            'product_id'  => $p2Product->id,
-            'quantity'    => 10,
-            'price'       => 20000,
+        // Pay the full amount via the service.
+        $paymentService->create($purchase1, [
+            'amount' => $purchase1->net_amount,
         ]);
 
-        $stock2 = Stock::firstOrCreate([
+        // ------ Purchase 2: received & partially paid ------
+        // Use a product NOT already stocked by purchase 1, so its selling
+        // price isn't constrained by existing batch purchase prices.
+        $p2Product = Product::whereNotIn('id', $products->pluck('id'))->first();
+
+        if (! $p2Product) {
+            return;
+        }
+
+        $purchase2 = $purchaseService->create([
+            'supplier_id' => $supplier->id,
+            'branch_id'   => $inventory->branch_id,
+            'note'        => 'Second purchase order',
+            'items' => [[
+                'product_id' => $p2Product->id,
+                'quantity'   => 10,
+                'price'      => 20000,
+            ]],
+        ]);
+
+        $purchaseService->receive($purchase2, [
             'inventory_id' => $inventory->id,
-            'product_id'   => $p2Product->id,
+            'items' => [[
+                'product_id'         => $p2Product->id,
+                'selling_prices'     => [40000],
+                'installment_prices' => [60000],
+            ]],
         ]);
 
-        Batch::firstOrCreate(
-            [
-                'stock_id'    => $stock2->id,
-                'source_id'   => $p2Item->id,
-                'source_type' => PurchaseItem::class,
-            ],
-            [
-                'purchase_price'   => 20000,
-                'initial_quantity'  => 10,
-                'current_quantity'  => 10,
-            ]
-        );
-
-        // Partial cash payment
-        PurchasePayment::create([
-            'purchase_id' => $purchase2->id,
-            'amount'      => 100000,
+        // Partial payment via the service.
+        $paymentService->create($purchase2, [
+            'amount' => 100000,
         ]);
-
-        $purchase2->recalculateAmounts();
 
         // ------ Purchase Return for Purchase 2 ------
-        $return = PurchaseReturn::create([
-            'purchase_id' => $purchase2->id,
-            'reference'   => 'PR-2024-001',
-            'note'        => 'Defective item returned',
+        $p2Item = $purchase2->items()->where('product_id', $p2Product->id)->first();
+
+        $return = $returnService->create($purchase2, [
+            'note' => 'Defective item returned',
+            'items' => [[
+                'purchase_item_id' => $p2Item->id,
+                'quantity'         => 2,
+                'reason'           => 'Defective product',
+            ]],
         ]);
 
-        PurchaseReturnItem::create([
-            'purchase_return_id' => $return->id,
-            'purchase_item_id'   => $p2Item->id,
-            'quantity'           => 2,
-            'reason'             => 'Defective product',
-        ]);
+        $returnService->approve($return);
     }
 }

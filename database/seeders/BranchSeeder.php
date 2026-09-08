@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use App\Models\Branch;
-use App\Models\Inventory;
-use App\Models\Wallet;
 use App\Models\Wilaya;
+use App\Services\BranchService;
 use Illuminate\Database\Seeder;
+use Illuminate\Http\Request;
 
 class BranchSeeder extends Seeder
 {
@@ -20,8 +20,6 @@ class BranchSeeder extends Seeder
                 'shop_name' => 'Rakime Main Store',
                 'address'   => '123 Main Street, City Center',
                 'phone'     => '+213 123 456 789',
-                'inventory' => 'Main Warehouse',
-                'wallet'    => 'Main Wallet',
             ],
             [
                 'name'      => 'Second Branch',
@@ -29,8 +27,6 @@ class BranchSeeder extends Seeder
                 'shop_name' => 'Rakime Second Store',
                 'address'   => '456 Second Avenue, Downtown',
                 'phone'     => '+213 987 654 321',
-                'inventory' => 'Second Branch Warehouse',
-                'wallet'    => 'Second Branch Wallet',
             ],
         ];
 
@@ -41,33 +37,25 @@ class BranchSeeder extends Seeder
             return;
         }
 
-        foreach ($branches as $data) {
-            $branch = Branch::firstOrCreate(
-                ['code' => $data['code']],
-                [
-                    'wilaya_id' => $wilaya->id,
-                    'name'      => $data['name'],
-                    'shop_name' => $data['shop_name'],
-                    'address'   => $data['address'],
-                    'phone'     => $data['phone'],
-                ]
-            );
+        $service = app(BranchService::class);
+        $request = Request::create('', 'POST');
 
-            // Attach all accounts to this branch
-            foreach ($accounts as $account) {
-                $branch->accounts()->syncWithoutDetaching([$account->id]);
+        foreach ($branches as $data) {
+            if (Branch::where('code', $data['code'])->exists()) {
+                continue;
             }
 
-            // Create inventory for the branch
-            Inventory::firstOrCreate(
-                ['branch_id' => $branch->id, 'name' => $data['inventory']],
-            );
-
-            // Create wallet for the branch
-            Wallet::firstOrCreate(
-                ['owner_type' => Branch::class, 'owner_id' => $branch->id, 'name' => $data['wallet']],
-                ['balance' => 0]
-            );
+            // The service creates the branch, its inventory and wallet,
+            // and syncs the attached accounts.
+            $service->create([
+                'wilaya_id' => $wilaya->id,
+                'name'      => $data['name'],
+                'code'      => $data['code'],
+                'shop_name' => $data['shop_name'],
+                'address'   => $data['address'],
+                'phone'     => $data['phone'],
+                'accounts'  => $accounts->pluck('id')->all(),
+            ], $request);
         }
     }
 }

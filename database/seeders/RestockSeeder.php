@@ -2,40 +2,35 @@
 
 namespace Database\Seeders;
 
-use App\Enums\RestockStatus;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Restock;
-use App\Models\RestockItem;
-use App\Models\User;
+use App\Services\RestockService;
 use Illuminate\Database\Seeder;
 
 class RestockSeeder extends Seeder
 {
     public function run(): void
     {
-        $user    = User::where('email', 'admin@example.com')->first();
         $branch  = Branch::where('code', 'M')->first();
         $product = Product::first();
 
-        if (! $user || ! $branch || ! $product) {
+        if (! $branch || ! $product) {
             return;
         }
 
-        $restock = Restock::create([
-            'branch_id'    => $branch->id,
-            'reference'    => 'RST-2024-001',
-            'status'       => RestockStatus::PENDING,
-            'note'         => 'Restock request for low inventory',
-            'created_by'   => $user->id,
-        ]);
+        if (Restock::where('branch_id', $branch->id)->exists()) {
+            return;
+        }
 
-        $item = new RestockItem();
-        $item->forceFill([
-            'restock_id'          => $restock->id,
-            'product_id'          => $product->id,
-            'requested_quantity'  => 10,
-            'fulfilled_quantity'  => 0,
-        ])->save();
+        // The service creates the restock and its items together.
+        app(RestockService::class)->create([
+            'branch_id' => $branch->id,
+            'note'      => 'Restock request for low inventory',
+            'items' => [[
+                'product_id'         => $product->id,
+                'requested_quantity' => 10,
+            ]],
+        ]);
     }
 }

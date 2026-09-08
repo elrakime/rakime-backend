@@ -3,36 +3,40 @@
 namespace Database\Seeders;
 
 use App\Models\Expiration;
-use App\Models\ExpirationItem;
 use App\Models\Inventory;
 use App\Models\Stock;
-use App\Models\User;
+use App\Services\ExpirationService;
 use Illuminate\Database\Seeder;
 
 class ExpirationSeeder extends Seeder
 {
     public function run(): void
     {
-        $user      = User::where('email', 'admin@example.com')->first();
-        $inventory = Inventory::where('name', 'Main Warehouse')->first();
-        $stock     = Stock::first();
+        $inventory = Inventory::whereHas('branch', fn ($q) => $q->where('code', 'M'))->first();
+        $stock     = Stock::where('inventory_id', $inventory?->id)->first();
 
-        if (! $user || ! $inventory || ! $stock) {
+        if (! $inventory || ! $stock) {
             return;
         }
 
-        $expiration = Expiration::create([
+        if (Expiration::where('inventory_id', $inventory->id)->exists()) {
+            return;
+        }
+
+        $service = app(ExpirationService::class);
+
+        // The service creates the expiration and its items together.
+        $expiration = $service->create([
             'inventory_id' => $inventory->id,
-            'reference'    => 'EXP-2024-001',
             'note'         => 'Products expired in storage',
-            'created_by'   => $user->id,
+            'items' => [[
+                'stock_id' => $stock->id,
+                'quantity' => 1,
+                'reason'   => 'Passed expiration date',
+            ]],
         ]);
 
-        ExpirationItem::create([
-            'expiration_id' => $expiration->id,
-            'stock_id'      => $stock->id,
-            'quantity'      => 1,
-            'reason'        => 'Passed expiration date',
-        ]);
+        // Approve it — this deducts stock and records the inventory movement.
+        $service->approve($expiration);
     }
 }

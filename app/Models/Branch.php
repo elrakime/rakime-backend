@@ -33,11 +33,6 @@ class Branch extends Model implements HasMedia
         'metadata',
     ];
 
-    protected $with = [
-        'inventory',
-        'wallet',
-    ];
-
     protected function casts(): array
     {
         return [
