@@ -20,7 +20,6 @@ class BranchService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with('accounts', 'managers', 'wilaya')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('code'),
@@ -79,12 +78,12 @@ class BranchService
             ['name' => $branch->name, 'balance' => 0],
         );
 
-        return $branch->loadMissing('accounts');
+        return $branch;
     }
 
     public function show(Branch $branch): Branch
     {
-        return $branch->loadMissing(['accounts', 'wilaya']);
+        return $branch;
     }
 
     public function update(Branch $branch, array $data, Request $request): Branch
@@ -118,7 +117,7 @@ class BranchService
             ['name' => $branch->name, 'balance' => 0],
         );
 
-        return $branch->refresh()->loadMissing('accounts');
+        return $branch->refresh();
     }
 
     public function delete(Branch $branch): void

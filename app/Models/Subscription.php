@@ -20,6 +20,13 @@ class Subscription extends Model
         'amount',
     ];
 
+    protected $with = [
+        'contract.client',
+        'contract.account',
+        'contract.branch',
+        'draws',
+    ];
+
     protected function casts(): array
     {
         return [

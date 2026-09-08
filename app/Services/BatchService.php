@@ -74,7 +74,7 @@ class BatchService
 
     public function show(Batch $batch): Batch
     {
-        return $batch->loadMissing(['stock', 'source']);
+        return $batch;
     }
 
     public function update(Batch $batch, array $data): Batch

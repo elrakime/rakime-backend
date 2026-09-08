@@ -21,7 +21,6 @@ class InventoryService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with('branch')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('branch_id'),
@@ -44,12 +43,12 @@ class InventoryService
             'name'      => $data['name'],
         ]);
 
-        return $inventory->loadMissing('branch');
+        return $inventory;
     }
 
     public function show(Inventory $inventory): Inventory
     {
-        return $inventory->loadMissing('branch');
+        return $inventory;
     }
 
     public function update(Inventory $inventory, array $data): Inventory
@@ -59,7 +58,7 @@ class InventoryService
             'name'      => $data['name'] ?? null,
         ], fn ($v) => $v !== null));
 
-        return $inventory->refresh()->loadMissing('branch');
+        return $inventory->refresh();
     }
 
     public function delete(Inventory $inventory): void

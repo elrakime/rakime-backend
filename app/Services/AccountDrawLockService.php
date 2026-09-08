@@ -18,7 +18,6 @@ class AccountDrawLockService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(AccountDrawLock::class, $request)
-            ->with('account')
             ->allowedFilters(
                 AllowedFilter::exact('account_id'),
             )

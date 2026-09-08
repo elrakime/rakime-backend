@@ -27,6 +27,12 @@ class Expiration extends Model
         'status',
     ];
 
+    protected $with = [
+        'user',
+        'inventory',
+        'items.stock.product',
+    ];
+
     protected function casts(): array
     {
         return [

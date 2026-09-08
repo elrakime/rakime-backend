@@ -20,6 +20,10 @@ class Price extends Model
         'amount',
     ];
 
+    protected $with = [
+        'stock',
+    ];
+
     protected function casts(): array
     {
         return [

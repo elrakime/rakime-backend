@@ -36,6 +36,9 @@ class Branch extends Model implements HasMedia
     protected $with = [
         'inventory',
         'wallet',
+        'accounts',
+        'managers',
+        'wilaya',
     ];
 
     protected function casts(): array

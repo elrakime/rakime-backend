@@ -30,6 +30,12 @@ class Product extends Model implements HasMedia
         'min_quantity',
     ];
 
+    protected $with = [
+        'type',
+        'color',
+        'brand',
+    ];
+
     protected function casts(): array
     {
         return [

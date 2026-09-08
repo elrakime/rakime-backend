@@ -24,6 +24,10 @@ class Batch extends Model
         'current_quantity',
     ];
 
+    protected $with = [
+        'stock',
+    ];
+
     protected function casts(): array
     {
         return [

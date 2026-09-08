@@ -14,7 +14,6 @@ class TypeService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Type::class, $request)
-            ->with('category')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('category_id'),
@@ -33,12 +32,12 @@ class TypeService
         return Type::create([
             'category_id' => $data['category_id'],
             'name'        => $data['name'],
-        ])->loadMissing('category');
+        ]);
     }
 
     public function show(Type $type): Type
     {
-        return $type->loadMissing('category');
+        return $type;
     }
 
     public function update(Type $type, array $data): Type
@@ -48,7 +47,7 @@ class TypeService
             'name'        => $data['name'] ?? null,
         ], fn ($v) => $v !== null));
 
-        return $type->refresh()->loadMissing('category');
+        return $type->refresh();
     }
 
     public function delete(Type $type): void

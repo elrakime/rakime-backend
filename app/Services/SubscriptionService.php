@@ -18,7 +18,6 @@ class SubscriptionService
         $query = $contract->subscriptions()->getQuery();
 
         return QueryBuilder::for($query, $request)
-            ->with(['contract.client', 'contract.account', 'contract.branch', 'draws'])
             ->allowedFilters(
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('search', function ($query, string $value) {

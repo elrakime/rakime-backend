@@ -31,6 +31,12 @@ class InventoryTransfer extends Model
         'status',
     ];
 
+    protected $with = [
+        'fromInventory',
+        'toInventory',
+        'items.stock.product',
+    ];
+
     protected function casts(): array
     {
         return [

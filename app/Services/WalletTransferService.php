@@ -24,7 +24,6 @@ class WalletTransferService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with(['fromWallet', 'toWallet'])
             ->allowedFilters(
                 AllowedFilter::exact('from_wallet_id'),
                 AllowedFilter::exact('to_wallet_id'),
@@ -85,7 +84,7 @@ class WalletTransferService
 
     public function show(WalletTransfer $walletTransfer): WalletTransfer
     {
-        return $walletTransfer->load(['fromWallet', 'toWallet']);
+        return $walletTransfer;
     }
 
     public function delete(WalletTransfer $walletTransfer): void

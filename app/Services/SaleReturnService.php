@@ -29,7 +29,6 @@ class SaleReturnService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(SaleReturn::class, $request)
-            ->with(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn'])
             ->allowedFilters(
                 AllowedFilter::partial('reference'),
                 AllowedFilter::exact('sale_id'),
@@ -71,7 +70,7 @@ class SaleReturnService
                 ]);
             }
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+            return $saleReturn->fresh();
         });
     }
 
@@ -105,13 +104,13 @@ class SaleReturnService
                 }
             }
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+            return $saleReturn->fresh();
         });
     }
 
     public function show(SaleReturn $saleReturn): SaleReturn
     {
-        return $saleReturn->loadMissing(['sale.branch', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+        return $saleReturn;
     }
 
     public function approve(SaleReturn $saleReturn, ?int $walletId = null): SaleReturn
@@ -178,7 +177,7 @@ class SaleReturnService
 
             $saleReturn->update(['status' => SaleReturnStatus::COMPLETED]);
 
-            return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+            return $saleReturn->fresh();
         });
     }
 
@@ -202,7 +201,7 @@ class SaleReturnService
 
         $saleReturn->update(['status' => SaleReturnStatus::CANCELED]);
 
-        return $saleReturn->refresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
+        return $saleReturn->refresh();
     }
 
     private function resolveWalletId(SaleReturn $saleReturn, ?int $walletId): int

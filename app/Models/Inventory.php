@@ -17,6 +17,10 @@ class Inventory extends Model
 
     protected $fillable = ['branch_id', 'name'];
 
+    protected $with = [
+        'branch',
+    ];
+
     public function scopeCentral(Builder $query): void
     {
         $query->whereNull('branch_id');

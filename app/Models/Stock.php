@@ -26,6 +26,18 @@ class Stock extends Model
         'product_id',
     ];
 
+    protected $with = [
+        'inventory',
+        'product',
+        'batches',
+        'prices',
+        'sellingPrice',
+        'installmentPrice',
+        'wholesalePrice',
+        'currentQuantity',
+        'initialQuantity',
+    ];
+
     protected function casts(): array
     {
         return [];

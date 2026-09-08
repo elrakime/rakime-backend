@@ -21,6 +21,11 @@ class FinancialRecord extends Model
         'note',
     ];
 
+    protected $with = [
+        'client',
+        'contract',
+    ];
+
     protected function casts(): array
     {
         return [

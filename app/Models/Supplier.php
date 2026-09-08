@@ -22,6 +22,10 @@ class Supplier extends Model implements HasMedia
 
     protected $fillable = ['name', 'phone', 'email', 'address', 'is_active', 'wilaya_id', 'metadata'];
 
+    protected $with = [
+        'wilaya',
+    ];
+
     protected function casts(): array
     {
         return [

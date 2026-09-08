@@ -25,6 +25,13 @@ class SaleReturn extends Model
         'status',
     ];
 
+    protected $with = [
+        'sale',
+        'items.saleItem.product',
+        'items.saleItem.stock',
+        'items.saleItem.returnItems.saleReturn',
+    ];
+
     protected function casts(): array
     {
         return [

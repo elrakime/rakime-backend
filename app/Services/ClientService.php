@@ -21,7 +21,6 @@ class ClientService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with(['branch', 'wilaya', 'financialRecords'])
             ->allowedFilters(
                 AllowedFilter::partial('firstname'),
                 AllowedFilter::partial('lastname'),
@@ -109,7 +108,6 @@ class ClientService
         }
 
         return $query
-            ->with(['branch', 'wilaya'])
             ->orderByDesc('created_at')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());
@@ -120,7 +118,6 @@ class ClientService
         return Client::query()
             ->where('ccp_number', $keyword)
             ->orWhere('nin', $keyword)
-            ->with(['branch', 'wilaya', 'financialRecords'])
             ->first();
     }
 
@@ -137,7 +134,7 @@ class ClientService
 
     public function show(Client $client): Client
     {
-        return $client->loadMissing(['branch', 'wilaya', 'financialRecords']);
+        return $client;
     }
 
     public function update(Client $client, array $data, Request $request): Client
@@ -159,7 +156,7 @@ class ClientService
             $client->addMediaFromRequest('image')->toMediaCollection('image');
         }
 
-        return $client->refresh()->loadMissing(['branch', 'wilaya']);
+        return $client->refresh();
     }
 
     public function delete(Client $client): void

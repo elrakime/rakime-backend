@@ -20,6 +20,11 @@ class ContractPayment extends Model
         'note',
     ];
 
+    protected $with = [
+        'contract.client',
+        'installments',
+    ];
+
     protected function casts(): array
     {
         return [

@@ -48,7 +48,7 @@ class PriceService
 
     public function show(Price $price): Price
     {
-        return $price->loadMissing('stock');
+        return $price;
     }
 
     public function update(Price $price, array $data): Price

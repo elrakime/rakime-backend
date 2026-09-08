@@ -14,7 +14,6 @@ class SupplierService
     public function list(Request $request): LengthAwarePaginator
     {
         return QueryBuilder::for(Supplier::class, $request)
-            ->with('wilaya')
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('phone'),
@@ -50,7 +49,7 @@ class SupplierService
 
     public function show(Supplier $supplier): Supplier
     {
-        return $supplier->loadMissing('wilaya');
+        return $supplier;
     }
 
     public function update(Supplier $supplier, array $data, Request $request): Supplier

@@ -21,6 +21,12 @@ class Client extends Model implements HasMedia
     use LogsActivity;
     use HasUserstamps;
 
+    protected $with = [
+        'branch',
+        'wilaya',
+        'financialRecords',
+    ];
+
     protected $fillable = [
         'branch_id',
         'wilaya_id',

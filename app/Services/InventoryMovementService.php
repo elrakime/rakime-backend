@@ -24,7 +24,7 @@ class InventoryMovementService
         $query->byUserBranches();
 
         return QueryBuilder::for($query, $request)
-            ->with(['stock.product', 'inventory', 'product', 'source' => function ($morphTo) {
+            ->with(['source' => function ($morphTo) {
                 $morphTo->morphWith([
                     Expiration::class        => [],
                     InventoryTransfer::class => ['fromInventory', 'toInventory'],

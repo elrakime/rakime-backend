@@ -30,6 +30,12 @@ class InventoryMovement extends Model
         'quantity',
     ];
 
+    protected $with = [
+        'stock.product',
+        'inventory',
+        'product',
+    ];
+
     protected function casts(): array
     {
         return [

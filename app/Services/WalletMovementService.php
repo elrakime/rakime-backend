@@ -19,7 +19,7 @@ class WalletMovementService
         $query->byUserBranches();
 
         return QueryBuilder::for($query)
-            ->with(['source', 'wallet'])
+            ->with('source')
             ->allowedFilters(
                 AllowedFilter::exact('wallet_id'),
                 AllowedFilter::exact('movement_type'),
