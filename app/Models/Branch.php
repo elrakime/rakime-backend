@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
@@ -30,6 +31,11 @@ class Branch extends Model implements HasMedia
         'phone',
         'wilaya_id',
         'metadata',
+    ];
+
+    protected $with = [
+        'inventory',
+        'wallet',
     ];
 
     protected function casts(): array
@@ -73,6 +79,18 @@ class Branch extends Model implements HasMedia
     public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(Inventory::class)->latestOfMany();
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class, 'owner_id')
+            ->where('owner_type', self::class)
+            ->latestOfMany();
     }
 
     public function wallets(): HasMany
