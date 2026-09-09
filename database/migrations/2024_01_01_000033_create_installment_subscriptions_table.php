@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\SubscriptionStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,10 +13,7 @@ return new class extends Migration
             $table->foreignId('contract_id')->constrained('contracts');
             $table->string('reference')->unique();
             $table->unsignedSmallInteger('subscription_number');
-            $table->unsignedInteger('amount');
-            $table->unsignedSmallInteger('total_months');
-            $table->date('draw_date')->nullable();
-            $table->enum('status', SubscriptionStatus::keys())->default(SubscriptionStatus::default()->value);
+            $table->decimal('amount', 15, 2);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
             $table->enum('type', PriceType::keys());
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 15, 2);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

@@ -13,8 +13,7 @@ return new class extends Migration
         Schema::create('installments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contract_id')->constrained('contracts');
-            $table->unsignedSmallInteger('month_number');
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 15, 2);
             $table->enum('status', InstallmentStatus::keys())->default(InstallmentStatus::default()->value);
             $table->string('payment_method', 50);
             $table->date('due_date');

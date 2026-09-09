@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('purchase_id')->constrained();
             $table->foreignId('product_id')->constrained();
             $table->unsignedInteger('quantity');
-            $table->unsignedInteger('price');
+            $table->decimal('price', 15, 2);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

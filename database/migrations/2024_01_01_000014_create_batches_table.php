@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('source_id')->nullable();
             $table->string('source_type')->nullable();
-            $table->unsignedInteger('purchase_price');
+            $table->decimal('purchase_price', 15, 2);
             $table->unsignedInteger('initial_quantity');
             $table->unsignedInteger('current_quantity');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

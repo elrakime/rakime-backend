@@ -13,10 +13,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('subscription_id')->constrained('subscriptions');
             $table->foreignId('installment_id')->constrained();
-            $table->unsignedSmallInteger('month_number');
-            $table->unsignedInteger('amount');
-            $table->enum('status', DrawStatus::keys());
-            $table->date('scheduled_date');
+            $table->decimal('amount', 15, 2);
+            $table->enum('status', DrawStatus::keys())->nullable();
+            $table->date('due_date');
+            $table->date('last_attempted_at')->nullable();
+            $table->decimal('tax_amount', 15, 2)->default(0);
+            $table->json('metadata')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

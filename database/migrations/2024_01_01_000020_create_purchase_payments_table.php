@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('purchase_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_id')->constrained();
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 15, 2);
             $table->string('status')->default(PurchasePaymentStatus::PAID->value);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('ccp_number')->unique();
             $table->string('ccp_key');
             $table->unsignedTinyInteger('draw_day');
-            $table->unsignedInteger('min_withdraw_amount');
+            $table->decimal('min_withdraw_amount', 15, 2)->nullable();
             $table->unsignedInteger('max_withdraw_count');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

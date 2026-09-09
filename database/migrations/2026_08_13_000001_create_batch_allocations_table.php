@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('inventory_movement_id')->constrained()->cascadeOnDelete();
             $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
-            $table->unsignedInteger('purchase_price');
+            $table->decimal('purchase_price', 15, 2);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
