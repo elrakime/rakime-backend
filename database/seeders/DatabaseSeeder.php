@@ -25,6 +25,12 @@ class DatabaseSeeder extends Seeder
             RestockSeeder::class,
             ExpirationSeeder::class,
             InventoryTransferSeeder::class,
+            SaleSeeder::class,
+            SaleReturnSeeder::class,
+            WalletTransferSeeder::class,
+            ContractSeeder::class,
+            ContractPaymentSeeder::class,
+            DrawSeeder::class,
         ]);
     }
 }

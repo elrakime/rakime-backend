@@ -34,7 +34,7 @@ class ContractPayment extends Model
 
     public function installments(): BelongsToMany
     {
-        return $this->belongsToMany(Installment::class, 'installment_payments')
+        return $this->belongsToMany(Installment::class, 'installment_payments', 'payment_id', 'installment_id')
             ->withTimestamps();
     }
 
