@@ -26,6 +26,12 @@ class DrawService
                 AllowedFilter::exact('installment_id'),
                 AllowedFilter::exact('subscription_id'),
                 AllowedFilter::exact('due_date'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
             )
             ->allowedSorts(
                 AllowedSort::field('due_date'),

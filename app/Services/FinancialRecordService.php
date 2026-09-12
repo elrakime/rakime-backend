@@ -22,6 +22,14 @@ class FinancialRecordService
             $query->where('contract_id', $contractId);
         }
 
+        if ($from = $request->string('created_at_from')->toString()) {
+            $query->whereDate('created_at', '>=', $from);
+        }
+
+        if ($to = $request->string('created_at_to')->toString()) {
+            $query->whereDate('created_at', '<=', $to);
+        }
+
         return $query->orderByDesc('created_at')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());

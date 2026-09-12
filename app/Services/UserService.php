@@ -23,6 +23,12 @@ class UserService
                 AllowedFilter::partial('email'),
                 AllowedFilter::partial('phone'),
                 AllowedFilter::exact('is_active'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function (Builder $query, string $value) {
                     $query->where(function (Builder $q) use ($value) {
                         $q->where('name', 'like', "%{$value}%")
@@ -127,9 +133,9 @@ class UserService
             throw new Exception(__('users.cannot_delete_self'), 422);
         }
 
-        if ($user->sales()->exists() || 
-            $user->productExpirations()->exists() || 
-            $user->restockOrders()->exists() || 
+        if ($user->sales()->exists() ||
+            $user->productExpirations()->exists() ||
+            $user->restockOrders()->exists() ||
             $user->installmentContracts()->exists()) {
             throw new Exception(__('users.cannot_delete_with_related_records'), 422);
         }

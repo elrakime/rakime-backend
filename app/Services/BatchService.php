@@ -22,6 +22,12 @@ class BatchService
             ->where('stock_id', $stock->id)
             ->allowedFilters(
                 AllowedFilter::partial('source_type'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('source_type', 'like', "%{$value}%");

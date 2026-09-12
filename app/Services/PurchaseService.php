@@ -50,6 +50,12 @@ class PurchaseService
                         };
                     });
                 }),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%");

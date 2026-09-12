@@ -40,6 +40,12 @@ class PurchaseReturnService
                 AllowedFilter::callback('branch_id', function ($query, $value) {
                     $query->whereHas('purchase', fn ($q) => $q->where('branch_id', $value));
                 }),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->where('reference', 'like', "%{$value}%");

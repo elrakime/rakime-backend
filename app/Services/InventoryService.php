@@ -25,6 +25,12 @@ class InventoryService
             ->allowedFilters(
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('branch_id'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('name', 'like', "%{$value}%");
                 }),

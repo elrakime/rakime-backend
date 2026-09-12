@@ -16,6 +16,12 @@ class BrandService
         return QueryBuilder::for(Brand::class, $request)
             ->allowedFilters(
                 AllowedFilter::partial('name'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
             )
             ->allowedSorts(
                 AllowedSort::field('name'),

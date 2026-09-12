@@ -48,6 +48,12 @@ class InventoryMovementService
                 AllowedFilter::callback('to_date', function ($query, string $value) {
                     $query->whereDate('created_at', '<=', $value);
                 }),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where(function ($q) use ($value) {
                         $q->whereHas('product', fn ($p) => $p->where('name', 'like', "%{$value}%"))

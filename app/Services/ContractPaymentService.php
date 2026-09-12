@@ -35,6 +35,12 @@ class ContractPaymentService
             ->with(['contract.client', 'installments'])
             ->allowedFilters(
                 AllowedFilter::exact('amount'),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('note', 'like', "%{$value}%");
                 }),

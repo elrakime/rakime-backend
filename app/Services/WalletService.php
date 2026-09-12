@@ -38,6 +38,12 @@ class WalletService
                     $query->where('owner_type', Account::class)
                           ->where('owner_id', $value);
                 }),
+                AllowedFilter::callback('created_at_from', function ($query, string $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('created_at_to', function ($query, string $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
                 AllowedFilter::callback('search', function ($query, string $value) {
                     $query->where('name', 'like', "%{$value}%");
                 }),
