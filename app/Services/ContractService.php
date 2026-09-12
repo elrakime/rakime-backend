@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
 use App\Enums\InstallmentStatus;
+use App\Models\Batch;
 use App\Models\Contract;
 use App\Models\ContractEarlyCancelation;
 use App\Models\ContractItem;
@@ -24,6 +25,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ContractService
 {
+    public function __construct(
+        private readonly InventoryService $inventoryService,
+    ) {}
 
     public function list(Request $request): LengthAwarePaginator
     {
@@ -63,6 +67,7 @@ class ContractService
             ->allowedSorts(
                 AllowedSort::field('reference'),
                 AllowedSort::field('total_amount'),
+                AllowedSort::field('purchase_cost'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -114,7 +119,7 @@ class ContractService
                 }
             }
 
-            $this->recalculateAmounts($contract);
+            $contract->recalculateAmounts();
 
             return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
         });
@@ -267,7 +272,7 @@ class ContractService
                 || array_key_exists('advance_amount', $data)
                 || array_key_exists('months_count', $data)
             ) {
-                $this->recalculateAmounts($contract);
+                $contract->recalculateAmounts();
             }
 
             $maxAmount = $updates['max_amount'] ?? $contract->max_amount;
@@ -331,7 +336,7 @@ class ContractService
                 array_key_exists('items', $data)
                 || array_key_exists('advance_amount', $data)
             ) {
-                $this->recalculateAmounts($contract);
+                $contract->recalculateAmounts();
                 $this->recalculateInstallmentsAndSubscriptions($contract);
             }
 
@@ -396,7 +401,7 @@ class ContractService
                 ]);
             }
 
-            $this->recalculateAmounts($contract);
+            $contract->recalculateAmounts();
 
             if ($originalNetAmount !== null && $contract->net_amount !== $originalNetAmount) {
                 throw new Exception(__('contracts.cannot_change_net_amount'), 422);
@@ -430,32 +435,6 @@ class ContractService
 
         $contract->subscriptions()->update([
             'amount' => $perDrawAmount,
-        ]);
-    }
-
-    private function recalculateAmounts(Contract $contract): void
-    {
-        $items = $contract->items()->get();
-
-        $totalAmount = $items->isEmpty()
-            ? null
-            : (float) $items->sum(fn ($item) => $item->quantity * $item->price);
-
-        $advanceAmount = (float) ($contract->advance_amount ?? 0);
-        $monthsCount   = $contract->months_count;
-
-        $netAmount = $totalAmount !== null
-            ? $totalAmount - $advanceAmount
-            : null;
-
-        $monthlyAmount = ($netAmount !== null && $monthsCount > 0)
-            ? (float) ceil($netAmount / $monthsCount)
-            : null;
-
-        $contract->update([
-            'total_amount'   => $totalAmount,
-            'net_amount'     => $netAmount,
-            'monthly_amount' => $monthlyAmount,
         ]);
     }
 
@@ -539,12 +518,66 @@ class ContractService
                 'end_date'   => $lastDueDate,
             ]);
 
+            $this->deductStock($contract);
+
+            $contract->recalculateAmounts();
+
             return $contract->fresh([
                 'client', 'account', 'branch',
                 'items.product', 'items.stock',
                 'installments', 'subscriptions.draws',
             ]);
         });
+    }
+
+    /**
+     * Deduct stock for each contract item via FIFO batch allocation, mirroring
+     * SaleService::deductStock(). Creates a CONTRACT inventory movement per item.
+     */
+    private function deductStock(Contract $contract): void
+    {
+        $contract->loadMissing('items');
+
+        foreach ($contract->items as $item) {
+            $remaining = $item->quantity;
+
+            $batches = Batch::with('stock')
+                ->where('stock_id', $item->stock_id)
+                ->where('current_quantity', '>', 0)
+                ->orderBy('created_at')
+                ->get();
+
+            $oldQuantity = $batches->sum('current_quantity');
+
+            $allocations = [];
+
+            foreach ($batches as $batch) {
+                $deduct = min($remaining, $batch->current_quantity);
+                $batch->decrement('current_quantity', $deduct);
+
+                $allocations[] = [
+                    'batch_id'       => $batch->id,
+                    'quantity'       => -$deduct,
+                    'purchase_price' => $batch->purchase_price,
+                ];
+
+                $remaining -= $deduct;
+                if ($remaining <= 0) {
+                    break;
+                }
+            }
+
+            $firstBatch = $batches->first();
+            $this->inventoryService->contract(
+                stockId: $item->stock_id,
+                inventoryId: $firstBatch?->stock->inventory_id,
+                productId: $item->product_id,
+                oldQuantity: $oldQuantity,
+                quantity: $item->quantity,
+                source: $contract,
+                allocations: $allocations,
+            );
+        }
     }
 
     private function resolveDrawDate(Carbon $month, int $drawDay): Carbon

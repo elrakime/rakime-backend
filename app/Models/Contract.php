@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
@@ -40,6 +41,7 @@ class Contract extends Model
         'total_amount',
         'net_amount',
         'monthly_amount',
+        'purchase_cost',
         'start_date',
         'end_date',
         'note',
@@ -55,6 +57,7 @@ class Contract extends Model
             'total_amount'   => 'decimal:2',
             'net_amount'     => 'decimal:2',
             'monthly_amount' => 'decimal:2',
+            'purchase_cost'  => 'decimal:2',
             'start_date'     => 'date',
             'end_date'       => 'date',
             'extended_at'    => 'datetime',
@@ -152,6 +155,11 @@ class Contract extends Model
         return $this->hasMany(FinancialRecord::class);
     }
 
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class, 'source_id');
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(ContractPayment::class, 'contract_id');
@@ -202,6 +210,61 @@ class Contract extends Model
     public function draws(): HasManyThrough
     {
         return $this->hasManyThrough(Draw::class, Subscription::class, 'contract_id', 'subscription_id');
+    }
+
+    /**
+     * Recompute the derived amount columns from their sources of truth.
+     *
+     * - total_amount   = Σ (contract_items.quantity * contract_items.price)
+     * - net_amount     = total_amount - advance_amount
+     * - monthly_amount = ceil(net_amount / months_count)
+     *
+     * Each is nullable when its inputs are absent (e.g. no items, no
+     * months_count), matching the original ContractService::recalculateAmounts().
+     */
+    public function recalculateAmounts(): void
+    {
+        $items = $this->items()->get();
+
+        $totalAmount = $items->isEmpty()
+            ? null
+            : (float) $items->sum(fn ($item) => $item->quantity * $item->price);
+
+        $advanceAmount = (float) ($this->advance_amount ?? 0);
+        $monthsCount   = $this->months_count;
+
+        $netAmount = $totalAmount !== null
+            ? $totalAmount - $advanceAmount
+            : null;
+
+        $monthlyAmount = ($netAmount !== null && $monthsCount > 0)
+            ? (float) ceil($netAmount / $monthsCount)
+            : null;
+
+        $values = [
+            'total_amount'   => $totalAmount,
+            'net_amount'     => $netAmount,
+            'monthly_amount' => $monthlyAmount,
+            'purchase_cost'  => $this->purchaseCostAmount(),
+        ];
+
+        static::query()->whereKey($this->getKey())->update($values);
+
+        $this->forceFill($values);
+        $this->syncOriginal();
+    }
+
+    /**
+     * Sum of (quantity * purchase_price) across all batch allocations of the
+     * contract's inventory movements. Signed quantities net returns automatically.
+     */
+    private function purchaseCostAmount(): float
+    {
+        $cost = $this->inventoryMovements()
+            ->join('batch_allocations', 'batch_allocations.inventory_movement_id', '=', 'inventory_movements.id')
+            ->sum(DB::raw('batch_allocations.quantity * batch_allocations.purchase_price'));
+
+        return (float) round((float) $cost, 2);
     }
 
     protected static function booted(): void

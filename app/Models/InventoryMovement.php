@@ -80,6 +80,7 @@ class InventoryMovement extends Model
             InventoryMovementType::SALE,
             InventoryMovementType::EXPIRED,
             InventoryMovementType::SALE_UPDATE,
+            InventoryMovementType::CONTRACT,
         ]);
     }
 
