@@ -178,6 +178,8 @@ class SaleReturnService
 
             $saleReturn->update(['status' => SaleReturnStatus::COMPLETED]);
 
+            $saleReturn->sale->recalculateAmounts();
+
             return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
     }

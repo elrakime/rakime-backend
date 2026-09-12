@@ -21,6 +21,7 @@ class SaleResource extends JsonResource
             'discount_value'  => $this->discount_value,
             'discount_amount' => $this->discount_amount,
             'total_amount'    => $this->total_amount,
+            'purchase_cost'   => $this->purchase_cost,
             'note'            => $this->note,
             'created_at'      => $this->created_at,
             'updated_at'      => $this->updated_at,

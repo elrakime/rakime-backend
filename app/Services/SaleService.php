@@ -49,6 +49,7 @@ class SaleService
             ->allowedSorts(
                 AllowedSort::field('reference'),
                 AllowedSort::field('total_amount'),
+                AllowedSort::field('purchase_cost'),
                 AllowedSort::field('created_at'),
             )
             ->defaultSort('-created_at')
@@ -100,6 +101,8 @@ class SaleService
             }
 
             $this->deductStock($sale);
+
+            $sale->recalculateAmounts();
 
             $this->creditBranchWallet($data['branch_id'], $totalAmount, $sale);
 
@@ -192,6 +195,8 @@ class SaleService
             }
 
             $sale->update($updateData);
+
+            $sale->recalculateAmounts();
 
             return $sale->fresh()->loadMissing(['user', 'branch', 'client', 'items.product', 'items.stock']);
         });
