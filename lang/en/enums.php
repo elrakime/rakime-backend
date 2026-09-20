@@ -93,6 +93,13 @@ return [
         'FAILED'       => 'Failed',
     ],
 
+    'client_rating' => [
+        'high'   => 'High',
+        'medium' => 'Medium',
+        'low'    => 'Low',
+        'none'   => 'None',
+    ],
+
     'price_type' => [
         'SELLING'     => 'Selling',
         'INSTALLMENT' => 'Installment',

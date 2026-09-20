@@ -93,6 +93,13 @@ return [
         'FAILED'       => 'Échoué',
     ],
 
+    'client_rating' => [
+        'high'   => 'Élevé',
+        'medium' => 'Moyen',
+        'low'    => 'Faible',
+        'none'   => 'Aucun',
+    ],
+
     'price_type' => [
         'SELLING'     => 'Vente',
         'INSTALLMENT' => 'Tranche',

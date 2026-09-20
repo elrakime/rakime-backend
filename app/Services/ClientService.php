@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ClientRating;
 use App\Enums\DrawStatus;
 use App\Models\Client;
 use Exception;
@@ -31,6 +32,9 @@ class ClientService
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('wilaya_id'),
                 AllowedFilter::exact('is_banned'),
+                AllowedFilter::callback('rating', function ($query, string $value) {
+                    $this->applyRatingFilter($query, $value);
+                }),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),
@@ -56,6 +60,66 @@ class ClientService
             ->defaultSort('-created_at')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());
+    }
+
+    /**
+     * Filter clients by their derived rating.
+     *
+     * The rating is computed from the share of draws paid on time over the
+     * last 12 months, so this filter reproduces that logic in SQL via
+     * correlated subqueries.
+     */
+    private function applyRatingFilter($query, string $value): void
+    {
+        $since = now()->subMonths(12);
+
+        // Correlated subqueries counting a client's draws in the last 12
+        // months, and how many of them were paid on time.
+        $onTimeSql = '(
+            SELECT COUNT(*)
+            FROM draws
+            INNER JOIN subscriptions ON subscriptions.id = draws.subscription_id
+            INNER JOIN contracts ON contracts.id = subscriptions.contract_id
+            WHERE contracts.client_id = clients.id
+              AND draws.due_date >= ?
+              AND draws.status = ?
+        )';
+
+        $totalSql = '(
+            SELECT COUNT(*)
+            FROM draws
+            INNER JOIN subscriptions ON subscriptions.id = draws.subscription_id
+            INNER JOIN contracts ON contracts.id = subscriptions.contract_id
+            WHERE contracts.client_id = clients.id
+              AND draws.due_date >= ?
+        )';
+
+        // Clients with no draws in the last 12 months.
+        if ($value === ClientRating::NONE->value) {
+            $query->whereRaw("{$totalSql} = 0", [$since]);
+
+            return;
+        }
+
+        // Clients with at least one draw in the last 12 months.
+        $query->whereRaw("{$totalSql} > 0", [$since]);
+
+        match ($value) {
+            ClientRating::LOW->value => $query->whereRaw(
+                "({$onTimeSql} * 1.0 / {$totalSql}) * 100 < 50",
+                [$since, DrawStatus::PAID_ON_TIME->value, $since],
+            ),
+            ClientRating::MEDIUM->value => $query->whereRaw(
+                "({$onTimeSql} * 1.0 / {$totalSql}) * 100 >= 50
+                 AND ({$onTimeSql} * 1.0 / {$totalSql}) * 100 < 80",
+                [$since, DrawStatus::PAID_ON_TIME->value, $since, $since, DrawStatus::PAID_ON_TIME->value, $since],
+            ),
+            ClientRating::HIGH->value => $query->whereRaw(
+                "({$onTimeSql} * 1.0 / {$totalSql}) * 100 >= 80",
+                [$since, DrawStatus::PAID_ON_TIME->value, $since],
+            ),
+            default => null,
+        };
     }
 
     /**

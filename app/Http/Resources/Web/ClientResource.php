@@ -31,6 +31,7 @@ class ClientResource extends JsonResource
             'ccp_key'    => $this->ccp_key,
             'eccp'       => $this->eccp,
             'is_banned'  => $this->is_banned,
+            'rating'     => $this->rating,
             'image'      => $this->getFirstMediaUrl('image') ?: null,
             'metadata'   => $this->metadata,
             'financial_records' => FinancialRecordResource::collection($this->whenLoaded('financialRecords')),

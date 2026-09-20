@@ -93,6 +93,13 @@ return [
         'FAILED'       => 'فاشل',
     ],
 
+    'client_rating' => [
+        'high'   => 'مرتفع',
+        'medium' => 'متوسط',
+        'low'    => 'منخفض',
+        'none'   => 'لا يوجد',
+    ],
+
     'price_type' => [
         'SELLING'     => 'البيع',
         'INSTALLMENT' => 'التقسيط',
