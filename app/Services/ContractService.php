@@ -46,12 +46,16 @@ class ContractService
                 'client', 'account', 'branch',
                 'items.product', 'items.stock',
                 'financialRecords',
+                'installments',
                 'parentContract', 'parentContract.parentContract',
             ])
             ->allowedFilters(
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::callback('payment_status', function ($query, string $value) {
+                    $this->applyPaymentStatusFilter($query, $value);
+                }),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),
@@ -79,6 +83,45 @@ class ContractService
             ->defaultSort('-created_at')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());
+    }
+
+    /**
+     * Filter contracts by their derived payment status.
+     *
+     * - paid           : every installment is paid
+     * - unpaid         : every installment is unpaid
+     * - partially_paid : any other combination
+     */
+    private function applyPaymentStatusFilter($query, string $value): void
+    {
+        switch ($value) {
+            case InstallmentStatus::PAID->value:
+                $query->whereHas('installments', function ($q) {
+                    $q->where('status', InstallmentStatus::PAID);
+                })->whereDoesntHave('installments', function ($q) {
+                    $q->where('status', '!=', InstallmentStatus::PAID);
+                });
+                break;
+
+            case InstallmentStatus::UNPAID->value:
+                $query->whereHas('installments', function ($q) {
+                    $q->where('status', InstallmentStatus::UNPAID);
+                })->whereDoesntHave('installments', function ($q) {
+                    $q->where('status', '!=', InstallmentStatus::UNPAID);
+                });
+                break;
+
+            case InstallmentStatus::PARTIALLY_PAID->value:
+                $query->whereHas('installments', function ($q) {
+                    $q->where('status', InstallmentStatus::PAID);
+                })->whereHas('installments', function ($q) {
+                    $q->where('status', '!=', InstallmentStatus::PAID);
+                });
+                break;
+
+            default:
+                break;
+        }
     }
 
     public function show(Contract $contract): Contract

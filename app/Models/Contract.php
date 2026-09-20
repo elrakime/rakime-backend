@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\ContractStatus;
 use App\Enums\DrawStatus;
+use App\Enums\InstallmentStatus;
 use App\Enums\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,8 @@ class Contract extends Model
         'end_date',
         'note',
     ];
+
+    protected $appends = ['payment_status'];
 
     protected function casts(): array
     {
@@ -210,6 +213,38 @@ class Contract extends Model
     public function draws(): HasManyThrough
     {
         return $this->hasManyThrough(Draw::class, Subscription::class, 'contract_id', 'subscription_id');
+    }
+
+    /**
+     * Derived payment status based on the installments of this contract.
+     *
+     * - paid           : all installments are paid
+     * - unpaid         : all installments are unpaid
+     * - partially_paid : any other combination
+     */
+    public function getPaymentStatusAttribute(): string
+    {
+        $installments = $this->relationLoaded('installments')
+            ? $this->installments
+            : $this->installments()->get();
+
+        if ($installments->isEmpty()) {
+            return InstallmentStatus::UNPAID->value;
+        }
+
+        $paidCount   = $installments->where('status', InstallmentStatus::PAID)->count();
+        $unpaidCount = $installments->where('status', InstallmentStatus::UNPAID)->count();
+        $total       = $installments->count();
+
+        if ($paidCount === $total) {
+            return InstallmentStatus::PAID->value;
+        }
+
+        if ($unpaidCount === $total) {
+            return InstallmentStatus::UNPAID->value;
+        }
+
+        return InstallmentStatus::PARTIALLY_PAID->value;
     }
 
     /**

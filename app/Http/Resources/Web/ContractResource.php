@@ -22,6 +22,7 @@ class ContractResource extends JsonResource
                 'name'  => $this->status->get_name(),
                 'color' => $this->status->get_color(),
             ],
+            'payment_status' => $this->payment_status,
             'max_amount'     => $this->max_amount,
             'advance_amount' => $this->advance_amount,
             'months_count'   => $this->months_count,
