@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;

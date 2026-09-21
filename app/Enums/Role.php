@@ -207,6 +207,8 @@ enum Role: string
                 Permission::CREATE_FINANCIAL_RECORDS->value,
                 Permission::UPDATE_FINANCIAL_RECORDS->value,
                 Permission::DELETE_FINANCIAL_RECORDS->value,
+                // Zakat
+                Permission::VIEW_ZAKAT->value,
             ],
 
             self::EMPLOYEE => [
@@ -286,6 +288,8 @@ enum Role: string
                 // Financial Records
                 Permission::VIEW_FINANCIAL_RECORDS->value,
                 Permission::CREATE_FINANCIAL_RECORDS->value,
+                // Zakat
+                Permission::VIEW_ZAKAT->value,
             ],
         };
     }

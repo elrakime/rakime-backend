@@ -1,25 +1,26 @@
 <?php
 
+use App\Http\Controllers\CcpController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\AccountDrawLockController;
+use App\Http\Controllers\AccountExportImportController;
 use App\Http\Controllers\Web\Auth\AuthController;
 use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
 use App\Http\Controllers\Web\BrandController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\ClientController;
+use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ContractController;
 use App\Http\Controllers\Web\ContractPaymentController;
-use App\Http\Controllers\Web\AccountExportImportController;
 use App\Http\Controllers\Web\DrawController;
-use App\Http\Controllers\Web\ImportController;
-use App\Http\Controllers\Web\InstallmentController;
-use App\Http\Controllers\Web\SubscriptionController;
-use App\Http\Controllers\Web\ColorController;
 use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\FinancialRecordController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\Web\InstallmentController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\InventoryMovementController;
+use App\Http\Controllers\Web\InventoryTransferController;
 use App\Http\Controllers\Web\PermissionController;
 use App\Http\Controllers\Web\PriceController;
 use App\Http\Controllers\Web\ProductController;
@@ -31,16 +32,16 @@ use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\SaleController;
 use App\Http\Controllers\Web\SaleReturnController;
 use App\Http\Controllers\Web\StockController;
+use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\SupplierController;
-use App\Http\Controllers\Web\InventoryTransferController;
+use App\Http\Controllers\Web\TypeController;
+use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\WalletController;
 use App\Http\Controllers\Web\WalletMovementController;
 use App\Http\Controllers\Web\WalletTransferController;
-use App\Http\Controllers\Web\TypeController;
-use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\WilayaController;
+use App\Http\Controllers\ZakatController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CcpController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -57,6 +58,7 @@ Route::prefix('v1')->middleware(['auth:sanctum','user.active'])->group(function 
     Route::get('export/cancellations', [AccountExportImportController::class, 'exportCancellations']);
     Route::post('import', [AccountExportImportController::class, 'import']);
     Route::post('ccp/info', [CcpController::class, 'info']);
+    Route::get('zakat', [ZakatController::class, 'index']);
 });
 
 

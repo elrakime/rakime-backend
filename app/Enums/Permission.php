@@ -220,6 +220,9 @@ enum Permission: string
     // Permissions
     case VIEW_PERMISSIONS = 'permissions.view';
 
+    // Zakat
+    case VIEW_ZAKAT = 'zakat.view';
+
     public static function keys(): array
     {
         return array_column(self::cases(), 'value');
@@ -259,6 +262,7 @@ enum Permission: string
             'wallet', 'wallet_movements', 'wallet_transfers' => 'emerald',
             'contracts', 'installments', 'subscriptions', 'draws', 'payments' => 'amber',
             'financial_records' => 'lime',
+            'zakat'                          => 'violet',
             'roles', 'permissions'            => 'indigo',
             default                           => 'gray',
         };

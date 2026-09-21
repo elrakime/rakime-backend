@@ -102,6 +102,9 @@ return [
     'update_financial_records' => 'Modifier les relevés financiers',
     'delete_financial_records' => 'Supprimer les relevés financiers',
 
+    // Zakat
+    'view_zakat' => 'Voir la zakat',
+
     // Mensualités
     'view_installments'   => 'Voir les mensualités',
     'create_installments' => 'Créer des mensualités',

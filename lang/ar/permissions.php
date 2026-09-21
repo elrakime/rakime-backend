@@ -102,6 +102,9 @@ return [
     'update_financial_records' => 'تعديل السجلات المالية',
     'delete_financial_records' => 'حذف السجلات المالية',
 
+    // الزكاة
+    'view_zakat' => 'عرض الزكاة',
+
     // الأقساط
     'view_installments'   => 'عرض الأقساط',
     'create_installments' => 'إنشاء أقساط',

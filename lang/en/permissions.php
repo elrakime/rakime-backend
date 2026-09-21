@@ -102,6 +102,9 @@ return [
     'update_financial_records' => 'Update Financial Records',
     'delete_financial_records' => 'Delete Financial Records',
 
+    // Zakat
+    'view_zakat' => 'View Zakat',
+
     // Installments
     'view_installments'   => 'View Installments',
     'create_installments' => 'Create Installments',
