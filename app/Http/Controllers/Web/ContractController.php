@@ -48,6 +48,19 @@ class ContractController extends Controller
         return $this->successResponse(ContractResource::collection($contracts));
     }
 
+    public function delinquent(Request $request): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $contracts = $this->contractService->delinquent(
+            $request->filled('account_id') ? $request->integer('account_id') : null,
+        );
+
+        return $this->successResponse(ContractResource::collection($contracts));
+    }
+
     public function show(Contract $contract): JsonResponse
     {
         if ($response = $this->authorizeBranchAccess($contract->branch_id)) {

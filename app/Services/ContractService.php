@@ -173,6 +173,42 @@ class ContractService
             ->get();
     }
 
+    /**
+     * List ACTIVE contracts that are "delinquent": exactly one installment remains
+     * PENDING (not yet processed), while at least one other installment is UNPAID
+     * or PARTIALLY_PAID (past dues not fully settled). Such contracts will not
+     * cleanly complete on the next import and therefore require an extension.
+     *
+     * @param  int|null  $accountId  Optional account filter.
+     * @return \Illuminate\Support\Collection<int, Contract>
+     */
+    public function delinquent(?int $accountId = null): \Illuminate\Support\Collection
+    {
+        $query = Contract::query()
+            ->byUserBranches()
+            ->where('status', ContractStatus::ACTIVE)
+            // Exactly one PENDING installment remains.
+            ->whereHas('installments', function ($q) {
+                $q->where('status', InstallmentStatus::PENDING);
+            }, '=', 1)
+            // And at least one past installment is not fully settled.
+            ->whereHas('installments', function ($q) {
+                $q->whereIn('status', [
+                    InstallmentStatus::UNPAID->value,
+                    InstallmentStatus::PARTIALLY_PAID->value,
+                ]);
+            });
+
+        if ($accountId !== null) {
+            $query->where('account_id', $accountId);
+        }
+
+        return $query
+            ->with(['client', 'account', 'branch', 'installments', 'subscriptions.draws'])
+            ->orderBy('start_date')
+            ->get();
+    }
+
     public function create(array $data): Contract
     {
         return DB::transaction(function () use ($data) {
