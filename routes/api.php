@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('guest');
 
-    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
+    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
         Route::put('update-profile', [AuthController::class, 'updateProfile']);
@@ -50,7 +50,7 @@ Route::prefix('v1/auth')->group(function () {
     });
 });
 
-Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
+Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('roles', RoleController::class);
     Route::get('permissions', [PermissionController::class, 'index']);

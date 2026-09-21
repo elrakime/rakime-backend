@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Role;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,10 @@ class AuthService
 
         if (! $user->is_active) {
             throw new Exception(__('auth.inactive'), 422);
+        }
+
+        if (! $user->hasAnyRole([Role::ADMIN->value, Role::MANAGER->value])) {
+            throw new Exception(__('auth.forbidden_role'), 403);
         }
 
         return $user->loadMissing(['roles', 'permissions', 'branches']);

@@ -6,6 +6,7 @@ return [
     'failed'           => 'Ces identifiants ne correspondent pas à nos enregistrements.',
     'mismatch'         => 'Ce jeton n\'est pas valide pour ce type de client.',
     'inactive'         => 'Votre compte est inactif. Veuillez contacter le support.',
+    'forbidden_role'   => 'Accès réservé aux administrateurs et aux gestionnaires uniquement.',
     'password'         => 'Le mot de passe est incorrect',
     'throttle'         => 'Tentatives de connexion trop nombreuses. Veuillez essayer de nouveau dans :seconds secondes.',
     'success'          => 'Connexion réussie.',
