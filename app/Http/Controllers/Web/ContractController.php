@@ -34,6 +34,20 @@ class ContractController extends Controller
         );
     }
 
+    public function unprocessed(Request $request): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::VIEW_CONTRACTS->value)) {
+            return $response;
+        }
+
+        $contracts = $this->contractService->unprocessed(
+            $request->filled('account_id') ? $request->integer('account_id') : null,
+            $request->string('draw_date')->toString() ?: null,
+        );
+
+        return $this->successResponse(ContractResource::collection($contracts));
+    }
+
     public function show(Contract $contract): JsonResponse
     {
         if ($response = $this->authorizeBranchAccess($contract->branch_id)) {

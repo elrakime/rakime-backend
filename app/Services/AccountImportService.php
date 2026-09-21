@@ -356,7 +356,7 @@ class AccountImportService
                 $totalDraws   = $draws->count();
 
                 $status = match (true) {
-                    $totalDraws === 0             => InstallmentStatus::UNPAID,
+                    $totalDraws === 0             => InstallmentStatus::PENDING,
                     $settledCount === $totalDraws => InstallmentStatus::PAID,
                     $settledCount > 0             => InstallmentStatus::PARTIALLY_PAID,
                     default                       => InstallmentStatus::UNPAID,

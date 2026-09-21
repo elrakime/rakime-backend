@@ -76,6 +76,7 @@ return [
     ],
 
     'installment_status' => [
+        'PENDING'        => 'En attente',
         'UNPAID'         => 'Non payé',
         'PAID'           => 'Payé',
         'PARTIALLY_PAID' => 'Partiellement payé',

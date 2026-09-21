@@ -76,6 +76,7 @@ return [
     ],
 
     'installment_status' => [
+        'PENDING'        => 'قيد الانتظار',
         'UNPAID'         => 'غير مدفوع',
         'PAID'           => 'مدفوع',
         'PARTIALLY_PAID' => 'مدفوع جزئياً',

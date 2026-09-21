@@ -137,6 +137,42 @@ class ContractService
         ]);
     }
 
+    /**
+     * List ACTIVE contracts whose first installment is still PENDING (the bank
+     * return has not been imported yet) for a given draw date.
+     *
+     * @param  int|null  $accountId  Optional account filter.
+     * @param  string|null  $drawDate  Optional draw date (defaults to today).
+     * @return \Illuminate\Support\Collection<int, Contract>
+     */
+    public function unprocessed(?int $accountId = null, ?string $drawDate = null): \Illuminate\Support\Collection
+    {
+        $target = $drawDate
+            ? Carbon::parse($drawDate)->startOfDay()
+            : now()->startOfDay();
+
+        $query = Contract::query()
+            ->byUserBranches()
+            ->where('status', ContractStatus::ACTIVE)
+            ->whereHas('installments', function ($q) use ($target) {
+                $q->where('status', InstallmentStatus::PENDING)
+                  ->whereDate('due_date', '<=', $target);
+            });
+
+        if ($accountId !== null) {
+            $query->where('account_id', $accountId);
+        }
+
+        return $query
+            ->with([
+                'client', 'account', 'branch',
+                'installments' => fn ($q) => $q->where('status', InstallmentStatus::PENDING),
+                'subscriptions.draws',
+            ])
+            ->orderBy('start_date')
+            ->get();
+    }
+
     public function create(array $data): Contract
     {
         return DB::transaction(function () use ($data) {
