@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
 use App\Enums\InstallmentStatus;
+use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\Contract;
 use App\Models\ContractEarlyCancelation;
@@ -22,9 +23,12 @@ use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Traits\NotifiesOnAction;
 
 class ContractService
 {
+    use NotifiesOnAction;
+
     public function __construct(
         private readonly InventoryService $inventoryService,
     ) {}
@@ -242,6 +246,8 @@ class ContractService
 
             $contract->recalculateAmounts();
 
+            $this->notifyCreated($contract, NotificationType::CONTRACT_CREATED);
+
             return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
         });
     }
@@ -291,6 +297,8 @@ class ContractService
                 'extended_at' => now(),
             ]);
 
+            $this->notifyCreated($extension, NotificationType::CONTRACT_CREATED);
+
             return $extension->fresh([
                 'client', 'account', 'branch',
                 'parentContract', 'parentContract.parentContract',
@@ -308,6 +316,8 @@ class ContractService
             'status'     => ContractStatus::APPROVED,
             'max_amount' => $maxAmount,
         ]);
+
+        $this->notifyAction($contract, NotificationType::CONTRACT_APPROVED, $contract->branch_id);
 
         return $contract->fresh(['client', 'account', 'branch', 'items.product', 'items.stock']);
     }
@@ -328,6 +338,8 @@ class ContractService
                     'is_banned' => true,
                 ]);
             }
+
+            $this->notifyAction($contract, NotificationType::CONTRACT_REJECTED, $contract->branch_id);
 
             return $contract->fresh(['client', 'account', 'branch']);
         });
@@ -643,6 +655,8 @@ class ContractService
 
             $contract->recalculateAmounts();
 
+            $this->notifyAction($contract, NotificationType::CONTRACT_CONFIGURED, $contract->branch_id);
+
             return $contract->fresh([
                 'client', 'account', 'branch',
                 'items.product', 'items.stock',
@@ -731,6 +745,8 @@ class ContractService
                     'end_date'    => $this->resolveNextDrawDate($contract),
                 ]);
             }
+
+            $this->notifyAction($contract, NotificationType::CONTRACT_CANCELLED, $contract->branch_id);
 
             return $contract->fresh([
                 'client', 'account', 'branch',

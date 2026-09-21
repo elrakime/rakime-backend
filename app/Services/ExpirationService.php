@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ExpirationStatus;
+use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\Expiration;
 use App\Models\ExpirationItem;
@@ -16,6 +17,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ExpirationService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
@@ -70,6 +73,8 @@ class ExpirationService
                     ]);
                 }
             }
+
+            $this->notifyCreated($expiration, NotificationType::EXPIRATION_CREATED);
 
             return $expiration->fresh()->load(['user', 'inventory', 'items.stock.product']);
         });
@@ -160,7 +165,7 @@ class ExpirationService
             }
 
             $expiration->update(['status' => ExpirationStatus::APPROVED]);
-
+            $this->notifyAction($expiration, NotificationType::EXPIRATION_APPROVED, $expiration->inventory?->branch_id);
             return $expiration->fresh()->loadMissing(['user', 'inventory', 'items.stock.product']);
         });
     }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Notification\DeviceTokenController;
+use App\Http\Controllers\Api\Notification\NotificationController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\AccountDrawLockController;
 use App\Http\Controllers\Web\BatchController;
@@ -121,5 +123,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.act
     Route::post('financial-records', [FinancialRecordController::class, 'store']);
     Route::put('financial-records/{financial_record}', [FinancialRecordController::class, 'update']);
     Route::delete('financial-records/{financial_record}', [FinancialRecordController::class, 'destroy']);
+
+    Route::post('device-tokens', [DeviceTokenController::class, 'register']);
+    Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
 
 });

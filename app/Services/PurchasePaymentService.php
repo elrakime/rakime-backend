@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\PurchasePaymentStatus;
 use App\Enums\PurchaseStatus;
 use App\Enums\WalletMovementType;
+use App\Enums\NotificationType;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use App\Models\Wallet;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class PurchasePaymentService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(private readonly WalletService $walletService) {}
 
     public function list(Purchase $purchase): \Illuminate\Database\Eloquent\Collection
@@ -80,6 +83,8 @@ class PurchasePaymentService
             $payment->update(['status' => PurchasePaymentStatus::CANCELED]);
 
             $purchase->recalculateAmounts();
+
+            $this->notifyAction($payment, NotificationType::PURCHASE_PAYMENT_CANCELLED, $purchase->branch_id);
 
             return $payment->refresh();
         });

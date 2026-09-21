@@ -94,4 +94,9 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(WalletMovement::class, 'created_by');
     }
+
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
 }

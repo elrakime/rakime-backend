@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Enums\PurchaseReturnStatus;
+use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Purchase;
@@ -22,6 +23,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseReturnService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(
         private readonly InventoryService $inventoryService,
         private readonly WalletService $walletService,
@@ -80,6 +83,8 @@ class PurchaseReturnService
                     'reason'             => $item['reason'] ?? null,
                 ]);
             }
+
+            $this->notifyCreated($purchaseReturn, NotificationType::PURCHASE_RETURN_CREATED);
 
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });
@@ -200,6 +205,8 @@ class PurchaseReturnService
 
             $purchase->recalculateAmounts();
 
+            $this->notifyAction($purchaseReturn, NotificationType::PURCHASE_RETURN_APPROVED, $purchase->branch_id);
+
             return $purchaseReturn->fresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
         });
     }
@@ -223,6 +230,8 @@ class PurchaseReturnService
         }
 
         $purchaseReturn->update(['status' => PurchaseReturnStatus::CANCELED]);
+
+        $this->notifyAction($purchaseReturn, NotificationType::PURCHASE_RETURN_CANCELLED, $purchaseReturn->purchase?->branch_id);
 
         return $purchaseReturn->refresh()->loadMissing(['purchase', 'purchase.returns.items.purchaseItem', 'items.purchaseItem.product', 'items.purchaseItem.returnItems.purchaseReturn']);
     }

@@ -33,6 +33,10 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
+        if ($request->filled('token')) {
+            app(\App\Services\NotificationService::class)->deleteToken($request->user(), $request->input('token'));
+        }
+
         return $this->successResponse(message: __('auth.logged_out'));
     }
 

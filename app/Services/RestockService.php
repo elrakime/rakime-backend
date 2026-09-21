@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\InventoryTransferStatus;
 use App\Enums\PurchaseStatus;
 use App\Enums\RestockStatus;
+use App\Enums\NotificationType;
 use App\Models\Inventory;
 use App\Models\InventoryTransfer;
 use App\Models\InventoryTransferItem;
@@ -23,6 +24,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class RestockService
 {
+
+    use \App\Traits\NotifiesOnAction;
 
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
@@ -82,6 +85,8 @@ class RestockService
                     'fulfilled_quantity' => 0,
                 ]);
             }
+
+            $this->notifyCreated($restock, NotificationType::RESTOCK_CREATED);
 
             return $restock->load(['user', 'branch', 'items.product']);
         });
@@ -152,6 +157,8 @@ class RestockService
 
         $restock->update(['status' => RestockStatus::CANCELLED]);
 
+        $this->notifyAction($restock, NotificationType::RESTOCK_CANCELLED, $restock->branch_id);
+
         return $restock->fresh()->loadMissing(['user', 'branch', 'items.product']);
     }
 
@@ -176,6 +183,8 @@ class RestockService
                 'fulfilled_with_id'  => $fulfilledWith?->id,
                 'fulfilled_with_type' => $fulfilledWith ? get_class($fulfilledWith) : null,
             ]);
+
+            $this->notifyAction($restock, NotificationType::RESTOCK_FULFILLED, $restock->branch_id);
 
             $restock = $restock->fresh()->loadMissing(['user', 'branch', 'items.product', 'fulfilledWith']);
             $restock->loadMorph('fulfilledWith', [

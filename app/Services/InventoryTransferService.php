@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\InventoryMovementType;
 use App\Enums\InventoryTransferStatus;
 use App\Enums\PriceType;
+use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\InventoryTransfer;
@@ -22,6 +23,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class InventoryTransferService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(private readonly InventoryService $inventoryService) {}
     public function list(Request $request): LengthAwarePaginator
     {
@@ -78,6 +81,8 @@ class InventoryTransferService
                     'quantity'              => $item['quantity'],
                 ]);
             }
+
+            $this->notifyCreated($transfer, NotificationType::INVENTORY_TRANSFER_CREATED);
 
             return $transfer->fresh()->load(['fromInventory', 'toInventory', 'items.stock.product']);
         });
@@ -177,6 +182,8 @@ class InventoryTransferService
 
             $transfer->update(['status' => InventoryTransferStatus::DISPATCHED]);
 
+            $this->notifyAction($transfer, NotificationType::INVENTORY_TRANSFER_DISPATCHED, $transfer->branchIds());
+
             return $transfer->fresh()->loadMissing(['fromInventory', 'toInventory', 'items.stock.product']);
         });
     }
@@ -260,6 +267,8 @@ class InventoryTransferService
                     }
                 }
             }
+
+            $this->notifyAction($transfer, NotificationType::INVENTORY_TRANSFER_RECEIVED, $transfer->branchIds());
 
             $transfer->update(['status' => InventoryTransferStatus::RECEIVED]);
 
@@ -363,6 +372,8 @@ class InventoryTransferService
                     }
                 }
             }
+
+            $this->notifyAction($transfer, NotificationType::INVENTORY_TRANSFER_CANCELLED, $transfer->branchIds());
 
             $transfer->update(['status' => InventoryTransferStatus::CANCELED]);
 

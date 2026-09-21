@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\PriceType;
 use App\Enums\PurchaseStatus;
+use App\Enums\NotificationType;
 use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Purchase;
@@ -21,6 +22,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PurchaseService
 {
+
+    use \App\Traits\NotifiesOnAction;
 
     public function __construct(private readonly InventoryService $inventoryService)
     {
@@ -96,6 +99,8 @@ class PurchaseService
 
             $purchase->recalculateAmounts();
 
+            $this->notifyCreated($purchase, NotificationType::PURCHASE_CREATED);
+
             return $purchase->loadMissing(['supplier', 'items.product', 'returns.items.purchaseItem']);
         });
     }
@@ -157,6 +162,8 @@ class PurchaseService
         }
 
         $purchase->update(['status' => PurchaseStatus::CANCELED]);
+
+        $this->notifyAction($purchase, NotificationType::PURCHASE_CANCELLED, $purchase->branch_id);
 
         return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
     }
@@ -240,6 +247,8 @@ class PurchaseService
                     }
                 }
             }
+
+            $this->notifyAction($purchase, NotificationType::PURCHASE_RECEIVED, $purchase->branch_id);
 
             return $purchase->refresh()->loadMissing(['supplier', 'items.product', 'payments', 'returns.items.purchaseItem']);
         });

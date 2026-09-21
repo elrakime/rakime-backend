@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Wallet;
 use App\Models\WalletTransfer;
+use App\Enums\NotificationType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class WalletTransferService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(private readonly WalletService $walletService) {}
 
     public function list(Request $request): LengthAwarePaginator
@@ -84,6 +87,8 @@ class WalletTransferService
                 source: $transfer,
                 note: $transfer->note,
             );
+
+            $this->notifyCreated($transfer, NotificationType::WALLET_TRANSFER_CREATED);
 
             return $transfer;
         });

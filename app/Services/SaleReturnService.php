@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\InventoryMovementType;
 use App\Enums\SaleReturnStatus;
+use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\InventoryMovement;
 use App\Models\Sale;
@@ -21,6 +22,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class SaleReturnService
 {
+    use \App\Traits\NotifiesOnAction;
+
     public function __construct(
         private readonly InventoryService $inventoryService,
         private readonly WalletService $walletService,
@@ -76,6 +79,8 @@ class SaleReturnService
                     'reason'         => $item['reason'] ?? null,
                 ]);
             }
+
+            $this->notifyCreated($saleReturn, NotificationType::SALE_RETURN_CREATED);
 
             return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
@@ -186,6 +191,8 @@ class SaleReturnService
 
             $saleReturn->sale->recalculateAmounts();
 
+            $this->notifyAction($saleReturn, NotificationType::SALE_RETURN_APPROVED, $saleReturn->sale?->branch_id);
+
             return $saleReturn->fresh()->loadMissing(['sale', 'items.saleItem.product', 'items.saleItem.stock', 'items.saleItem.returnItems.saleReturn']);
         });
     }
@@ -207,6 +214,8 @@ class SaleReturnService
         if ($saleReturn->status !== SaleReturnStatus::PENDING) {
             throw new Exception(__('sale_returns.not_pending'), 422);
         }
+
+        $this->notifyAction($saleReturn, NotificationType::SALE_RETURN_CANCELLED, $saleReturn->sale?->branch_id);
 
         $saleReturn->update(['status' => SaleReturnStatus::CANCELED]);
 
