@@ -6,7 +6,6 @@ return [
     'cannot_update_max_amount' => 'Only administrators can update the maximum amount.',
     'client_banned' => 'This client is banned and cannot create new contracts.',
     'cannot_cancel' => 'This contract can no longer be cancelled.',
-    'cannot_update_months_count' => 'The months count cannot be changed after the contract is configured.',
     'cannot_update_active_amounts' => 'Advance and maximum amounts cannot be changed on an active contract.',
     'cannot_update_active' => 'Only the items can be updated on an active contract.',
     'cannot_update_after_start_date' => 'The items of an active contract can only be updated before the start date.',
@@ -15,4 +14,5 @@ return [
     'cannot_extend' => 'Only closed or cancelled contracts can be extended.',
     'cannot_extend_items' => 'Extension contracts cannot have items.',
     'missing_remaining_amount' => 'The contract has no remaining amount to extend.',
+    'missing_months_count' => 'The number of months must be at least 1.',
 ];

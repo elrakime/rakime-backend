@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\ContractStatus;
 use App\Enums\InstallmentPaymentMethod;
 use App\Enums\InstallmentStatus;
+use App\Enums\InventoryMovementType;
 use App\Enums\NotificationType;
 use App\Models\Batch;
 use App\Models\Contract;
@@ -275,7 +276,7 @@ class ContractService
         }
 
         if ($monthsCount < 1) {
-            throw new Exception(__('contracts.cannot_update_months_count'), 422);
+            throw new Exception(__('contracts.missing_months_count'), 422);
         }
 
         $monthlyAmount = (float) ceil($remaining / $monthsCount);
@@ -428,12 +429,15 @@ class ContractService
      */
     private function updateConfigured(Contract $contract, array $data): Contract
     {
-        if (array_key_exists('months_count', $data)) {
-            throw new Exception(__('contracts.cannot_update_months_count'), 422);
-        }
-
         if (array_key_exists('max_amount', $data) && auth()->user()->isAdmin() === false) {
             throw new Exception(__('contracts.cannot_update_max_amount'), 403);
+        }
+
+        // Changing the months count resets the contract back to PENDING with no
+        // configuration (installments and subscriptions are removed and the
+        // deducted stock is restored), so it can be reconfigured from scratch.
+        if (array_key_exists('months_count', $data)) {
+            return $this->resetConfiguredToPending($contract, $data);
         }
 
         return DB::transaction(function () use ($contract, $data) {
@@ -488,6 +492,87 @@ class ContractService
     }
 
     /**
+     * Reset a configured contract back to PENDING with no configuration.
+     *
+     * Used when the months count is changed on an already configured contract.
+     * The deducted stock is restored, the installments and subscriptions are
+     * removed, the start/end dates are cleared and the status is set back to
+     * PENDING so the contract can be approved and reconfigured.
+     */
+    private function resetConfiguredToPending(Contract $contract, array $data): Contract
+    {
+        return DB::transaction(function () use ($contract, $data) {
+            $this->restoreStock($contract);
+
+            $contract->installments()->delete();
+            $contract->subscriptions()->delete();
+
+            $updates = [
+                'status'       => ContractStatus::PENDING,
+                'start_date'   => null,
+                'end_date'     => null,
+                'months_count' => $data['months_count'],
+            ];
+
+            if (array_key_exists('advance_amount', $data)) {
+                $updates['advance_amount'] = $data['advance_amount'];
+            }
+
+            if (array_key_exists('max_amount', $data)) {
+                $updates['max_amount'] = $data['max_amount'];
+            }
+
+            if (array_key_exists('items', $data)) {
+                $contract->items()->delete();
+
+                foreach ($data['items'] as $item) {
+                    ContractItem::create([
+                        'contract_id' => $contract->id,
+                        'product_id'  => $item['product_id'],
+                        'stock_id'    => $item['stock_id'],
+                        'quantity'    => $item['quantity'],
+                        'price'       => $item['price'],
+                    ]);
+                }
+            }
+
+            $contract->update($updates);
+            $contract->recalculateAmounts();
+
+            return $contract->fresh([
+                'client', 'account', 'branch',
+                'items.product', 'items.stock',
+                'installments', 'subscriptions.draws',
+            ]);
+        });
+    }
+
+    /**
+     * Restore the stock that was deducted when the contract was configured.
+     *
+     * Reverses the CONTRACT inventory movements by incrementing the batch
+     * quantities back and deleting the movements, so the stock returns to its
+     * pre-configuration state.
+     */
+    private function restoreStock(Contract $contract): void
+    {
+        $movements = $contract->inventoryMovements()
+            ->where('movement_type', InventoryMovementType::CONTRACT)
+            ->with('allocations')
+            ->get();
+
+        foreach ($movements as $movement) {
+            foreach ($movement->allocations as $allocation) {
+                Batch::whereKey($allocation->batch_id)
+                    ->increment('current_quantity', abs($allocation->quantity));
+            }
+
+            $movement->allocations()->delete();
+            $movement->delete();
+        }
+    }
+
+    /**
      * Update an active contract (admin only).
      *
      * Allows changing items and advance_amount before the start date, as long
@@ -502,7 +587,7 @@ class ContractService
         }
 
         if (array_key_exists('months_count', $data) || array_key_exists('max_amount', $data)) {
-            throw new Exception(__('contracts.cannot_update_months_count'), 422);
+            throw new Exception(__('contracts.cannot_update_active_amounts'), 422);
         }
 
         if (! array_key_exists('items', $data)) {
