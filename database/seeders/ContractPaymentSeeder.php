@@ -11,9 +11,9 @@ class ContractPaymentSeeder extends Seeder
 {
     public function run(): void
     {
-        // Pick a configured contract (has installments to settle).
+        // Pick a configured/active contract with unpaid installments to settle.
         $contract = Contract::whereIn('status', ['configured', 'active'])
-            ->whereHas('installments')
+            ->whereHas('installments', fn ($q) => $q->where('status', 'unpaid'))
             ->first();
 
         if (! $contract) {
