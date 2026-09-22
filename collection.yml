@@ -46,9 +46,422 @@ items:
       auth: inherit
     items:
       - info:
+          name: Branches
+          type: folder
+          seq: 2
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create branch
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Third Branch
+                  - name: code
+                    type: text
+                    value: T
+                  - name: accounts[]
+                    type: text
+                    value: '1'
+                  - name: shop_name
+                    type: text
+                    value: Third Shop
+                  - name: address
+                    type: text
+                    value: 12 Rue des Fleurs, Alger
+                  - name: phone
+                    type: text
+                    value: '0123456789'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete branch
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/branches/{{branch}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: branch
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list branches
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/branches'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[code]
+                  value: ''
+                  type: query
+                - name: filter[shop_name]
+                  value: ''
+                  type: query
+                - name: filter[phone]
+                  value: ''
+                  type: query
+                - name: filter[wilaya_id]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show branch
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/branches/{{branch}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: branch
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update branch
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/branches/{{branch}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Main Branch
+                  - name: code
+                    type: text
+                    value: M
+                  - name: accounts[]
+                    type: text
+                    value: '1'
+                  - name: shop_name
+                    type: text
+                    value: Main Shop
+                  - name: address
+                    type: text
+                    value: 12 Rue des Fleurs, Alger
+                  - name: phone
+                    type: text
+                    value: '0123456789'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: branch
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Accounts
+          type: folder
+          seq: 3
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create account
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: CCP Account
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                  - name: draw_day
+                    type: text
+                    value: '15'
+                  - name: min_withdraw_amount
+                    type: text
+                    value: '1000'
+                  - name: max_withdraw_count
+                    type: text
+                    value: '3'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete account
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/accounts/{{account}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list accounts
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[ccp_number]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show account
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/accounts/{{account}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update account
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/accounts/{{account}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: CCP Account2
+                  - name: ccp_number
+                    type: text
+                    value: '0012345678'
+                    disabled: true
+                  - name: ccp_key
+                    type: text
+                    value: '42'
+                    disabled: true
+                  - name: draw_day
+                    type: text
+                    value: '15'
+                  - name: min_withdraw_amount
+                    type: text
+                    value: '1000'
+                  - name: max_withdraw_count
+                    type: text
+                    value: '3'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: account
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
           name: Clients
           type: folder
-          seq: 6
+          seq: 7
         request:
           auth: inherit
         items:
@@ -375,19 +788,136 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Accounts
+          name: Auth
           type: folder
-          seq: 3
+          seq: 1
         request:
           auth: inherit
         items:
           - info:
-              name: create account
+              name: change-password
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/change-password'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: current_password
+                    type: text
+                    value: password
+                  - name: new_password
+                    type: text
+                    value: new_password
+                  - name: new_password_confirmation
+                    type: text
+                    value: new_password
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: login
+              type: http
+              seq: 1
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/login'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: email
+                    type: text
+                    value: admin@example.com
+                  - name: password
+                    type: text
+                    value: password
+              auth: inherit
+            runtime:
+              scripts:
+                - type: after-response
+                  code: |-
+                    let jsonResponse = res.getBody();
+
+                    if (jsonResponse.status && jsonResponse.data.token) {
+                    bru.setEnvVar("token", jsonResponse.data.token);
+                    console.log("Token has been set: " + jsonResponse.data.token);
+                    }
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: logout
               type: http
               seq: 2
             http:
               method: POST
-              url: '{{url}}/v1/accounts'
+              url: '{{url}}/v1/auth/logout'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: me
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/auth/me'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update-profile
+              type: http
+              seq: 5
+            http:
+              method: PUT
+              url: '{{url}}/v1/auth/update-profile'
               headers:
                 - name: Accept
                   value: application/json
@@ -400,22 +930,56 @@ items:
                 data:
                   - name: name
                     type: text
-                    value: CCP Account
-                  - name: ccp_number
+                    value: John Doe
+                  - name: email
                     type: text
-                    value: '0012345678'
-                  - name: ccp_key
+                    value: john@example.com
+                  - name: phone
                     type: text
-                    value: '42'
-                  - name: draw_day
+                    value: '0550123456'
+                  - name: image
+                    type: file
+                    value:
+                      - C:\Users\Abdelali\Downloads\icons8-deepseek-144.png
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Inventories
+          type: folder
+          seq: 8
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create inventory
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/inventories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
                     type: text
-                    value: '15'
-                  - name: min_withdraw_amount
+                    value: Main Inventory
+                  - name: branch_id
                     type: text
-                    value: '1000'
-                  - name: max_withdraw_count
-                    type: text
-                    value: '3'
+                    value: '1'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -426,12 +990,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete account
+              name: delete inventory
               type: http
               seq: 5
             http:
               method: DELETE
-              url: '{{url}}/v1/accounts/{{account}}'
+              url: '{{url}}/v1/inventories/{{inventory}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -442,7 +1006,7 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: account
+                - name: inventory
                   value: '1'
             settings:
               encodeUrl: true
@@ -451,12 +1015,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list accounts
+              name: list inventories
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/accounts'
+              url: '{{url}}/v1/inventories'
               headers:
                 - name: Accept
                   value: application/json
@@ -469,7 +1033,7 @@ items:
                 - name: filter[name]
                   value: ''
                   type: query
-                - name: filter[ccp_number]
+                - name: filter[branch_id]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -497,12 +1061,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show account
+              name: show inventory
               type: http
               seq: 3
             http:
               method: GET
-              url: '{{url}}/v1/accounts/{{account}}'
+              url: '{{url}}/v1/inventories/{{inventory}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -513,7 +1077,7 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: account
+                - name: inventory
                   value: '1'
             settings:
               encodeUrl: true
@@ -522,12 +1086,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: update account
+              name: update inventory
               type: http
               seq: 4
             http:
               method: PUT
-              url: '{{url}}/v1/accounts/{{account}}'
+              url: '{{url}}/v1/inventories/{{inventory}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -540,246 +1104,16 @@ items:
                 data:
                   - name: name
                     type: text
-                    value: CCP Account2
-                  - name: ccp_number
-                    type: text
-                    value: '0012345678'
-                    disabled: true
-                  - name: ccp_key
-                    type: text
-                    value: '42'
-                    disabled: true
-                  - name: draw_day
-                    type: text
-                    value: '15'
-                  - name: min_withdraw_amount
-                    type: text
-                    value: '1000'
-                  - name: max_withdraw_count
-                    type: text
-                    value: '3'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: account
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Branches
-          type: folder
-          seq: 2
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create branch
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/branches'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Third Branch
-                  - name: code
-                    type: text
-                    value: T
-                  - name: accounts[]
+                    value: Main Inventory
+                  - name: branch_id
                     type: text
                     value: '1'
-                  - name: shop_name
-                    type: text
-                    value: Third Shop
-                  - name: address
-                    type: text
-                    value: 12 Rue des Fleurs, Alger
-                  - name: phone
-                    type: text
-                    value: '0123456789'
-                  - name: wilaya_id
-                    type: text
-                    value: ''
-                  - name: image
-                    type: text
-                    value: ''
-                  - name: metadata
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete branch
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/branches/{{branch}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
               auth:
                 type: bearer
                 token: '{{token}}'
             runtime:
               variables:
-                - name: branch
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list branches
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/branches'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[name]
-                  value: ''
-                  type: query
-                - name: filter[code]
-                  value: ''
-                  type: query
-                - name: filter[shop_name]
-                  value: ''
-                  type: query
-                - name: filter[phone]
-                  value: ''
-                  type: query
-                - name: filter[wilaya_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show branch
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/branches/{{branch}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: branch
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update branch
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/branches/{{branch}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Main Branch
-                  - name: code
-                    type: text
-                    value: M
-                  - name: accounts[]
-                    type: text
-                    value: '1'
-                  - name: shop_name
-                    type: text
-                    value: Main Shop
-                  - name: address
-                    type: text
-                    value: 12 Rue des Fleurs, Alger
-                  - name: phone
-                    type: text
-                    value: '0123456789'
-                  - name: wilaya_id
-                    type: text
-                    value: ''
-                  - name: image
-                    type: text
-                    value: ''
-                  - name: metadata
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: branch
+                - name: inventory
                   value: '1'
             settings:
               encodeUrl: true
@@ -790,7 +1124,7 @@ items:
       - info:
           name: Contracts
           type: folder
-          seq: 5
+          seq: 6
         request:
           auth: inherit
         items:
@@ -940,6 +1274,31 @@ items:
                   - name: items[0][price]
                     type: text
                     value: '5000'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delinquent contracts
+              type: http
+              seq: 14
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/delinquent'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: account_id
+                  value: ''
+                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -1240,6 +1599,34 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
+              name: unprocessed contracts
+              type: http
+              seq: 13
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/unprocessed'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: account_id
+                  value: ''
+                  type: query
+                - name: draw_date
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
               name: update contract
               type: http
               seq: 5
@@ -1291,343 +1678,9 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Auth
-          type: folder
-          seq: 1
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: change-password
-              type: http
-              seq: 4
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/change-password'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: current_password
-                    type: text
-                    value: password
-                  - name: new_password
-                    type: text
-                    value: new_password
-                  - name: new_password_confirmation
-                    type: text
-                    value: new_password
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: login
-              type: http
-              seq: 1
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/login'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: email
-                    type: text
-                    value: admin@example.com
-                  - name: password
-                    type: text
-                    value: password
-              auth: inherit
-            runtime:
-              scripts:
-                - type: after-response
-                  code: |-
-                    let jsonResponse = res.getBody();
-
-                    if (jsonResponse.status && jsonResponse.data.token) {
-                    bru.setEnvVar("token", jsonResponse.data.token);
-                    console.log("Token has been set: " + jsonResponse.data.token);
-                    }
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: logout
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/logout'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: me
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/auth/me'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update-profile
-              type: http
-              seq: 5
-            http:
-              method: PUT
-              url: '{{url}}/v1/auth/update-profile'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: John Doe
-                  - name: email
-                    type: text
-                    value: john@example.com
-                  - name: phone
-                    type: text
-                    value: '0550123456'
-                  - name: image
-                    type: file
-                    value:
-                      - C:\Users\Abdelali\Downloads\icons8-deepseek-144.png
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Inventories
-          type: folder
-          seq: 7
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create inventory
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/inventories'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Main Inventory
-                  - name: branch_id
-                    type: text
-                    value: '1'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete inventory
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/inventories/{{inventory}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: inventory
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list inventories
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/inventories'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[name]
-                  value: ''
-                  type: query
-                - name: filter[branch_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show inventory
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/inventories/{{inventory}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: inventory
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update inventory
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/inventories/{{inventory}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Main Inventory
-                  - name: branch_id
-                    type: text
-                    value: '1'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: inventory
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
           name: Inventory Movements
           type: folder
-          seq: 9
+          seq: 10
         request:
           auth: inherit
         items:
@@ -1693,19 +1746,100 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Wallet Movements
+          name: Stocks
           type: folder
-          seq: 10
+          seq: 4
         request:
           auth: inherit
         items:
           - info:
-              name: list wallet movements
+              name: create stock
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/stocks'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: inventory_id
+                    type: text
+                    value: '1'
+                  - name: product_id
+                    type: text
+                    value: '2'
+                  - name: source_id
+                    type: text
+                    value: ''
+                  - name: source_type
+                    type: text
+                    value: ''
+                  - name: initial_quantity
+                    type: text
+                    value: '20'
+                  - name: current_quantity
+                    type: text
+                    value: '20'
+                  - name: purchase_price
+                    type: text
+                    value: '50000'
+                  - name: selling_prices[0]
+                    type: text
+                    value: '60000'
+                  - name: installment_prices[0]
+                    type: text
+                    value: '65000'
+                  - name: wholesale_prices[0]
+                    type: text
+                    value: '55000'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete stock
+              type: http
+              seq: 4
+            http:
+              method: DELETE
+              url: '{{url}}/v1/stocks/{{stock}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: stock
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list stocks
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/wallet-movements?filter[search]=&filter[wallet_id]=&filter[movement_type]=&filter[inflow]=&filter[outflow]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
+              url: '{{url}}/v1/stocks?filter[search]=&filter[inventory_id]=1&filter[product_id]=&sort=-created_at&page=&per_page='
               headers:
                 - name: Accept
                   value: application/json
@@ -1715,28 +1849,13 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
-                - name: filter[wallet_id]
-                  value: ''
+                - name: filter[inventory_id]
+                  value: '1'
                   type: query
-                - name: filter[movement_type]
-                  value: ''
-                  type: query
-                - name: filter[inflow]
-                  value: ''
-                  type: query
-                - name: filter[outflow]
-                  value: ''
-                  type: query
-                - name: filter[from_date]
-                  value: ''
-                  type: query
-                - name: filter[to_date]
+                - name: filter[product_id]
                   value: ''
                   type: query
                 - name: filter[branch_id]
-                  value: ''
-                  type: query
-                - name: filter[account_id]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -1763,10 +1882,114 @@ items:
               followRedirects: true
               maxRedirects: 5
               forwardAuthorizationHeader: true
+          - info:
+              name: show stock
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/stocks/{{stock}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: stock
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Notifications
+          type: folder
+          seq: 13
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list notifications
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/notifications'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: mark notification as read
+              type: http
+              seq: 3
+            http:
+              method: POST
+              url: '{{url}}/v1/notifications/{{notification}}/read'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data: []
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: notification
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: unread notifications count
+              type: http
+              seq: 2
+            http:
+              method: GET
+              url: '{{url}}/v1/notifications/unread-count'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
       - info:
           name: Wallets
           type: folder
-          seq: 8
+          seq: 9
         request:
           auth: inherit
         items:
@@ -2026,9 +2249,80 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
+          name: Wallet Movements
+          type: folder
+          seq: 11
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list wallet movements
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/wallet-movements?filter[search]=&filter[wallet_id]=&filter[movement_type]=&filter[inflow]=&filter[outflow]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[wallet_id]
+                  value: ''
+                  type: query
+                - name: filter[movement_type]
+                  value: ''
+                  type: query
+                - name: filter[inflow]
+                  value: ''
+                  type: query
+                - name: filter[outflow]
+                  value: ''
+                  type: query
+                - name: filter[from_date]
+                  value: ''
+                  type: query
+                - name: filter[to_date]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[account_id]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: ''
+                  type: query
+                - name: per_page
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
           name: Wilayas
           type: folder
-          seq: 4
+          seq: 5
         request:
           auth: inherit
         items:
@@ -2179,93 +2473,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Stocks
+          name: Device Tokens
           type: folder
-          seq: 3
+          seq: 12
         request:
           auth: inherit
         items:
           - info:
-              name: show stock
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/stocks/{{stock}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: stock
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list stocks
+              name: register device token
               type: http
               seq: 1
             http:
-              method: GET
-              url: '{{url}}/v1/stocks?filter[search]=&filter[inventory_id]=1&filter[product_id]=&sort=-created_at&page=&per_page='
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[inventory_id]
-                  value: '1'
-                  type: query
-                - name: filter[product_id]
-                  value: ''
-                  type: query
-                - name: filter[branch_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: ''
-                  type: query
-                - name: per_page
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: create stock
-              type: http
-              seq: 2
-            http:
               method: POST
-              url: '{{url}}/v1/stocks'
+              url: '{{url}}/v1/device-tokens'
               headers:
                 - name: Accept
                   value: application/json
@@ -2276,36 +2496,12 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: inventory_id
-                    type: text
-                    value: '1'
-                  - name: product_id
-                    type: text
-                    value: '2'
-                  - name: source_id
+                  - name: token
                     type: text
                     value: ''
-                  - name: source_type
+                  - name: platform
                     type: text
-                    value: ''
-                  - name: initial_quantity
-                    type: text
-                    value: '20'
-                  - name: current_quantity
-                    type: text
-                    value: '20'
-                  - name: purchase_price
-                    type: text
-                    value: '50000'
-                  - name: selling_prices[0]
-                    type: text
-                    value: '60000'
-                  - name: installment_prices[0]
-                    type: text
-                    value: '65000'
-                  - name: wholesale_prices[0]
-                    type: text
-                    value: '55000'
+                    value: android
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -2316,30 +2512,185 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete stock
+              name: delete device token
               type: http
-              seq: 4
+              seq: 2
             http:
               method: DELETE
-              url: '{{url}}/v1/stocks/{{stock}}'
+              url: '{{url}}/v1/device-tokens'
               headers:
                 - name: Accept
                   value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
                 - name: X-Client-Type
                   value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: token
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
-            runtime:
-              variables:
-                - name: stock
-                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
               followRedirects: true
               maxRedirects: 5
               forwardAuthorizationHeader: true
+  - info:
+      name: Extras
+      type: folder
+      seq: 3
+    request:
+      auth: inherit
+    items:
+      - info:
+          name: ccp info
+          type: http
+          seq: 1
+        http:
+          method: POST
+          url: '{{url}}/v1/ccp/info'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: multipart/form-data
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          body:
+            type: multipart-form
+            data:
+              - name: ccp
+                type: text
+                value: '0016188475'
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: export cancellations
+          type: http
+          seq: 3
+        http:
+          method: GET
+          url: '{{url}}/v1/export/cancellations'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          params:
+            - name: account_id
+              value: '1'
+              type: query
+            - name: branch_ids[]
+              value: ''
+              type: query
+            - name: date
+              value: ''
+              type: query
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: export registrations
+          type: http
+          seq: 2
+        http:
+          method: GET
+          url: '{{url}}/v1/export/registrations'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          params:
+            - name: account_id
+              value: '1'
+              type: query
+            - name: branch_ids[]
+              value: ''
+              type: query
+            - name: date
+              value: ''
+              type: query
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: import draws
+          type: http
+          seq: 4
+        http:
+          method: POST
+          url: '{{url}}/v1/import'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: multipart/form-data
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          body:
+            type: multipart-form
+            data:
+              - name: account_id
+                type: text
+                value: '1'
+              - name: file
+                type: file
+                value: []
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
+      - info:
+          name: zakat
+          type: http
+          seq: 5
+        http:
+          method: GET
+          url: '{{url}}/v1/zakat'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-Client-Type
+              value: '{{client_type}}'
+          auth:
+            type: bearer
+            token: '{{token}}'
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+          forwardAuthorizationHeader: true
   - info:
       name: Web
       type: folder
@@ -2545,6 +2896,169 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
+          name: Auth
+          type: folder
+          seq: 1
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: change-password
+              type: http
+              seq: 4
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/change-password'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: current_password
+                    type: text
+                    value: password
+                  - name: new_password
+                    type: text
+                    value: new_password
+                  - name: new_password_confirmation
+                    type: text
+                    value: new_password
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: login
+              type: http
+              seq: 1
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/login'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: email
+                    type: text
+                    value: admin@example.com
+                  - name: password
+                    type: text
+                    value: password
+              auth: inherit
+            runtime:
+              scripts:
+                - type: after-response
+                  code: |-
+                    let jsonResponse = res.getBody();
+
+                    if (jsonResponse.status && jsonResponse.data.token) {
+                    bru.setEnvVar("token", jsonResponse.data.token);
+                    console.log("Token has been set: " + jsonResponse.data.token);
+                    }
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: logout
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/auth/logout'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: me
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/auth/me'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update-profile
+              type: http
+              seq: 5
+            http:
+              method: PUT
+              url: '{{url}}/v1/auth/update-profile'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: John Doe
+                  - name: email
+                    type: text
+                    value: john@example.com
+                  - name: phone
+                    type: text
+                    value: '0550123456'
+                  - name: image
+                    type: file
+                    value:
+                      - C:\Users\Abdelali\Downloads\icons8-deepseek-144.png
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
           name: Account Draw Locks
           type: folder
           seq: 6
@@ -2614,6 +3128,171 @@ items:
               auth:
                 type: bearer
                 token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Brands
+          type: folder
+          seq: 10
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create brand
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Samsung
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete brand
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/brands/{{brand}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: brand
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list brands
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/brands'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show brand
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/brands/{{brand}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: brand
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update brand
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/brands/{{brand}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Samsung
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: brand
+                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
@@ -2837,19 +3516,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Brands
+          name: Colors
           type: folder
-          seq: 10
+          seq: 13
         request:
           auth: inherit
         items:
           - info:
-              name: create brand
+              name: create color
               type: http
               seq: 2
             http:
               method: POST
-              url: '{{url}}/v1/brands'
+              url: '{{url}}/v1/colors'
               headers:
                 - name: Accept
                   value: application/json
@@ -2862,10 +3541,10 @@ items:
                 data:
                   - name: name
                     type: text
-                    value: Samsung
-                  - name: image
+                    value: Rouge
+                  - name: code
                     type: text
-                    value: ''
+                    value: '#FF0000'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -2876,12 +3555,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete brand
+              name: delete color
               type: http
               seq: 5
             http:
               method: DELETE
-              url: '{{url}}/v1/brands/{{brand}}'
+              url: '{{url}}/v1/colors/{{color}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -2892,7 +3571,7 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: brand
+                - name: color
                   value: '1'
             settings:
               encodeUrl: true
@@ -2901,19 +3580,25 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list brands
+              name: list colors
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/brands'
+              url: '{{url}}/v1/colors'
               headers:
                 - name: Accept
                   value: application/json
                 - name: X-Client-Type
                   value: '{{client_type}}'
               params:
+                - name: filter[search]
+                  value: ''
+                  type: query
                 - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[code]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -2941,12 +3626,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show brand
+              name: show color
               type: http
               seq: 3
             http:
               method: GET
-              url: '{{url}}/v1/brands/{{brand}}'
+              url: '{{url}}/v1/colors/{{color}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -2957,7 +3642,7 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: brand
+                - name: color
                   value: '1'
             settings:
               encodeUrl: true
@@ -2966,12 +3651,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: update brand
+              name: update color
               type: http
               seq: 4
             http:
               method: PUT
-              url: '{{url}}/v1/brands/{{brand}}'
+              url: '{{url}}/v1/colors/{{color}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -2984,345 +3669,17 @@ items:
                 data:
                   - name: name
                     type: text
-                    value: Samsung
-                  - name: image
+                    value: Rouge
+                  - name: code
                     type: text
-                    value: ''
+                    value: '#FF0000'
               auth:
                 type: bearer
                 token: '{{token}}'
             runtime:
               variables:
-                - name: brand
+                - name: color
                   value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Categories
-          type: folder
-          seq: 8
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create category
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/categories'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Cuisine
-                  - name: image
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete category
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/categories/{{category}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: category
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list categories
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/categories'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[name]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show category
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/categories/{{category}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: category
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update category
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/categories/{{category}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Cuisine
-                  - name: image
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: category
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Auth
-          type: folder
-          seq: 1
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: change-password
-              type: http
-              seq: 4
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/change-password'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: current_password
-                    type: text
-                    value: password
-                  - name: new_password
-                    type: text
-                    value: new_password
-                  - name: new_password_confirmation
-                    type: text
-                    value: new_password
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: login
-              type: http
-              seq: 1
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/login'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: email
-                    type: text
-                    value: admin@example.com
-                  - name: password
-                    type: text
-                    value: password
-              auth: inherit
-            runtime:
-              scripts:
-                - type: after-response
-                  code: |-
-                    let jsonResponse = res.getBody();
-
-                    if (jsonResponse.status && jsonResponse.data.token) {
-                    bru.setEnvVar("token", jsonResponse.data.token);
-                    console.log("Token has been set: " + jsonResponse.data.token);
-                    }
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: logout
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/auth/logout'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: me
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/auth/me'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update-profile
-              type: http
-              seq: 5
-            http:
-              method: PUT
-              url: '{{url}}/v1/auth/update-profile'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: John Doe
-                  - name: email
-                    type: text
-                    value: john@example.com
-                  - name: phone
-                    type: text
-                    value: '0550123456'
-                  - name: image
-                    type: file
-                    value:
-                      - C:\Users\Abdelali\Downloads\icons8-deepseek-144.png
-              auth:
-                type: bearer
-                token: '{{token}}'
             settings:
               encodeUrl: true
               timeout: 0
@@ -3659,6 +4016,264 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
+          name: Categories
+          type: folder
+          seq: 8
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create category
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Cuisine
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete category
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/categories/{{category}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: category
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list categories
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/categories'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show category
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/categories/{{category}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: category
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update category
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/categories/{{category}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Cuisine
+                  - name: image
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: category
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Contract Payments
+          type: folder
+          seq: 11
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create contract payment
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/contracts/{{contract}}/payments'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: amount
+                    type: text
+                    value: '5000'
+                  - name: note
+                    type: text
+                    value: ''
+                  - name: wallet_id
+                    type: text
+                    value: '1'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list contract payments
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/{{contract}}/payments'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[amount]
+                  value: ''
+                  type: query
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: contract
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
           name: Contracts
           type: folder
           seq: 9
@@ -3811,6 +4426,31 @@ items:
                   - name: items[0][price]
                     type: text
                     value: '5000'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delinquent contracts
+              type: http
+              seq: 14
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/delinquent'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: account_id
+                  value: ''
+                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -4111,6 +4751,34 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
+              name: unprocessed contracts
+              type: http
+              seq: 13
+            http:
+              method: GET
+              url: '{{url}}/v1/contracts/unprocessed'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: account_id
+                  value: ''
+                  type: query
+                - name: draw_date
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
               name: update contract
               type: http
               seq: 5
@@ -4148,270 +4816,6 @@ items:
                   - name: max_amount
                     type: text
                     value: '100000'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: contract
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Colors
-          type: folder
-          seq: 13
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create color
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/colors'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Rouge
-                  - name: code
-                    type: text
-                    value: '#FF0000'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete color
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/colors/{{color}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: color
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list colors
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/colors'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[name]
-                  value: ''
-                  type: query
-                - name: filter[code]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show color
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/colors/{{color}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: color
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update color
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/colors/{{color}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Rouge
-                  - name: code
-                    type: text
-                    value: '#FF0000'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: color
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Contract Payments
-          type: folder
-          seq: 11
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create contract payment
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/contracts/{{contract}}/payments'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: amount
-                    type: text
-                    value: '5000'
-                  - name: note
-                    type: text
-                    value: ''
-                  - name: wallet_id
-                    type: text
-                    value: '1'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: contract
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list contract payments
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/contracts/{{contract}}/payments'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[amount]
-                  value: ''
-                  type: query
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -4987,6 +5391,433 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
+          name: Inventory Movements
+          type: folder
+          seq: 29
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list inventory movements
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/inventory-movements?filter[search]=&filter[inventory_id]=1&filter[stock_id]=&filter[product_id]=&filter[movement_type]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[inventory_id]
+                  value: '1'
+                  type: query
+                - name: filter[stock_id]
+                  value: ''
+                  type: query
+                - name: filter[product_id]
+                  value: ''
+                  type: query
+                - name: filter[branch_id]
+                  value: ''
+                  type: query
+                - name: filter[movement_type]
+                  value: ''
+                  type: query
+                - name: filter[from_date]
+                  value: ''
+                  type: query
+                - name: filter[to_date]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: ''
+                  type: query
+                - name: per_page
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Products
+          type: folder
+          seq: 15
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create product
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '1'
+                  - name: brand_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: Samsung RT38 RÃƒÂ©frigÃƒÂ©rateur
+                  - name: barcode
+                    type: text
+                    value: '88016543033569'
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: min_quantity
+                    type: text
+                    value: '5'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete product
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/products/{{product}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: product
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list products
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/products'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[barcode]
+                  value: ''
+                  type: query
+                - name: filter[type_id]
+                  value: ''
+                  type: query
+                - name: filter[color_id]
+                  value: ''
+                  type: query
+                - name: filter[brand_id]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show product
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/products/{{product}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: product
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update product
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/products/{{product}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: type_id
+                    type: text
+                    value: '1'
+                  - name: color_id
+                    type: text
+                    value: '2'
+                  - name: brand_id
+                    type: text
+                    value: '2'
+                  - name: name
+                    type: text
+                    value: Samsung RT38 RefrigÃƒÂ©rateur
+                    disabled: true
+                  - name: barcode
+                    type: text
+                    value: '88016430335698'
+                    disabled: true
+                  - name: image
+                    type: text
+                    value: ''
+                    disabled: true
+                  - name: min_quantity
+                    type: text
+                    value: '6'
+                    disabled: true
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: product
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Permissions
+          type: folder
+          seq: 16
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: list permissions
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/permissions'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Purchase Payments
+          type: folder
+          seq: 23
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: add purchase payment
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/purchases/{{purchase}}/payments'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: wallet_id
+                    type: text
+                    value: '1'
+                  - name: amount
+                    type: text
+                    value: '5000'
+                  - name: note
+                    type: text
+                    value: First payment
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: purchase
+                  value: '3'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: cancel purchase payment
+              type: http
+              seq: 3
+            http:
+              method: POST
+              url: '{{url}}/v1/purchases/{{purchase}}/payments/{{payment}}/cancel'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data: []
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: purchase
+                  value: '2'
+                - name: payment
+                  value: '4'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list purchase payments
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/purchases/{{purchase}}/payments'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: purchase
+                  value: '2'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
           name: Inventory Transfers
           type: folder
           seq: 27
@@ -5281,122 +6112,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Permissions
+          name: Purchase Returns
           type: folder
-          seq: 16
+          seq: 24
         request:
           auth: inherit
         items:
           - info:
-              name: list permissions
+              name: approve return
               type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/permissions'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Inventory Movements
-          type: folder
-          seq: 29
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: list inventory movements
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/inventory-movements?filter[search]=&filter[inventory_id]=1&filter[stock_id]=&filter[product_id]=&filter[movement_type]=&filter[from_date]=&filter[to_date]=&sort=-created_at&page=&per_page='
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[inventory_id]
-                  value: '1'
-                  type: query
-                - name: filter[stock_id]
-                  value: ''
-                  type: query
-                - name: filter[product_id]
-                  value: ''
-                  type: query
-                - name: filter[branch_id]
-                  value: ''
-                  type: query
-                - name: filter[movement_type]
-                  value: ''
-                  type: query
-                - name: filter[from_date]
-                  value: ''
-                  type: query
-                - name: filter[to_date]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: ''
-                  type: query
-                - name: per_page
-                  value: ''
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Products
-          type: folder
-          seq: 15
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create product
-              type: http
-              seq: 2
+              seq: 6
             http:
               method: POST
-              url: '{{url}}/v1/products'
+              url: '{{url}}/v1/purchase-returns/{{purchase_return}}/approve'
               headers:
                 - name: Accept
                   value: application/json
@@ -5407,30 +6135,16 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: type_id
+                  - name: wallet_id
                     type: text
                     value: '1'
-                  - name: color_id
-                    type: text
-                    value: '1'
-                  - name: brand_id
-                    type: text
-                    value: '1'
-                  - name: name
-                    type: text
-                    value: Samsung RT38 RÃƒÂ©frigÃƒÂ©rateur
-                  - name: barcode
-                    type: text
-                    value: '88016543033569'
-                  - name: image
-                    type: text
-                    value: ''
-                  - name: min_quantity
-                    type: text
-                    value: '5'
               auth:
                 type: bearer
                 token: '{{token}}'
+            runtime:
+              variables:
+                - name: purchase_return
+                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
@@ -5438,12 +6152,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete product
+              name: cancel return
               type: http
-              seq: 5
+              seq: 7
             http:
-              method: DELETE
-              url: '{{url}}/v1/products/{{product}}'
+              method: POST
+              url: '{{url}}/v1/purchase-returns/{{purchase_return}}/cancel'
               headers:
                 - name: Accept
                   value: application/json
@@ -5454,7 +6168,7 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: product
+                - name: purchase_return
                   value: '1'
             settings:
               encodeUrl: true
@@ -5463,12 +6177,83 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list products
+              name: create return
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/purchase-returns'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: purchase_id
+                    type: text
+                    value: '3'
+                  - name: items[0][purchase_item_id]
+                    type: text
+                    value: '5'
+                  - name: items[0][quantity]
+                    type: text
+                    value: '5'
+                  - name: items[0][reason]
+                    type: text
+                    value: damage
+                  - name: note
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete return
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data: []
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: purchase_return
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list returns
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/products'
+              url: '{{url}}/v1/purchase-returns?filter[search]=&filter[reference]=&filter[purchase_id]=&filter[inventory_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -5478,19 +6263,13 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
-                - name: filter[name]
+                - name: filter[reference]
                   value: ''
                   type: query
-                - name: filter[barcode]
+                - name: filter[purchase_id]
                   value: ''
                   type: query
-                - name: filter[type_id]
-                  value: ''
-                  type: query
-                - name: filter[color_id]
-                  value: ''
-                  type: query
-                - name: filter[brand_id]
+                - name: filter[inventory_id]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -5518,138 +6297,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show product
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/products/{{product}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: product
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update product
+              name: show return
               type: http
               seq: 4
             http:
-              method: PUT
-              url: '{{url}}/v1/products/{{product}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: type_id
-                    type: text
-                    value: '1'
-                  - name: color_id
-                    type: text
-                    value: '2'
-                  - name: brand_id
-                    type: text
-                    value: '2'
-                  - name: name
-                    type: text
-                    value: Samsung RT38 RefrigÃƒÂ©rateur
-                    disabled: true
-                  - name: barcode
-                    type: text
-                    value: '88016430335698'
-                    disabled: true
-                  - name: image
-                    type: text
-                    value: ''
-                    disabled: true
-                  - name: min_quantity
-                    type: text
-                    value: '6'
-                    disabled: true
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: product
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Purchase Payments
-          type: folder
-          seq: 23
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: add purchase payment
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/purchases/{{purchase}}/payments'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: wallet_id
-                    type: text
-                    value: '1'
-                  - name: amount
-                    type: text
-                    value: '5000'
-                  - name: note
-                    type: text
-                    value: First payment
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase
-                  value: '3'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: cancel purchase payment
-              type: http
-              seq: 3
-            http:
-              method: POST
-              url: '{{url}}/v1/purchases/{{purchase}}/payments/{{payment}}/cancel'
+              method: GET
+              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -5665,10 +6318,8 @@ items:
                 token: '{{token}}'
             runtime:
               variables:
-                - name: purchase
-                  value: '2'
-                - name: payment
-                  value: '4'
+                - name: purchase_return
+                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
@@ -5676,31 +6327,41 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list purchase payments
+              name: update return
               type: http
-              seq: 1
+              seq: 3
             http:
-              method: GET
-              url: '{{url}}/v1/purchases/{{purchase}}/payments'
+              method: PUT
+              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
               headers:
                 - name: Accept
                   value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
                 - name: X-Client-Type
                   value: '{{client_type}}'
-              params:
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
+              body:
+                type: multipart-form
+                data:
+                  - name: items[0][purchase_item_id]
+                    type: text
+                    value: '5'
+                  - name: items[0][quantity]
+                    type: text
+                    value: '6'
+                  - name: items[0][reason]
+                    type: text
+                    value: damaged
+                  - name: note
+                    type: text
+                    value: ''
               auth:
                 type: bearer
                 token: '{{token}}'
             runtime:
               variables:
-                - name: purchase
-                  value: '2'
+                - name: purchase_return
+                  value: '1'
             settings:
               encodeUrl: true
               timeout: 0
@@ -5980,263 +6641,6 @@ items:
             runtime:
               variables:
                 - name: purchase
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
-          name: Purchase Returns
-          type: folder
-          seq: 24
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: approve return
-              type: http
-              seq: 6
-            http:
-              method: POST
-              url: '{{url}}/v1/purchase-returns/{{purchase_return}}/approve'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: wallet_id
-                    type: text
-                    value: '1'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase_return
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: cancel return
-              type: http
-              seq: 7
-            http:
-              method: POST
-              url: '{{url}}/v1/purchase-returns/{{purchase_return}}/cancel'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase_return
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: create return
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/purchase-returns'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: purchase_id
-                    type: text
-                    value: '3'
-                  - name: items[0][purchase_item_id]
-                    type: text
-                    value: '5'
-                  - name: items[0][quantity]
-                    type: text
-                    value: '5'
-                  - name: items[0][reason]
-                    type: text
-                    value: damage
-                  - name: note
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete return
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase_return
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list returns
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/purchase-returns?filter[search]=&filter[reference]=&filter[purchase_id]=&filter[inventory_id]=&sort=-created_at&page=1&per_page=15'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[reference]
-                  value: ''
-                  type: query
-                - name: filter[purchase_id]
-                  value: ''
-                  type: query
-                - name: filter[inventory_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show return
-              type: http
-              seq: 4
-            http:
-              method: GET
-              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase_return
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update return
-              type: http
-              seq: 3
-            http:
-              method: PUT
-              url: '{{url}}/v1/purchase-returns/{{purchase_return}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: items[0][purchase_item_id]
-                    type: text
-                    value: '5'
-                  - name: items[0][quantity]
-                    type: text
-                    value: '6'
-                  - name: items[0][reason]
-                    type: text
-                    value: damaged
-                  - name: note
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: purchase_return
                   value: '1'
             settings:
               encodeUrl: true
@@ -7018,19 +7422,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Stock Prices
+          name: Stock Batches
           type: folder
-          seq: 21
+          seq: 20
         request:
           auth: inherit
         items:
           - info:
-              name: create price
+              name: create batch
               type: http
               seq: 2
             http:
               method: POST
-              url: '{{url}}/v1/stocks/{{stock}}/prices'
+              url: '{{url}}/v1/stocks/{{stock}}/batches'
               headers:
                 - name: Accept
                   value: application/json
@@ -7041,12 +7445,21 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: type
+                  - name: source_id
                     type: text
-                    value: selling
-                  - name: amount
+                    value: ''
+                  - name: source_type
                     type: text
-                    value: '68000'
+                    value: ''
+                  - name: purchase_price
+                    type: text
+                    value: '60000'
+                  - name: initial_quantity
+                    type: text
+                    value: '10'
+                  - name: current_quantity
+                    type: text
+                    value: '10'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -7061,12 +7474,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete price
+              name: delete batch
               type: http
               seq: 4
             http:
               method: DELETE
-              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
+              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7079,7 +7492,7 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: price
+                - name: batch
                   value: '1'
             settings:
               encodeUrl: true
@@ -7088,12 +7501,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list prices
+              name: list batches
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/prices?filter[search]=&filter[type]=&sort=-created_at&page=1&per_page=15'
+              url: '{{url}}/v1/stocks/{{stock}}/batches?filter[search]=&filter[source_type]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -7103,7 +7516,7 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
-                - name: filter[type]
+                - name: filter[source_type]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -7135,12 +7548,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show price
+              name: show batch
               type: http
               seq: 5
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
+              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7153,7 +7566,7 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: price
+                - name: batch
                   value: '1'
             settings:
               encodeUrl: true
@@ -7162,12 +7575,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: update price
+              name: update batch
               type: http
               seq: 3
             http:
               method: PUT
-              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
+              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7178,10 +7591,19 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: type
+                  - name: source_id
                     type: text
                     value: ''
-                  - name: amount
+                  - name: source_type
+                    type: text
+                    value: ''
+                  - name: purchase_price
+                    type: text
+                    value: ''
+                  - name: initial_quantity
+                    type: text
+                    value: ''
+                  - name: current_quantity
                     type: text
                     value: ''
               auth:
@@ -7191,7 +7613,7 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: price
+                - name: batch
                   value: '1'
             settings:
               encodeUrl: true
@@ -7422,19 +7844,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Stock Batches
+          name: Stock Prices
           type: folder
-          seq: 20
+          seq: 21
         request:
           auth: inherit
         items:
           - info:
-              name: create batch
+              name: create price
               type: http
               seq: 2
             http:
               method: POST
-              url: '{{url}}/v1/stocks/{{stock}}/batches'
+              url: '{{url}}/v1/stocks/{{stock}}/prices'
               headers:
                 - name: Accept
                   value: application/json
@@ -7445,21 +7867,12 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: source_id
+                  - name: type
                     type: text
-                    value: ''
-                  - name: source_type
+                    value: selling
+                  - name: amount
                     type: text
-                    value: ''
-                  - name: purchase_price
-                    type: text
-                    value: '60000'
-                  - name: initial_quantity
-                    type: text
-                    value: '10'
-                  - name: current_quantity
-                    type: text
-                    value: '10'
+                    value: '68000'
               auth:
                 type: bearer
                 token: '{{token}}'
@@ -7474,12 +7887,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete batch
+              name: delete price
               type: http
               seq: 4
             http:
               method: DELETE
-              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
+              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7492,7 +7905,7 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: batch
+                - name: price
                   value: '1'
             settings:
               encodeUrl: true
@@ -7501,12 +7914,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list batches
+              name: list prices
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/batches?filter[search]=&filter[source_type]=&sort=-created_at&page=1&per_page=15'
+              url: '{{url}}/v1/stocks/{{stock}}/prices?filter[search]=&filter[type]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -7516,7 +7929,7 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
-                - name: filter[source_type]
+                - name: filter[type]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -7548,12 +7961,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show batch
+              name: show price
               type: http
               seq: 5
             http:
               method: GET
-              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
+              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7566,7 +7979,7 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: batch
+                - name: price
                   value: '1'
             settings:
               encodeUrl: true
@@ -7575,12 +7988,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: update batch
+              name: update price
               type: http
               seq: 3
             http:
               method: PUT
-              url: '{{url}}/v1/stocks/{{stock}}/batches/{{batch}}'
+              url: '{{url}}/v1/stocks/{{stock}}/prices/{{price}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -7591,19 +8004,10 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: source_id
+                  - name: type
                     type: text
                     value: ''
-                  - name: source_type
-                    type: text
-                    value: ''
-                  - name: purchase_price
-                    type: text
-                    value: ''
-                  - name: initial_quantity
-                    type: text
-                    value: ''
-                  - name: current_quantity
+                  - name: amount
                     type: text
                     value: ''
               auth:
@@ -7613,7 +8017,388 @@ items:
               variables:
                 - name: stock
                   value: '1'
-                - name: batch
+                - name: price
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Types
+          type: folder
+          seq: 12
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create type
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: category_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: RÃƒÂ©frigÃƒÂ©rateur
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete type
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/types/{{type}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: type
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list types
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/types'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[category_id]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show type
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/types/{{type}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: type
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update type
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/types/{{type}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: category_id
+                    type: text
+                    value: '1'
+                  - name: name
+                    type: text
+                    value: RÃƒÂ©frigÃƒÂ©rateur
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: type
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+      - info:
+          name: Suppliers
+          type: folder
+          seq: 19
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: create supplier
+              type: http
+              seq: 2
+            http:
+              method: POST
+              url: '{{url}}/v1/suppliers'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Ahmed Supply Co
+                  - name: phone
+                    type: text
+                    value: '0550123456'
+                  - name: email
+                    type: text
+                    value: supplier@example.com
+                  - name: address
+                    type: text
+                    value: 123 Rue Hassiba Ben Bouali
+                  - name: is_active
+                    type: text
+                    value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: delete supplier
+              type: http
+              seq: 5
+            http:
+              method: DELETE
+              url: '{{url}}/v1/suppliers/{{supplier}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: supplier
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list suppliers
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/suppliers'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              params:
+                - name: filter[search]
+                  value: ''
+                  type: query
+                - name: filter[name]
+                  value: ''
+                  type: query
+                - name: filter[phone]
+                  value: ''
+                  type: query
+                - name: filter[wilaya_id]
+                  value: ''
+                  type: query
+                - name: filter[is_active]
+                  value: ''
+                  type: query
+                - name: filter[created_at_from]
+                  value: ''
+                  type: query
+                - name: filter[created_at_to]
+                  value: ''
+                  type: query
+                - name: sort
+                  value: '-created_at'
+                  type: query
+                - name: page
+                  value: '1'
+                  type: query
+                - name: per_page
+                  value: '15'
+                  type: query
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: show supplier
+              type: http
+              seq: 3
+            http:
+              method: GET
+              url: '{{url}}/v1/suppliers/{{supplier}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: supplier
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: update supplier
+              type: http
+              seq: 4
+            http:
+              method: PUT
+              url: '{{url}}/v1/suppliers/{{supplier}}'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: name
+                    type: text
+                    value: Ahmed Supply Co Updated
+                  - name: phone
+                    type: text
+                    value: '0550123456'
+                  - name: email
+                    type: text
+                    value: supplier@example.com
+                  - name: address
+                    type: text
+                    value: 123 Rue Hassiba Ben Bouali
+                  - name: is_active
+                    type: text
+                    value: '1'
+                  - name: wilaya_id
+                    type: text
+                    value: ''
+                  - name: image
+                    type: text
+                    value: ''
+                  - name: metadata
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: supplier
                   value: '1'
             settings:
               encodeUrl: true
@@ -7835,174 +8620,6 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Types
-          type: folder
-          seq: 12
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create type
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/types'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: category_id
-                    type: text
-                    value: '1'
-                  - name: name
-                    type: text
-                    value: RÃƒÂ©frigÃƒÂ©rateur
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete type
-              type: http
-              seq: 5
-            http:
-              method: DELETE
-              url: '{{url}}/v1/types/{{type}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: type
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list types
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/types'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[name]
-                  value: ''
-                  type: query
-                - name: filter[category_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show type
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/types/{{type}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: type
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update type
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/types/{{type}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: category_id
-                    type: text
-                    value: '1'
-                  - name: name
-                    type: text
-                    value: RÃƒÂ©frigÃƒÂ©rateur
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: type
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
           name: Wallet Movements
           type: folder
           seq: 30
@@ -8074,19 +8691,19 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Suppliers
+          name: Wallet Transfers
           type: folder
-          seq: 19
+          seq: 28
         request:
           auth: inherit
         items:
           - info:
-              name: create supplier
+              name: create wallet transfer
               type: http
               seq: 2
             http:
               method: POST
-              url: '{{url}}/v1/suppliers'
+              url: '{{url}}/v1/wallet-transfers'
               headers:
                 - name: Accept
                   value: application/json
@@ -8097,28 +8714,16 @@ items:
               body:
                 type: multipart-form
                 data:
-                  - name: name
-                    type: text
-                    value: Ahmed Supply Co
-                  - name: phone
-                    type: text
-                    value: '0550123456'
-                  - name: email
-                    type: text
-                    value: supplier@example.com
-                  - name: address
-                    type: text
-                    value: 123 Rue Hassiba Ben Bouali
-                  - name: is_active
+                  - name: from_wallet_id
                     type: text
                     value: '1'
-                  - name: wilaya_id
+                  - name: to_wallet_id
                     type: text
-                    value: ''
-                  - name: image
+                    value: '2'
+                  - name: amount
                     type: text
-                    value: ''
-                  - name: metadata
+                    value: '500'
+                  - name: note
                     type: text
                     value: ''
               auth:
@@ -8131,23 +8736,28 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: delete supplier
+              name: delete wallet transfer
               type: http
-              seq: 5
+              seq: 4
             http:
               method: DELETE
-              url: '{{url}}/v1/suppliers/{{supplier}}'
+              url: '{{url}}/v1/wallet-transfers/{{wallet-transfer}}'
               headers:
                 - name: Accept
                   value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
                 - name: X-Client-Type
                   value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data: []
               auth:
                 type: bearer
                 token: '{{token}}'
             runtime:
               variables:
-                - name: supplier
+                - name: wallet-transfer
                   value: '1'
             settings:
               encodeUrl: true
@@ -8156,12 +8766,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: list suppliers
+              name: list wallet transfers
               type: http
               seq: 1
             http:
               method: GET
-              url: '{{url}}/v1/suppliers'
+              url: '{{url}}/v1/wallet-transfers?filter[search]=&filter[from_wallet_id]=&filter[to_wallet_id]=&sort=-created_at&page=1&per_page=15'
               headers:
                 - name: Accept
                   value: application/json
@@ -8171,16 +8781,16 @@ items:
                 - name: filter[search]
                   value: ''
                   type: query
-                - name: filter[name]
+                - name: filter[from_wallet_id]
                   value: ''
                   type: query
-                - name: filter[phone]
+                - name: filter[to_wallet_id]
                   value: ''
                   type: query
-                - name: filter[wilaya_id]
+                - name: filter[branch_id]
                   value: ''
                   type: query
-                - name: filter[is_active]
+                - name: filter[account_id]
                   value: ''
                   type: query
                 - name: filter[created_at_from]
@@ -8208,37 +8818,12 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
           - info:
-              name: show supplier
+              name: show wallet transfer
               type: http
               seq: 3
             http:
               method: GET
-              url: '{{url}}/v1/suppliers/{{supplier}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: supplier
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: update supplier
-              type: http
-              seq: 4
-            http:
-              method: PUT
-              url: '{{url}}/v1/suppliers/{{supplier}}'
+              url: '{{url}}/v1/wallet-transfers/{{wallet-transfer}}'
               headers:
                 - name: Accept
                   value: application/json
@@ -8248,37 +8833,13 @@ items:
                   value: '{{client_type}}'
               body:
                 type: multipart-form
-                data:
-                  - name: name
-                    type: text
-                    value: Ahmed Supply Co Updated
-                  - name: phone
-                    type: text
-                    value: '0550123456'
-                  - name: email
-                    type: text
-                    value: supplier@example.com
-                  - name: address
-                    type: text
-                    value: 123 Rue Hassiba Ben Bouali
-                  - name: is_active
-                    type: text
-                    value: '1'
-                  - name: wilaya_id
-                    type: text
-                    value: ''
-                  - name: image
-                    type: text
-                    value: ''
-                  - name: metadata
-                    type: text
-                    value: ''
+                data: []
               auth:
                 type: bearer
                 token: '{{token}}'
             runtime:
               variables:
-                - name: supplier
+                - name: wallet-transfer
                   value: '1'
             settings:
               encodeUrl: true
@@ -8549,163 +9110,6 @@ items:
               maxRedirects: 5
               forwardAuthorizationHeader: true
       - info:
-          name: Wallet Transfers
-          type: folder
-          seq: 28
-        request:
-          auth: inherit
-        items:
-          - info:
-              name: create wallet transfer
-              type: http
-              seq: 2
-            http:
-              method: POST
-              url: '{{url}}/v1/wallet-transfers'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data:
-                  - name: from_wallet_id
-                    type: text
-                    value: '1'
-                  - name: to_wallet_id
-                    type: text
-                    value: '2'
-                  - name: amount
-                    type: text
-                    value: '500'
-                  - name: note
-                    type: text
-                    value: ''
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: delete wallet transfer
-              type: http
-              seq: 4
-            http:
-              method: DELETE
-              url: '{{url}}/v1/wallet-transfers/{{wallet-transfer}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: wallet-transfer
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: list wallet transfers
-              type: http
-              seq: 1
-            http:
-              method: GET
-              url: '{{url}}/v1/wallet-transfers?filter[search]=&filter[from_wallet_id]=&filter[to_wallet_id]=&sort=-created_at&page=1&per_page=15'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              params:
-                - name: filter[search]
-                  value: ''
-                  type: query
-                - name: filter[from_wallet_id]
-                  value: ''
-                  type: query
-                - name: filter[to_wallet_id]
-                  value: ''
-                  type: query
-                - name: filter[branch_id]
-                  value: ''
-                  type: query
-                - name: filter[account_id]
-                  value: ''
-                  type: query
-                - name: filter[created_at_from]
-                  value: ''
-                  type: query
-                - name: filter[created_at_to]
-                  value: ''
-                  type: query
-                - name: sort
-                  value: '-created_at'
-                  type: query
-                - name: page
-                  value: '1'
-                  type: query
-                - name: per_page
-                  value: '15'
-                  type: query
-              auth:
-                type: bearer
-                token: '{{token}}'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-          - info:
-              name: show wallet transfer
-              type: http
-              seq: 3
-            http:
-              method: GET
-              url: '{{url}}/v1/wallet-transfers/{{wallet-transfer}}'
-              headers:
-                - name: Accept
-                  value: application/json
-                - name: Content-Type
-                  value: multipart/form-data
-                - name: X-Client-Type
-                  value: '{{client_type}}'
-              body:
-                type: multipart-form
-                data: []
-              auth:
-                type: bearer
-                token: '{{token}}'
-            runtime:
-              variables:
-                - name: wallet-transfer
-                  value: '1'
-            settings:
-              encodeUrl: true
-              timeout: 0
-              followRedirects: true
-              maxRedirects: 5
-              forwardAuthorizationHeader: true
-      - info:
           name: Wilayas
           type: folder
           seq: 7
@@ -8858,141 +9262,158 @@ items:
               followRedirects: true
               maxRedirects: 5
               forwardAuthorizationHeader: true
-  - info:
-      name: Extras
-      type: folder
-      seq: 3
-    request:
-      auth: inherit
-    items:
       - info:
-          name: ccp info
-          type: http
-          seq: 1
-        http:
-          method: POST
-          url: '{{url}}/v1/ccp/info'
-          headers:
-            - name: Accept
-              value: application/json
-            - name: Content-Type
-              value: multipart/form-data
-            - name: X-Client-Type
-              value: '{{client_type}}'
-          body:
-            type: multipart-form
-            data:
-              - name: ccp
-                type: text
-                value: '0016188475'
-          auth:
-            type: bearer
-            token: '{{token}}'
-        settings:
-          encodeUrl: true
-          timeout: 0
-          followRedirects: true
-          maxRedirects: 5
-          forwardAuthorizationHeader: true
+          name: Device Tokens
+          type: folder
+          seq: 34
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: delete device token
+              type: http
+              seq: 2
+            http:
+              method: DELETE
+              url: '{{url}}/v1/device-tokens'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: token
+                    type: text
+                    value: ''
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: register device token
+              type: http
+              seq: 1
+            http:
+              method: POST
+              url: '{{url}}/v1/device-tokens'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data:
+                  - name: token
+                    type: text
+                    value: ''
+                  - name: platform
+                    type: text
+                    value: android
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
       - info:
-          name: export cancellations
-          type: http
-          seq: 3
-        http:
-          method: GET
-          url: '{{url}}/v1/export/cancellations'
-          headers:
-            - name: Accept
-              value: application/json
-            - name: X-Client-Type
-              value: '{{client_type}}'
-          params:
-            - name: account_id
-              value: '1'
-              type: query
-            - name: branch_ids[]
-              value: ''
-              type: query
-            - name: date
-              value: ''
-              type: query
-          auth:
-            type: bearer
-            token: '{{token}}'
-        settings:
-          encodeUrl: true
-          timeout: 0
-          followRedirects: true
-          maxRedirects: 5
-          forwardAuthorizationHeader: true
-      - info:
-          name: export registrations
-          type: http
-          seq: 2
-        http:
-          method: GET
-          url: '{{url}}/v1/export/registrations'
-          headers:
-            - name: Accept
-              value: application/json
-            - name: X-Client-Type
-              value: '{{client_type}}'
-          params:
-            - name: account_id
-              value: '1'
-              type: query
-            - name: branch_ids[]
-              value: ''
-              type: query
-            - name: date
-              value: ''
-              type: query
-          auth:
-            type: bearer
-            token: '{{token}}'
-        settings:
-          encodeUrl: true
-          timeout: 0
-          followRedirects: true
-          maxRedirects: 5
-          forwardAuthorizationHeader: true
-      - info:
-          name: import draws
-          type: http
-          seq: 4
-        http:
-          method: POST
-          url: '{{url}}/v1/import'
-          headers:
-            - name: Accept
-              value: application/json
-            - name: Content-Type
-              value: multipart/form-data
-            - name: X-Client-Type
-              value: '{{client_type}}'
-          body:
-            type: multipart-form
-            data:
-              - name: account_id
-                type: text
-                value: '1'
-              - name: file
-                type: file
-                value: []
-          auth:
-            type: bearer
-            token: '{{token}}'
-        settings:
-          encodeUrl: true
-          timeout: 0
-          followRedirects: true
-          maxRedirects: 5
-          forwardAuthorizationHeader: true
+          name: Notifications
+          type: folder
+          seq: 35
+        request:
+          auth: inherit
+        items:
+          - info:
+              name: unread notifications count
+              type: http
+              seq: 2
+            http:
+              method: GET
+              url: '{{url}}/v1/notifications/unread-count'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: mark notification as read
+              type: http
+              seq: 3
+            http:
+              method: POST
+              url: '{{url}}/v1/notifications/{{notification}}/read'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: Content-Type
+                  value: multipart/form-data
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              body:
+                type: multipart-form
+                data: []
+              auth:
+                type: bearer
+                token: '{{token}}'
+            runtime:
+              variables:
+                - name: notification
+                  value: '1'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
+          - info:
+              name: list notifications
+              type: http
+              seq: 1
+            http:
+              method: GET
+              url: '{{url}}/v1/notifications'
+              headers:
+                - name: Accept
+                  value: application/json
+                - name: X-Client-Type
+                  value: '{{client_type}}'
+              auth:
+                type: bearer
+                token: '{{token}}'
+            settings:
+              encodeUrl: true
+              timeout: 0
+              followRedirects: true
+              maxRedirects: 5
+              forwardAuthorizationHeader: true
 bundled: true
 extensions:
   bruno:
     ignore:
       - node_modules
       - .git
-    exportedAt: '2026-09-12T13:52:07.520Z'
+    exportedAt: '2026-09-22T07:42:07.480Z'
     exportedUsing: Bruno
