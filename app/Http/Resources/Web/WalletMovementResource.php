@@ -24,6 +24,7 @@ class WalletMovementResource extends JsonResource
             'source_id'     => $this->source_id,
             'note'           => $this->note,
             'source'         => $this->whenLoaded('source'),
+            'wallet'         => new WalletResource($this->whenLoaded('wallet')),
             'created_at'     => $this->created_at,
             'updated_at'     => $this->updated_at,
             'created_by'     => new AvatarResource($this->whenLoaded('creator')),

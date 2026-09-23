@@ -32,7 +32,7 @@ class ContractPaymentService
         $query = $contract->payments()->getQuery();
 
         return QueryBuilder::for($query, $request)
-            ->with(['contract.client', 'installments'])
+            ->with(['contract.client', 'installments', 'walletMovement.wallet'])
             ->allowedFilters(
                 AllowedFilter::exact('amount'),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
@@ -120,7 +120,7 @@ class ContractPaymentService
 
             $this->creditWallet($contract, $amount, $payment, $walletId);
 
-            return $payment->load(['contract', 'installments']);
+            return $payment->load(['contract', 'installments', 'walletMovement.wallet']);
         });
     }
 

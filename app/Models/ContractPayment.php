@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Traits\HasUserstamps;
 
 class ContractPayment extends Model
@@ -41,5 +42,10 @@ class ContractPayment extends Model
     public function earlyCancelations(): HasMany
     {
         return $this->hasMany(ContractEarlyCancelation::class);
+    }
+
+    public function walletMovement(): MorphOne
+    {
+        return $this->morphOne(WalletMovement::class, 'source');
     }
 }

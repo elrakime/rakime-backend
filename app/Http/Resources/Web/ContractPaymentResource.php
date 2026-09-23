@@ -21,6 +21,7 @@ class ContractPaymentResource extends JsonResource
 
             'contract'     => new ContractResource($this->whenLoaded('contract')),
             'installments' => InstallmentResource::collection($this->whenLoaded('installments')),
+            'wallet_movement' => new WalletMovementResource($this->whenLoaded('walletMovement')),
         ];
     }
 }
