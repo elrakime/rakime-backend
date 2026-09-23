@@ -203,7 +203,7 @@ class Contract extends Model
     {
         $drawsPaid = (float) $this->draws()
             ->whereIn('status', [DrawStatus::PAID_ON_TIME->value, DrawStatus::LATE_PAYMENT->value])
-            ->sum('amount');
+            ->sum('draws.amount');
 
         $cashPaid = (float) $this->payments()->sum('amount');
 
