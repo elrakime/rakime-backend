@@ -12,6 +12,7 @@ return [
     'cannot_change_net_amount' => 'Le montant net d\'un contrat actif ne peut pas être modifié.',
     'net_exceeds_max_amount' => 'Le montant net dépasse le montant maximum autorisé pour ce contrat.',
     'cannot_extend' => 'Seuls les contrats clôturés ou annulés peuvent être prolongés.',
+    'cannot_extend_superseded' => 'Ce contrat a déjà été prolongé et ne peut pas être prolongé à nouveau.',
     'cannot_extend_items' => 'Les contrats de prolongation ne peuvent pas contenir d\'articles.',
     'missing_remaining_amount' => 'Le contrat n\'a aucun montant restant à prolonger.',
     'missing_months_count' => 'Le nombre de mois doit être d\'au moins 1.',

@@ -267,6 +267,10 @@ class ContractService
             throw new Exception(__('contracts.cannot_extend'), 422);
         }
 
+        if($contract->isSuperseded()){
+            throw new Exception(__('contracts.cannot_extend_superseded'), 422);
+        }
+
         $netAmount    = (float) $contract->net_amount;
         $paidAmount   = $contract->paidAmount();
         $remaining    = $netAmount - $paidAmount;
