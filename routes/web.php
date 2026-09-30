@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AccountExportImportController;
+use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CcpController;
-use App\Http\Controllers\Api\Notification\DeviceTokenController;
-use App\Http\Controllers\Api\Notification\NotificationController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ZakatController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\AccountDrawLockController;
-use App\Http\Controllers\AccountExportImportController;
 use App\Http\Controllers\Web\Auth\AuthController;
 use App\Http\Controllers\Web\BatchController;
 use App\Http\Controllers\Web\BranchController;
@@ -18,7 +21,6 @@ use App\Http\Controllers\Web\ContractPaymentController;
 use App\Http\Controllers\Web\DrawController;
 use App\Http\Controllers\Web\ExpirationController;
 use App\Http\Controllers\Web\FinancialRecordController;
-use App\Http\Controllers\ImportController;
 use App\Http\Controllers\Web\InstallmentController;
 use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\InventoryMovementController;
@@ -42,7 +44,6 @@ use App\Http\Controllers\Web\WalletController;
 use App\Http\Controllers\Web\WalletMovementController;
 use App\Http\Controllers\Web\WalletTransferController;
 use App\Http\Controllers\Web\WilayaController;
-use App\Http\Controllers\ZakatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -61,8 +62,9 @@ Route::prefix('v1')->middleware(['auth:sanctum','user.active'])->group(function 
     Route::post('import', [AccountExportImportController::class, 'import']);
     Route::post('ccp/info', [CcpController::class, 'info']);
     Route::get('zakat', [ZakatController::class, 'index']);
+    Route::get('stats', [StatsController::class, 'index']);
+    Route::post('stats', [StatsController::class, 'store']);
 });
-
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('guest');
@@ -73,6 +75,14 @@ Route::prefix('v1/auth')->group(function () {
         Route::put('update-profile', [AuthController::class, 'updateProfile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+Route::middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
+    Route::post('device-tokens', [DeviceTokenController::class, 'register']);
+    Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
 });
 
 Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
@@ -146,11 +156,5 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:web', 'user.active
     Route::post('financial-records', [FinancialRecordController::class, 'store']);
     Route::put('financial-records/{financial_record}', [FinancialRecordController::class, 'update']);
     Route::delete('financial-records/{financial_record}', [FinancialRecordController::class, 'destroy']);
-
-    Route::post('device-tokens', [DeviceTokenController::class, 'register']);
-    Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
-    Route::get('notifications', [NotificationController::class, 'index']);
-    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
-    Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
 
 });

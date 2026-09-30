@@ -10,3 +10,5 @@ Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=50')
     ->runInBackground();
 
 Schedule::command('contracts:sync-status')->daily();
+
+Schedule::command('stats:generate-month')->monthlyOn(1, '00:00');

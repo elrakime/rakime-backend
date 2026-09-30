@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Notification\DeviceTokenController;
-use App\Http\Controllers\Api\Notification\NotificationController;
+use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\AccountDrawLockController;
 use App\Http\Controllers\Web\BatchController;
@@ -50,6 +50,14 @@ Route::prefix('v1/auth')->group(function () {
         Route::put('update-profile', [AuthController::class, 'updateProfile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
+    Route::post('device-tokens', [DeviceTokenController::class, 'register']);
+    Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
 });
 
 Route::prefix('v1')->middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {

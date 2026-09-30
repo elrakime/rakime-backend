@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ContractSeeder::class,
             ContractPaymentSeeder::class,
             DrawSeeder::class,
+            StatsSeeder::class,
         ]);
     }
 }
