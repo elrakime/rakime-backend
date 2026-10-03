@@ -53,7 +53,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
+    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
         Route::post('device-tokens', [DeviceTokenController::class, 'register']);
         Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
         Route::get('notifications', [NotificationController::class, 'index']);
@@ -61,7 +61,7 @@ Route::prefix('v1')->group(function () {
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
     });
 
-    Route::middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
+    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
         Route::apiResource('users', UserController::class);
         Route::apiResource('roles', RoleController::class);
         Route::get('permissions', [PermissionController::class, 'index']);
