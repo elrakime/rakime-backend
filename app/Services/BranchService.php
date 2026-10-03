@@ -27,6 +27,11 @@ class BranchService
                 AllowedFilter::partial('shop_name'),
                 AllowedFilter::partial('phone'),
                 AllowedFilter::exact('wilaya_id'),
+                AllowedFilter::callback('account_id', function ($query, string $value) {
+                    $query->whereHas('accounts', function ($q) use ($value) {
+                        $q->where('accounts.id', $value);
+                    });
+                }),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),
