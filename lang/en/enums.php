@@ -16,6 +16,7 @@ return [
         'SALE_RETURN'       => 'Sale Return',
         'SALE_UPDATE'       => 'Sale Update',
         'CONTRACT'          => 'Contract',
+        'CONTRACT_CANCEL'   => 'Contract Cancel',
         'MANUAL'            => 'Manual',
     ],
 

@@ -160,7 +160,8 @@ class Contract extends Model
 
     public function inventoryMovements(): HasMany
     {
-        return $this->hasMany(InventoryMovement::class, 'source_id');
+        return $this->hasMany(InventoryMovement::class, 'source_id')
+            ->where('source_type', self::class);
     }
 
     public function payments(): HasMany

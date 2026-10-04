@@ -16,6 +16,7 @@ return [
         'SALE_RETURN'      => 'إرجاع مبيعات',
         'SALE_UPDATE'      => 'تحديث مبيعات',
         'CONTRACT'         => 'عقد',
+        'CONTRACT_CANCEL'  => 'إلغاء عقد',
         'MANUAL'           => 'يدوي',
     ],
 

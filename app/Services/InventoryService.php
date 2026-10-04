@@ -342,6 +342,31 @@ class InventoryService
     }
 
     /**
+     * Record a contract cancellation reversal (inflow), restoring the stock
+     * that was deducted when the contract was configured.
+     */
+    public function contractCancel(
+        int $stockId,
+        int $inventoryId,
+        int $productId,
+        int $oldQuantity,
+        int $quantity,
+        ?Model $source = null,
+        array $allocations = [],
+    ): InventoryMovement {
+        return $this->recordMovement(
+            $stockId,
+            $inventoryId,
+            $productId,
+            InventoryMovementType::CONTRACT_CANCEL,
+            $oldQuantity,
+            abs($quantity),
+            $source,
+            $allocations,
+        );
+    }
+
+    /**
      * Record a manual adjustment (positive or negative), e.g. stock/batch creation or manual edits.
      */
     public function manual(

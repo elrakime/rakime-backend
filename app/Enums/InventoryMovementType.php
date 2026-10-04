@@ -17,6 +17,7 @@ enum InventoryMovementType: string
     case SALE_RETURN      = 'sale_return';
     case SALE_UPDATE      = 'sale_update';
     case CONTRACT         = 'contract';
+    case CONTRACT_CANCEL  = 'contract_cancel';
     case MANUAL           = 'manual';
 
     public static function keys(): array
@@ -59,6 +60,7 @@ enum InventoryMovementType: string
             self::SALE_RETURN      => 'blue',
             self::SALE_UPDATE      => 'amber',
             self::CONTRACT         => 'cyan',
+            self::CONTRACT_CANCEL  => 'red',
             self::MANUAL           => 'gray',
         };
     }

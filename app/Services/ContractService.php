@@ -570,8 +570,8 @@ class ContractService
      * Restore the stock that was deducted when the contract was configured.
      *
      * Reverses the CONTRACT inventory movements by incrementing the batch
-     * quantities back and deleting the movements, so the stock returns to its
-     * pre-configuration state.
+     * quantities back and recording a CONTRACT_CANCEL reversal movement (inflow)
+     * with positive allocations. The original movements are kept for audit.
      */
     private function restoreStock(Contract $contract): void
     {
@@ -581,13 +581,30 @@ class ContractService
             ->get();
 
         foreach ($movements as $movement) {
+            $allocations = [];
+
             foreach ($movement->allocations as $allocation) {
+                $restored = abs($allocation->quantity);
+
                 Batch::whereKey($allocation->batch_id)
-                    ->increment('current_quantity', abs($allocation->quantity));
+                    ->increment('current_quantity', $restored);
+
+                $allocations[] = [
+                    'batch_id'       => $allocation->batch_id,
+                    'quantity'       => $restored,
+                    'purchase_price' => $allocation->purchase_price,
+                ];
             }
 
-            $movement->allocations()->delete();
-            $movement->delete();
+            $this->inventoryService->contractCancel(
+                stockId: $movement->stock_id,
+                inventoryId: $movement->inventory_id,
+                productId: $movement->product_id,
+                oldQuantity: $movement->new_quantity,
+                quantity: abs($movement->quantity),
+                source: $contract,
+                allocations: $allocations,
+            );
         }
     }
 
