@@ -418,6 +418,30 @@ class WalletService
     }
 
     /**
+     * Record a contract cancellation reversal (outflow when negative).
+     */
+    public function contractCancel(
+        Wallet $wallet,
+        int|float|string $delta,
+        Model $source,
+        ?string $note = null,
+    ): WalletMovement {
+        $delta = (float) $delta;
+
+        if ($delta < 0) {
+            $this->guardSufficientBalance($wallet, abs($delta));
+        }
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::CONTRACT_CANCEL,
+            $delta,
+            $note,
+            $source,
+        );
+    }
+
+    /**
      * Record a settled draw payment credit (inflow).
      */
     public function drawPayment(

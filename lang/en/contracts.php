@@ -17,4 +17,6 @@ return [
     'missing_remaining_amount' => 'The contract has no remaining amount to extend.',
     'missing_months_count' => 'The number of months must be at least 1.',
     'advance_changed' => 'Advance amount changed from :from to :to.',
+    'advance_cancelled' => 'Advance reversed on contract cancellation (:amount).',
+    'payment_cancelled' => 'Contract payment reversed on cancellation (:amount).',
 ];

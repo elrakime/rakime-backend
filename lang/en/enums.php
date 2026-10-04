@@ -38,6 +38,7 @@ return [
         'PAYMENT_CANCEL'      => 'Payment Cancel',
         'ADJUSTMENT'          => 'Adjustment',
         'ADVANCE_PAYMENT'     => 'Advance Payment',
+        'CONTRACT_CANCEL'     => 'Contract Cancel',
     ],
 
     'sale_return_status' => [

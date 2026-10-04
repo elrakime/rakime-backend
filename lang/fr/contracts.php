@@ -17,4 +17,6 @@ return [
     'missing_remaining_amount' => 'Le contrat n\'a aucun montant restant à prolonger.',
     'missing_months_count' => 'Le nombre de mois doit être d\'au moins 1.',
     'advance_changed' => "Le montant d'avance est passé de :from à :to.",
+    'advance_cancelled' => "Avance annulée lors de l'annulation du contrat (:amount).",
+    'payment_cancelled' => 'Paiement de contrat annulé (:amount).',
 ];

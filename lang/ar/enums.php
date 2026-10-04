@@ -38,6 +38,7 @@ return [
         'PAYMENT_CANCEL'      => 'إلغاء الدفع',
         'ADJUSTMENT'          => 'تسوية',
         'ADVANCE_PAYMENT'     => 'دفع تسبيق',
+        'CONTRACT_CANCEL'     => 'إلغاء عقد',
     ],
 
     'sale_return_status' => [

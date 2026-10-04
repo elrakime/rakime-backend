@@ -24,6 +24,7 @@ enum WalletMovementType: string
     case PAYMENT_CANCEL      = 'payment_cancel';
     case ADJUSTMENT          = 'adjustment';
     case ADVANCE_PAYMENT     = 'advance_payment';
+    case CONTRACT_CANCEL     = 'contract_cancel';
 
     public static function keys(): array
     {
@@ -72,6 +73,7 @@ enum WalletMovementType: string
             self::PAYMENT_CANCEL      => 'green',
             self::ADJUSTMENT          => 'gray',
             self::ADVANCE_PAYMENT     => 'emerald',
+            self::CONTRACT_CANCEL     => 'red',
         };
     }
 

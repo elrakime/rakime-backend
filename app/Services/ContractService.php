@@ -592,6 +592,50 @@ class ContractService
     }
 
     /**
+     * Reverse the wallet movements created by this contract's advance and cash
+     * payments, using a CONTRACT_CANCEL movement.
+     *
+     * - Advance: reversed as a single negative delta against the branch wallet
+     *   (source = Contract).
+     * - Contract payments: each reversed individually against the wallet that
+     *   originally received it (source = ContractPayment).
+     */
+    private function restoreWallet(Contract $contract): void
+    {
+        // Reverse the advance (net of all ADVANCE_PAYMENT movements == current advance).
+        $advance = (float) ($contract->advance_amount ?? 0);
+
+        if ($advance > 0) {
+            $wallet = $contract->branch?->wallet;
+
+            if ($wallet !== null) {
+                $this->walletService->contractCancel(
+                    $wallet,
+                    -$advance,
+                    $contract,
+                    __('contracts.advance_cancelled', ['amount' => $advance]),
+                );
+            }
+        }
+
+        // Reverse each contract (cash) payment against its original wallet.
+        foreach ($contract->payments as $payment) {
+            $wallet = $payment->walletMovement?->wallet;
+
+            if ($wallet === null) {
+                continue;
+            }
+
+            $this->walletService->contractCancel(
+                $wallet,
+                -abs((float) $payment->amount),
+                $payment,
+                __('contracts.payment_cancelled', ['amount' => $payment->amount]),
+            );
+        }
+    }
+
+    /**
      * Update an active contract (admin only).
      *
      * Allows changing items and advance_amount before the start date, as long
@@ -871,6 +915,12 @@ class ContractService
         }
 
         return DB::transaction(function () use ($contract) {
+            // Undo inventory changes (restore deducted stock).
+            $this->restoreStock($contract);
+
+            // Undo wallet changes (advance + contract payments).
+            $this->restoreWallet($contract);
+
             $contract->update([
                 'status' => ContractStatus::CANCELLED,
             ]);

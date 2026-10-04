@@ -17,4 +17,6 @@ return [
     'missing_remaining_amount' => 'لا يوجد مبلغ متبقٍ لتمديد هذا العقد.',
     'missing_months_count' => 'يجب أن يكون عدد الأشهر 1 على الأقل.',
     'advance_changed' => 'تم تغيير مبلغ التسبيق من :from إلى :to.',
+    'advance_cancelled' => 'تم عكس التسبيق عند إلغاء العقد (:amount).',
+    'payment_cancelled' => 'تم عكس دفعة العقد عند الإلغاء (:amount).',
 ];

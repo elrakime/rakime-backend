@@ -38,6 +38,7 @@ return [
         'PAYMENT_CANCEL'      => 'Paiement annulé',
         'ADJUSTMENT'          => 'Ajustement',
         'ADVANCE_PAYMENT'     => "Paiement d'avance",
+        'CONTRACT_CANCEL'     => 'Annulation de contrat',
     ],
 
     'sale_return_status' => [
