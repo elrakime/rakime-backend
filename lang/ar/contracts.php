@@ -16,4 +16,5 @@ return [
     'cannot_extend_items' => 'لا يمكن أن تحتوي عقود التمديد على عناصر.',
     'missing_remaining_amount' => 'لا يوجد مبلغ متبقٍ لتمديد هذا العقد.',
     'missing_months_count' => 'يجب أن يكون عدد الأشهر 1 على الأقل.',
+    'advance_changed' => 'تم تغيير مبلغ التسبيق من :from إلى :to.',
 ];

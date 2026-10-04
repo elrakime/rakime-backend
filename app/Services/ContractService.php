@@ -32,6 +32,7 @@ class ContractService
 
     public function __construct(
         private readonly InventoryService $inventoryService,
+        private readonly WalletService $walletService,
     ) {}
 
     public function list(Request $request): LengthAwarePaginator
@@ -233,6 +234,8 @@ class ContractService
                 'note'           => $data['note'] ?? null,
             ]);
 
+            $this->recordAdvanceChange($contract, $data['advance_amount'] ?? null);
+
             if (! empty($data['items'])) {
                 foreach ($data['items'] as $item) {
                     ContractItem::create([
@@ -405,6 +408,10 @@ class ContractService
                 $contract->update($updates);
             }
 
+            if (array_key_exists('advance_amount', $data)) {
+                $this->recordAdvanceChange($contract, $data['advance_amount']);
+            }
+
             if (
                 array_key_exists('items', $data)
                 || array_key_exists('advance_amount', $data)
@@ -471,6 +478,10 @@ class ContractService
 
             if ($updates !== []) {
                 $contract->update($updates);
+            }
+
+            if (array_key_exists('advance_amount', $data)) {
+                $this->recordAdvanceChange($contract, $data['advance_amount']);
             }
 
             if (
@@ -543,6 +554,10 @@ class ContractService
             $contract->update($updates);
             $contract->recalculateAmounts();
 
+            if (array_key_exists('advance_amount', $data)) {
+                $this->recordAdvanceChange($contract, $data['advance_amount']);
+            }
+
             return $contract->fresh([
                 'client', 'account', 'branch',
                 'items.product', 'items.stock',
@@ -609,6 +624,8 @@ class ContractService
                 $contract->update([
                     'advance_amount' => $data['advance_amount'],
                 ]);
+
+                $this->recordAdvanceChange($contract, $data['advance_amount']);
             }
 
             $contract->items()->delete();
@@ -658,6 +675,37 @@ class ContractService
         $contract->subscriptions()->update([
             'amount' => $perDrawAmount,
         ]);
+    }
+
+    /**
+     * Record a wallet movement for a change in the contract's advance amount.
+     *
+     * The signed delta (new - old) is recorded against the branch wallet as an
+     * ADVANCE_PAYMENT movement: positive when the advance is raised, negative
+     * when it is lowered. A zero delta produces no movement.
+     */
+    private function recordAdvanceChange(Contract $contract, ?float $newAdvance): void
+    {
+        $oldAdvance = (float) ($contract->advance_amount ?? 0);
+        $newAdvance = (float) ($newAdvance ?? 0);
+        $delta = $newAdvance - $oldAdvance;
+
+        if ($delta == 0) {
+            return;
+        }
+
+        $wallet = $contract->branch?->wallet;
+
+        if ($wallet === null) {
+            return;
+        }
+
+        $this->walletService->advancePayment(
+            $wallet,
+            $delta,
+            $contract,
+            __('contracts.advance_changed', ['from' => $oldAdvance, 'to' => $newAdvance]),
+        );
     }
 
     public function configure(Contract $contract, int $subscriptionCount, string $drawDate): Contract

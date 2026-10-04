@@ -16,4 +16,5 @@ return [
     'cannot_extend_items' => 'Extension contracts cannot have items.',
     'missing_remaining_amount' => 'The contract has no remaining amount to extend.',
     'missing_months_count' => 'The number of months must be at least 1.',
+    'advance_changed' => 'Advance amount changed from :from to :to.',
 ];

@@ -37,6 +37,7 @@ return [
         'SALE_PAYMENT'        => 'Paiement de vente',
         'PAYMENT_CANCEL'      => 'Paiement annulé',
         'ADJUSTMENT'          => 'Ajustement',
+        'ADVANCE_PAYMENT'     => "Paiement d'avance",
     ],
 
     'sale_return_status' => [

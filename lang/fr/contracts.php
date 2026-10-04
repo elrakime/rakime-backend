@@ -16,4 +16,5 @@ return [
     'cannot_extend_items' => 'Les contrats de prolongation ne peuvent pas contenir d\'articles.',
     'missing_remaining_amount' => 'Le contrat n\'a aucun montant restant à prolonger.',
     'missing_months_count' => 'Le nombre de mois doit être d\'au moins 1.',
+    'advance_changed' => "Le montant d'avance est passé de :from à :to.",
 ];
