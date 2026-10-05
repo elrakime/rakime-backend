@@ -234,8 +234,6 @@ class ContractService
                 'note'           => $data['note'] ?? null,
             ]);
 
-            $this->recordAdvanceChange($contract, $data['advance_amount'] ?? null);
-
             if (! empty($data['items'])) {
                 foreach ($data['items'] as $item) {
                     ContractItem::create([
@@ -408,10 +406,6 @@ class ContractService
                 $contract->update($updates);
             }
 
-            if (array_key_exists('advance_amount', $data)) {
-                $this->recordAdvanceChange($contract, $data['advance_amount']);
-            }
-
             if (
                 array_key_exists('items', $data)
                 || array_key_exists('advance_amount', $data)
@@ -518,6 +512,7 @@ class ContractService
     {
         return DB::transaction(function () use ($contract, $data) {
             $this->restoreStock($contract);
+            $this->restoreAdvance($contract);
 
             $contract->installments()->delete();
             $contract->subscriptions()->delete();
@@ -553,10 +548,6 @@ class ContractService
 
             $contract->update($updates);
             $contract->recalculateAmounts();
-
-            if (array_key_exists('advance_amount', $data)) {
-                $this->recordAdvanceChange($contract, $data['advance_amount']);
-            }
 
             return $contract->fresh([
                 'client', 'account', 'branch',
@@ -619,21 +610,7 @@ class ContractService
      */
     private function restoreWallet(Contract $contract): void
     {
-        // Reverse the advance (net of all ADVANCE_PAYMENT movements == current advance).
-        $advance = (float) ($contract->advance_amount ?? 0);
-
-        if ($advance > 0) {
-            $wallet = $contract->branch?->wallet;
-
-            if ($wallet !== null) {
-                $this->walletService->contractCancel(
-                    $wallet,
-                    -$advance,
-                    $contract,
-                    __('contracts.advance_cancelled', ['amount' => $advance]),
-                );
-            }
-        }
+        $this->restoreAdvance($contract);
 
         // Reverse each contract (cash) payment against its original wallet.
         foreach ($contract->payments as $payment) {
@@ -650,6 +627,32 @@ class ContractService
                 __('contracts.payment_cancelled', ['amount' => $payment->amount]),
             );
         }
+    }
+
+    /**
+     * Reverse only the advance amount (net of all ADVANCE_PAYMENT movements ==
+     * current advance) against the branch wallet.
+     */
+    private function restoreAdvance(Contract $contract): void
+    {
+        $advance = (float) ($contract->advance_amount ?? 0);
+
+        if ($advance <= 0) {
+            return;
+        }
+
+        $wallet = $contract->branch?->wallet;
+
+        if ($wallet === null) {
+            return;
+        }
+
+        $this->walletService->contractCancel(
+            $wallet,
+            -$advance,
+            $contract,
+            __('contracts.advance_cancelled', ['amount' => $advance]),
+        );
     }
 
     /**
@@ -685,8 +688,6 @@ class ContractService
                 $contract->update([
                     'advance_amount' => $data['advance_amount'],
                 ]);
-
-                $this->recordAdvanceChange($contract, $data['advance_amount']);
             }
 
             $contract->items()->delete();
@@ -766,6 +767,33 @@ class ContractService
             $delta,
             $contract,
             __('contracts.advance_changed', ['from' => $oldAdvance, 'to' => $newAdvance]),
+        );
+    }
+
+    /**
+     * Record the full advance amount as a wallet inflow when the contract is
+     * configured (committed). Unlike recordAdvanceChange(), this records the
+     * absolute amount rather than a delta against the stored value.
+     */
+    private function recordAdvancePayment(Contract $contract): void
+    {
+        $advance = (float) ($contract->advance_amount ?? 0);
+
+        if ($advance <= 0) {
+            return;
+        }
+
+        $wallet = $contract->branch?->wallet;
+
+        if ($wallet === null) {
+            return;
+        }
+
+        $this->walletService->advancePayment(
+            $wallet,
+            $advance,
+            $contract,
+            __('contracts.advance_changed', ['from' => 0, 'to' => $advance]),
         );
     }
 
@@ -850,6 +878,10 @@ class ContractService
             ]);
 
             $this->deductStock($contract);
+
+            // Record the advance as a wallet inflow now that the contract is
+            // committed (configured). The advance is collected at this point.
+            $this->recordAdvancePayment($contract);
 
             $contract->recalculateAmounts();
 
