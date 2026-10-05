@@ -129,7 +129,7 @@ class SaleReturnController extends Controller
 
             $saleReturn->assertCanTransitionTo(SaleReturnStatus::COMPLETED->value);
 
-            $saleReturn = $this->saleReturnService->approve($saleReturn, $data['wallet_id'] ?? null);
+            $saleReturn = $this->saleReturnService->approve($saleReturn, isset($data['wallet_id']) ? (int) $data['wallet_id'] : null);
 
             return $this->successResponse(
                 new SaleReturnResource($saleReturn)

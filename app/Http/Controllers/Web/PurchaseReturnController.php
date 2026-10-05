@@ -129,7 +129,7 @@ class PurchaseReturnController extends Controller
 
             $purchaseReturn->assertCanTransitionTo(PurchaseReturnStatus::COMPLETED->value);
 
-            $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn, $data['wallet_id'] ?? null);
+            $purchaseReturn = $this->purchaseReturnService->approve($purchaseReturn, isset($data['wallet_id']) ? (int) $data['wallet_id'] : null);
 
             return $this->successResponse(
                 new PurchaseReturnResource($purchaseReturn)

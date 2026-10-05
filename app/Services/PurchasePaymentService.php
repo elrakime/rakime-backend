@@ -42,7 +42,8 @@ class PurchasePaymentService
                 'amount'      => $data['amount'],
             ]);
 
-            $wallet = Wallet::findOrFail($this->resolveWalletId($purchase, $data['wallet_id'] ?? null));
+            $walletId = isset($data['wallet_id']) ? (int) $data['wallet_id'] : null;
+            $wallet = Wallet::findOrFail($this->resolveWalletId($purchase, $walletId));
 
             $this->walletService->purchasePayment(
                 wallet: $wallet,

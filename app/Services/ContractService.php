@@ -745,7 +745,7 @@ class ContractService
      * ADVANCE_PAYMENT movement: positive when the advance is raised, negative
      * when it is lowered. A zero delta produces no movement.
      */
-    private function recordAdvanceChange(Contract $contract, ?float $newAdvance): void
+    private function recordAdvanceChange(Contract $contract, string|float|int|null $newAdvance): void
     {
         $oldAdvance = (float) ($contract->advance_amount ?? 0);
         $newAdvance = (float) ($newAdvance ?? 0);
