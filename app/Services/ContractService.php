@@ -670,10 +670,11 @@ class ContractService
     /**
      * Update an active contract (admin only).
      *
-     * Allows changing items, advance_amount and note before the start date, as
-     * long as the net amount remains unchanged. max_amount and months_count
-     * cannot be changed on an active contract. Since the net amount is
-     * preserved, the installments and subscriptions are not recalculated.
+     * Allows changing items, advance_amount and note at any point during the
+     * contract's lifetime, as long as the net amount remains unchanged.
+     * max_amount and months_count cannot be changed on an active contract.
+     * Since the net amount is preserved, the installments and subscriptions
+     * are not recalculated.
      */
     private function updateActive(Contract $contract, array $data): Contract
     {
@@ -687,10 +688,6 @@ class ContractService
 
         if (! array_key_exists('items', $data) && ! array_key_exists('note', $data)) {
             throw new Exception(__('contracts.cannot_update_active'), 422);
-        }
-
-        if ($contract->start_date !== null && $contract->start_date->lte(now()->startOfDay())) {
-            throw new Exception(__('contracts.cannot_update_after_start_date'), 422);
         }
 
         return DB::transaction(function () use ($contract, $data) {

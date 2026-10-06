@@ -8,7 +8,6 @@ return [
     'cannot_cancel' => 'Ce contrat ne peut plus être annulé.',
     'cannot_update_active_amounts' => 'Les montants d\'avance et maximum ne peuvent pas être modifiés sur un contrat actif.',
     'cannot_update_active' => 'Seuls les articles peuvent être modifiés sur un contrat actif.',
-    'cannot_update_after_start_date' => 'Les articles d\'un contrat actif ne peuvent être modifiés qu\'avant la date de début.',
     'cannot_change_net_amount' => 'Le montant net d\'un contrat actif ne peut pas être modifié.',
     'net_exceeds_max_amount' => 'Le montant net dépasse le montant maximum autorisé pour ce contrat.',
     'cannot_extend' => 'Seuls les contrats clôturés ou annulés peuvent être prolongés.',
