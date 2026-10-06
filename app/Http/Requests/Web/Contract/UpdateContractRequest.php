@@ -24,6 +24,7 @@ class UpdateContractRequest extends FormRequest
             'advance_amount'      => ['sometimes', 'numeric', 'min:0'],
             'months_count'        => ['sometimes', 'integer', 'min:1'],
             'max_amount'          => ['sometimes', 'numeric', 'min:1'],
+            'note'                => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

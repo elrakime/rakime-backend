@@ -388,6 +388,10 @@ class ContractService
                 $updates['months_count'] = $data['months_count'];
             }
 
+            if (array_key_exists('note', $data)) {
+                $updates['note'] = $data['note'];
+            }
+
             if (array_key_exists('items', $data)) {
                 $contract->items()->delete();
 
@@ -427,7 +431,7 @@ class ContractService
     /**
      * Update a configured contract (any user with update permission).
      *
-     * Allows changing items and advance_amount. Only admins may change
+     * Allows changing items, advance_amount and note. Only admins may change
      * max_amount. The months_count and subscription count are preserved;
      * amounts are recalculated and propagated to the existing installments
      * and subscriptions.
@@ -454,6 +458,10 @@ class ContractService
 
             if (array_key_exists('max_amount', $data)) {
                 $updates['max_amount'] = $data['max_amount'];
+            }
+
+            if (array_key_exists('note', $data)) {
+                $updates['note'] = $data['note'];
             }
 
             if (array_key_exists('items', $data)) {
@@ -530,6 +538,10 @@ class ContractService
 
             if (array_key_exists('max_amount', $data)) {
                 $updates['max_amount'] = $data['max_amount'];
+            }
+
+            if (array_key_exists('note', $data)) {
+                $updates['note'] = $data['note'];
             }
 
             if (array_key_exists('items', $data)) {
@@ -658,10 +670,10 @@ class ContractService
     /**
      * Update an active contract (admin only).
      *
-     * Allows changing items and advance_amount before the start date, as long
-     * as the net amount remains unchanged. max_amount and months_count cannot
-     * be changed on an active contract. Since the net amount is preserved, the
-     * installments and subscriptions are not recalculated.
+     * Allows changing items, advance_amount and note before the start date, as
+     * long as the net amount remains unchanged. max_amount and months_count
+     * cannot be changed on an active contract. Since the net amount is
+     * preserved, the installments and subscriptions are not recalculated.
      */
     private function updateActive(Contract $contract, array $data): Contract
     {
@@ -673,7 +685,7 @@ class ContractService
             throw new Exception(__('contracts.cannot_update_active_amounts'), 422);
         }
 
-        if (! array_key_exists('items', $data)) {
+        if (! array_key_exists('items', $data) && ! array_key_exists('note', $data)) {
             throw new Exception(__('contracts.cannot_update_active'), 422);
         }
 
@@ -682,6 +694,20 @@ class ContractService
         }
 
         return DB::transaction(function () use ($contract, $data) {
+            if (array_key_exists('note', $data)) {
+                $contract->update([
+                    'note' => $data['note'],
+                ]);
+            }
+
+            if (! array_key_exists('items', $data)) {
+                return $contract->fresh([
+                    'client', 'account', 'branch',
+                    'items.product', 'items.stock',
+                    'installments', 'subscriptions.draws',
+                ]);
+            }
+
             $originalNetAmount = $contract->net_amount;
 
             if (array_key_exists('advance_amount', $data)) {
