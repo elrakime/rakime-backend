@@ -118,6 +118,10 @@ class ContractPaymentService
                 'end_date'    => $lastCovered->due_date,
             ]);
 
+            $contract->update([
+                'cancel_date' => $contract->fresh(['earlyCancelations'])->earliestCancelationDate(),
+            ]);
+
             $this->creditWallet($contract, $amount, $payment, $walletId);
 
             return $payment->load(['contract', 'installments', 'walletMovement.wallet']);

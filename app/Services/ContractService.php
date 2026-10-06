@@ -980,6 +980,10 @@ class ContractService
                     'payment_id'  => null,
                     'end_date'    => $this->resolveNextDrawDate($contract),
                 ]);
+
+                $contract->update([
+                    'cancel_date' => $contract->fresh(['earlyCancelations'])->earliestCancelationDate(),
+                ]);
             }
 
             $this->notifyAction($contract, NotificationType::CONTRACT_CANCELLED, $contract->branch_id);

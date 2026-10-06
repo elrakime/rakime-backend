@@ -28,8 +28,8 @@ class AccountExportService
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('installments', function ($query) use ($account, $date) {
-                $this->applyPeriodFilter($query, 'due_date', $account, $date);
+            ->where(function ($query) use ($account, $date) {
+                $this->applyPeriodFilter($query, 'start_date', $account, $date);
             })
             ->with(['client', 'subscriptions', 'installments'])
             ->get();
@@ -49,9 +49,9 @@ class AccountExportService
     /**
      * Export subscriptions that must be cancelled on a given date.
      *
-     * A subscription is included when its contract's EARLIEST early-cancellation
-     * end_date matches the target date (the contract's original end_date
-     * does not count — it is cancelled automatically at the bank).
+     * A subscription is included when its contract's cancel_date (the earliest
+     * early-cancellation date) falls within the target month. Contracts without
+     * a cancel_date are excluded.
      *
      * @param string|null $date Optional target month in "Y-m" format (e.g.
      *                          "2026-10"). When omitted, the next draw date
@@ -63,8 +63,8 @@ class AccountExportService
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('earlyCancelations', function ($query) use ($account, $date) {
-                $this->applyPeriodFilter($query, 'end_date', $account, $date);
+            ->where(function ($query) use ($account, $date) {
+                $this->applyPeriodFilter($query, 'cancel_date', $account, $date);
             })
             ->with(['client', 'subscriptions', 'earlyCancelations'])
             ->get();
@@ -183,7 +183,7 @@ class AccountExportService
     }
 
     /**
-     * Apply the period filter to the given relation query.
+     * Apply the period filter to the given contract query.
      *
      * When an explicit "Y-m" month is provided, the column is filtered by that
      * month and year. Otherwise the column is matched against the next draw

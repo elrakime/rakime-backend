@@ -20,6 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use App\Traits\HasStatusHistory;
 use App\Traits\HasStatusGuard;
 use App\Traits\HasUserstamps;
+use Carbon\Carbon;
 
 class Contract extends Model
 {
@@ -45,6 +46,7 @@ class Contract extends Model
         'purchase_cost',
         'start_date',
         'end_date',
+        'cancel_date',
         'note',
     ];
 
@@ -63,6 +65,7 @@ class Contract extends Model
             'purchase_cost'  => 'decimal:2',
             'start_date'     => 'date',
             'end_date'       => 'date',
+            'cancel_date'    => 'date',
             'extended_at'    => 'datetime',
             'created_at'     => 'datetime',
         ];
@@ -172,6 +175,20 @@ class Contract extends Model
     public function earlyCancelations(): HasMany
     {
         return $this->hasMany(ContractEarlyCancelation::class, 'contract_id');
+    }
+
+    /**
+     * The earliest early-cancellation date across the contract's early
+     * cancelations, or null when there are none.
+     */
+    public function earliestCancelationDate(): ?Carbon
+    {
+        $dates = $this->earlyCancelations
+            ->pluck('end_date')
+            ->filter()
+            ->map(fn ($date) => $date->copy()->startOfDay());
+
+        return $dates->isEmpty() ? null : $dates->min();
     }
 
     public function parentContract(): BelongsTo
