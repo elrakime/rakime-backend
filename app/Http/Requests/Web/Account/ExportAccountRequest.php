@@ -12,7 +12,7 @@ class ExportAccountRequest extends FormRequest
             'account_id' => ['required', 'integer', 'exists:accounts,id'],
             'branch_ids' => ['sometimes', 'array'],
             'branch_ids.*' => ['integer'],
-            'date' => ['sometimes', 'nullable', 'date'],
+            'date' => ['sometimes', 'nullable', 'date_format:Y-m'],
         ];
     }
 }

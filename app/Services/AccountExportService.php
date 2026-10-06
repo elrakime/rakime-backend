@@ -18,20 +18,18 @@ class AccountExportService
      * Export all configured contracts' subscriptions for the given account
      * as an Excel (.xls) spreadsheet.
      *
-     * @param string|null $date Optional target draw date. When omitted, the
-     *                          next draw date after the account's last lock
-     *                          is used.
+     * @param string|null $date Optional target month in "Y-m" format (e.g.
+     *                          "2026-10"). When omitted, the next draw date
+     *                          after the account's last lock is used.
      * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
     public function exportRegistrations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
-        $targetDrawDate = $this->resolveTargetDrawDate($account, $date);
-
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('installments', function ($query) use ($targetDrawDate) {
-                $query->whereDate('due_date', $targetDrawDate);
+            ->whereHas('installments', function ($query) use ($account, $date) {
+                $this->applyPeriodFilter($query, 'due_date', $account, $date);
             })
             ->with(['client', 'subscriptions', 'installments'])
             ->get();
@@ -55,19 +53,18 @@ class AccountExportService
      * end_date matches the target date (the contract's original end_date
      * does not count — it is cancelled automatically at the bank).
      *
-     * @param string|null $date Optional target date. When omitted, the next
-     *                          draw date after the account's last lock is used.
+     * @param string|null $date Optional target month in "Y-m" format (e.g.
+     *                          "2026-10"). When omitted, the next draw date
+     *                          after the account's last lock is used.
      * @param array|null $branchIds Optional branch IDs to filter contracts by.
      */
     public function exportCancellations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
-        $targetDate = $this->resolveTargetDrawDate($account, $date);
-
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->whereHas('earlyCancelations', function ($query) use ($targetDate) {
-                $query->whereDate('end_date', $targetDate);
+            ->whereHas('earlyCancelations', function ($query) use ($account, $date) {
+                $this->applyPeriodFilter($query, 'end_date', $account, $date);
             })
             ->with(['client', 'subscriptions', 'earlyCancelations'])
             ->get();
@@ -186,18 +183,34 @@ class AccountExportService
     }
 
     /**
-     * Resolve the target draw date for the export.
+     * Apply the period filter to the given relation query.
      *
-     * When an explicit draw date is provided it is used as-is. Otherwise the
-     * next draw date after the account's last lock date is generated from the
-     * account's draw day.
+     * When an explicit "Y-m" month is provided, the column is filtered by that
+     * month and year. Otherwise the column is matched against the next draw
+     * date after the account's last lock.
      */
-    private function resolveTargetDrawDate(Account $account, ?string $drawDate): Carbon
+    private function applyPeriodFilter($query, string $column, Account $account, ?string $date): void
     {
-        if ($drawDate !== null) {
-            return Carbon::parse($drawDate)->startOfDay();
+        if ($date !== null) {
+            $month = Carbon::parse($date);
+
+            $query->whereYear($column, $month->year)
+                ->whereMonth($column, $month->month);
+
+            return;
         }
 
+        $query->whereDate($column, $this->resolveTargetDrawDate($account));
+    }
+
+    /**
+     * Resolve the target draw date for the export.
+     *
+     * The next draw date after the account's last lock date is generated from
+     * the account's draw day.
+     */
+    private function resolveTargetDrawDate(Account $account): Carbon
+    {
         $lastLock = $account->drawLocks()->latest('month')->first();
 
         $candidate = $lastLock !== null
