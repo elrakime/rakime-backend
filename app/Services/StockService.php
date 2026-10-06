@@ -28,6 +28,9 @@ class StockService
                 AllowedFilter::callback('branch_id', function ($query, $value) {
                     $query->whereHas('inventory', fn ($q) => $q->where('branch_id', $value));
                 }),
+                AllowedFilter::callback('type_id', function ($query, $value) {
+                    $query->whereHas('product.type', fn ($q) => $q->where('type_id', $value));
+                }),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),
