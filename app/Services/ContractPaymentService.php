@@ -86,7 +86,7 @@ class ContractPaymentService
         return DB::transaction(function () use ($contract, $amount, $note, $count, $walletId) {
             $installments = $contract->installments()
                 ->where('status', InstallmentStatus::PENDING)
-                ->orderBy('due_date')
+                ->orderBy('due_date', 'DESC')
                 ->lockForUpdate()
                 ->limit($count)
                 ->get();
