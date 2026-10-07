@@ -44,6 +44,7 @@ class Contract extends Model
         'net_amount',
         'monthly_amount',
         'purchase_cost',
+        'net_profit',
         'start_date',
         'end_date',
         'cancel_date',
@@ -63,6 +64,7 @@ class Contract extends Model
             'net_amount'     => 'decimal:2',
             'monthly_amount' => 'decimal:2',
             'purchase_cost'  => 'decimal:2',
+            'net_profit'     => 'decimal:2',
             'start_date'     => 'date',
             'end_date'       => 'date',
             'cancel_date'    => 'date',
@@ -294,11 +296,16 @@ class Contract extends Model
             ? (float) ceil($netAmount / $monthsCount)
             : null;
 
+        $purchaseCost = $this->purchaseCostAmount();
+
         $values = [
             'total_amount'   => $totalAmount,
             'net_amount'     => $netAmount,
             'monthly_amount' => $monthlyAmount,
-            'purchase_cost'  => $this->purchaseCostAmount(),
+            'purchase_cost'  => $purchaseCost,
+            'net_profit'     => $netAmount !== null
+                ? (float) round($netAmount - $purchaseCost, 2)
+                : null,
         ];
 
         static::query()->whereKey($this->getKey())->update($values);

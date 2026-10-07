@@ -32,6 +32,7 @@ class Sale extends Model
         'discount_amount',
         'total_amount',
         'purchase_cost',
+        'net_profit',
         'note',
     ];
 
@@ -45,6 +46,7 @@ class Sale extends Model
             'discount_amount' => 'decimal:2',
             'total_amount'    => 'decimal:2',
             'purchase_cost'   => 'decimal:2',
+            'net_profit'      => 'decimal:2',
         ];
     }
 
@@ -111,12 +113,15 @@ class Sale extends Model
         $discountAmount = $this->discountAmount($grossAmount);
         $totalAmount    = $grossAmount + $taxAmount - $discountAmount;
 
+        $purchaseCost = $this->purchaseCostAmount();
+
         $values = [
             'gross_amount'    => $grossAmount,
             'tax_amount'      => $taxAmount,
             'discount_amount' => $discountAmount,
             'total_amount'    => $totalAmount,
-            'purchase_cost'   => $this->purchaseCostAmount(),
+            'purchase_cost'   => $purchaseCost,
+            'net_profit'      => (float) round($totalAmount - $purchaseCost, 2),
         ];
 
         static::query()->whereKey($this->getKey())->update($values);

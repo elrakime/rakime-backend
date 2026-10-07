@@ -4,11 +4,14 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Enums\Role;
 
 class SaleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $canViewCosts = $this->canViewCosts($request);
+
         return [
             'id'              => $this->id,
             'branch_id'       => $this->branch_id,
@@ -21,7 +24,8 @@ class SaleResource extends JsonResource
             'discount_value'  => $this->discount_value,
             'discount_amount' => $this->discount_amount,
             'total_amount'    => $this->total_amount,
-            'purchase_cost'   => $this->purchase_cost,
+            'purchase_cost'   => $this->when($canViewCosts, $this->purchase_cost),
+            'net_profit'      => $this->when($canViewCosts, $this->net_profit),
             'note'            => $this->note,
             'created_at'      => $this->created_at,
             'updated_at'      => $this->updated_at,
@@ -44,5 +48,15 @@ class SaleResource extends JsonResource
             ] : null),
             'items' => SaleItemResource::collection($this->whenLoaded('items')),
         ];
+    }
+
+    /**
+     * Purchase cost and net profit are only visible to admins and managers.
+     */
+    private function canViewCosts(Request $request): bool
+    {
+        $user = $request->user();
+
+        return $user && $user->hasAnyRole([Role::ADMIN->value, Role::MANAGER->value]);
     }
 }
