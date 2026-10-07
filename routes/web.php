@@ -72,6 +72,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum','user.active'])->group(function () {
         Route::get('export/registrations', [AccountExportImportController::class, 'exportRegistrations']);
         Route::get('export/cancellations', [AccountExportImportController::class, 'exportCancellations']);
+        Route::get('preview/registrations', [AccountExportImportController::class, 'previewRegistrations']);
+        Route::get('preview/cancellations', [AccountExportImportController::class, 'previewCancellations']);
         Route::post('import', [AccountExportImportController::class, 'import']);
         Route::post('ccp/info', [CcpController::class, 'info']);
         Route::get('zakat', [ZakatController::class, 'index']);

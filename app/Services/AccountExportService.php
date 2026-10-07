@@ -25,21 +25,7 @@ class AccountExportService
      */
     public function exportRegistrations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
-        $contracts = $account->installmentContracts()
-            ->where('status', ContractStatus::CONFIGURED)
-            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
-            ->where(function ($query) use ($account, $date) {
-                $this->applyPeriodFilter($query, 'start_date', $account, $date);
-            })
-            ->with(['client', 'subscriptions', 'installments'])
-            ->get();
-
-        $subscriptions = $contracts
-            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
-                'subscription' => $subscription,
-                'contract'     => $contract,
-            ]))
-            ->sortBy(fn ($item) => $item['subscription']->reference);
+        $subscriptions = $this->getRegistrations($account, $date, $branchIds);
 
         $filename = 'account-' . $account->id . '-subscriptions-' . now()->format('Ymd-His') . '.xls';
 
@@ -60,6 +46,60 @@ class AccountExportService
      */
     public function exportCancellations(Account $account, ?string $date = null, ?array $branchIds = null): StreamedResponse
     {
+        $subscriptions = $this->getCancellations($account, $date, $branchIds);
+
+        $filename = 'account-' . $account->id . '-cancellations-' . now()->format('Ymd-His') . '.xls';
+
+        return $this->buildSpreadsheet($account, $subscriptions, $filename);
+    }
+
+    /**
+     * Return the registrations export data as an array (for JSON preview).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function previewRegistrations(Account $account, ?string $date = null, ?array $branchIds = null): array
+    {
+        return $this->buildPreview($account, $this->getRegistrations($account, $date, $branchIds));
+    }
+
+    /**
+     * Return the cancellations export data as an array (for JSON preview).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function previewCancellations(Account $account, ?string $date = null, ?array $branchIds = null): array
+    {
+        return $this->buildPreview($account, $this->getCancellations($account, $date, $branchIds));
+    }
+
+    /**
+     * Fetch the configured contracts' subscriptions for the registrations export.
+     */
+    private function getRegistrations(Account $account, ?string $date, ?array $branchIds)
+    {
+        $contracts = $account->installmentContracts()
+            ->where('status', ContractStatus::CONFIGURED)
+            ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
+            ->where(function ($query) use ($account, $date) {
+                $this->applyPeriodFilter($query, 'start_date', $account, $date);
+            })
+            ->with(['client', 'subscriptions', 'installments'])
+            ->get();
+
+        return $contracts
+            ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
+                'subscription' => $subscription,
+                'contract'     => $contract,
+            ]))
+            ->sortBy(fn ($item) => $item['subscription']->reference);
+    }
+
+    /**
+     * Fetch the subscriptions that must be cancelled for the cancellations export.
+     */
+    private function getCancellations(Account $account, ?string $date, ?array $branchIds)
+    {
         $contracts = $account->installmentContracts()
             ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
@@ -69,29 +109,22 @@ class AccountExportService
             ->with(['client', 'subscriptions', 'earlyCancelations'])
             ->get();
 
-        $subscriptions = $contracts
+        return $contracts
             ->flatMap(fn ($contract) => $contract->subscriptions->map(fn ($subscription) => [
                 'subscription' => $subscription,
                 'contract'     => $contract,
             ]))
             ->sortBy(fn ($item) => $item['subscription']->reference);
-
-        $filename = 'account-' . $account->id . '-cancellations-' . now()->format('Ymd-His') . '.xls';
-
-        return $this->buildSpreadsheet($account, $subscriptions, $filename);
     }
 
     /**
-     * Build the .xls spreadsheet from the flattened subscription list.
+     * The column headers shared by the export and preview output.
      *
-     * @param  \Illuminate\Support\Collection<int, array>  $subscriptions
+     * @return array<int, string>
      */
-    private function buildSpreadsheet(Account $account, $subscriptions, string $filename): StreamedResponse
+    public function getHeaders(): array
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet       = $spreadsheet->getActiveSheet();
-
-        $headers = [
+        return [
             'CompteA',
             'cleA',
             'NOM',
@@ -107,10 +140,18 @@ class AccountExportService
             'JourPrel',
             'Reference',
         ];
+    }
 
-        $sheet->fromArray($headers, null, 'A1');
-
-        $row = 2;
+    /**
+     * Build the data rows (one per subscription) shared by the spreadsheet
+     * and the JSON preview.
+     *
+     * @param  \Illuminate\Support\Collection<int, array>  $subscriptions
+     * @return array<int, array<int, mixed>>
+     */
+    private function buildRows(Account $account, $subscriptions): array
+    {
+        $rows = [];
 
         foreach ($subscriptions as $item) {
             $contract     = $item['contract'];
@@ -120,7 +161,7 @@ class AccountExportService
             $firstDueDate = $contract->start_date;
             $lastDueDate  = $contract->end_date;
 
-            $sheet->fromArray([
+            $rows[] = [
                 $client?->ccp_number,
                 $client?->ccp_key,
                 $client?->firstname,
@@ -131,11 +172,50 @@ class AccountExportService
                 $firstDueDate,
                 $lastDueDate,
                 $firstDueDate,
-                null, // MoisTraite (K) — set explicitly below.
+                0, // MoisTraite (K) is always 0 for now.
                 $contract->months_count,
                 $account->draw_day,
                 $subscription->reference,
-            ], null, 'A' . $row);
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Build the preview data (one keyed object per subscription) for JSON output.
+     *
+     * @param  \Illuminate\Support\Collection<int, array>  $subscriptions
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildPreview(Account $account, $subscriptions): array
+    {
+        $headers = $this->getHeaders();
+
+        return array_map(
+            fn (array $row) => array_combine($headers, $row),
+            $this->buildRows($account, $subscriptions),
+        );
+    }
+
+    /**
+     * Build the .xls spreadsheet from the flattened subscription list.
+     *
+     * @param  \Illuminate\Support\Collection<int, array>  $subscriptions
+     */
+    private function buildSpreadsheet(Account $account, $subscriptions, string $filename): StreamedResponse
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+
+        $headers = $this->getHeaders();
+
+        $sheet->fromArray($headers, null, 'A1');
+
+        $row = 2;
+
+        foreach ($this->buildRows($account, $subscriptions) as $values) {
+            $sheet->fromArray($values, null, 'A' . $row);
 
             // MoisTraite (K) is always 0 for now.
             $sheet->setCellValue('K' . $row, 0);

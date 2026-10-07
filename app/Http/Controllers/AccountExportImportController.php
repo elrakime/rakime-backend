@@ -69,6 +69,66 @@ class AccountExportImportController extends Controller
         );
     }
 
+    public function previewRegistrations(ExportAccountRequest $request): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::EXPORT_REGISTRATIONS->value)) {
+            return $response;
+        }
+
+        $account = Account::findOrFail($request->integer('account_id'));
+
+        $branchIds = $request->filled('branch_ids')
+            ? array_map('intval', (array) $request->input('branch_ids'))
+            : $this->getUserBranchIds();
+
+        if (! empty($branchIds)) {
+            if ($response = $this->authorizeBranchAccess($branchIds)) {
+                return $response;
+            }
+        }
+
+        $rows = $this->accountExportService->previewRegistrations(
+            $account,
+            $request->string('date')->toString() ?: null,
+            $branchIds,
+        );
+
+        return $this->successResponse([
+            'rows'  => $rows,
+            'count' => count($rows),
+        ]);
+    }
+
+    public function previewCancellations(ExportAccountRequest $request): JsonResponse
+    {
+        if ($response = $this->authorizePermission(Permission::EXPORT_CANCELATIONS->value)) {
+            return $response;
+        }
+
+        $account = Account::findOrFail($request->integer('account_id'));
+
+        $branchIds = $request->filled('branch_ids')
+            ? array_map('intval', (array) $request->input('branch_ids'))
+            : $this->getUserBranchIds();
+
+        if (! empty($branchIds)) {
+            if ($response = $this->authorizeBranchAccess($branchIds)) {
+                return $response;
+            }
+        }
+
+        $rows = $this->accountExportService->previewCancellations(
+            $account,
+            $request->string('date')->toString() ?: null,
+            $branchIds,
+        );
+
+        return $this->successResponse([
+            'rows'  => $rows,
+            'count' => count($rows),
+        ]);
+    }
+
     public function import(ImportAccountRequest $request): JsonResponse
     {
         if ($response = $this->authorizePermission(Permission::IMPORT_ACCOUNTS->value)) {
