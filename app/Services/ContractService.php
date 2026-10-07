@@ -373,7 +373,7 @@ class ContractService
             $updates = [];
 
             if (array_key_exists('max_amount', $data)) {
-                if (auth()->user()->isAdmin() === false) {
+                if (auth()->user()->isAdmin() === false && (float) $data['max_amount'] !== (float) $contract->max_amount) {
                     throw new Exception(__('contracts.cannot_update_max_amount'), 403);
                 }
 
@@ -438,7 +438,11 @@ class ContractService
      */
     private function updateConfigured(Contract $contract, array $data): Contract
     {
-        if (array_key_exists('max_amount', $data) && auth()->user()->isAdmin() === false) {
+        if (
+            array_key_exists('max_amount', $data)
+            && auth()->user()->isAdmin() === false
+            && (float) $data['max_amount'] !== (float) $contract->max_amount
+        ) {
             throw new Exception(__('contracts.cannot_update_max_amount'), 403);
         }
 
@@ -682,7 +686,10 @@ class ContractService
             throw new Exception(__('contracts.cannot_update'), 403);
         }
 
-        if (array_key_exists('months_count', $data) || array_key_exists('max_amount', $data)) {
+        if (
+            (array_key_exists('months_count', $data) && (int) $data['months_count'] !== (int) $contract->months_count)
+            || (array_key_exists('max_amount', $data) && (float) $data['max_amount'] !== (float) $contract->max_amount)
+        ) {
             throw new Exception(__('contracts.cannot_update_active_amounts'), 422);
         }
 
