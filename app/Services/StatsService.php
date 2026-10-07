@@ -109,12 +109,10 @@ class StatsService
         $cost   = (float) $totals->sum('purchase_cost');
 
         return [
-            'count'              => (clone $query)->count(),
-            'total_amount'       => round($amount, 2),
-            'total_cost'         => round($cost, 2),
-            'total_profit'       => round($amount - $cost, 2),
-            'total_purchase_cost' => round($cost, 2),
-            'net_profit'         => round($amount - $cost, 2),
+            'count'        => (clone $query)->count(),
+            'total_amount' => round($amount, 2),
+            'total_cost'   => round($cost, 2),
+            'total_profit' => round($amount - $cost, 2),
         ];
     }
 
@@ -140,12 +138,10 @@ class StatsService
         $cost   = (float) abs($totals->sum('purchase_cost'));
 
         return [
-            'count'              => (clone $query)->count(),
-            'total_amount'       => round($amount, 2),
-            'total_cost'         => round($cost, 2),
-            'total_profit'       => round($amount - $cost, 2),
-            'total_purchase_cost' => round($cost, 2),
-            'net_profit'         => round($amount - $cost, 2),
+            'count'        => (clone $query)->count(),
+            'total_amount' => round($amount, 2),
+            'total_cost'   => round($cost, 2),
+            'total_profit' => round($amount - $cost, 2),
         ];
     }
 
