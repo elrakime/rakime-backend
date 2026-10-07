@@ -90,6 +90,8 @@ return [
     'update_configured_contracts' => 'Modifier les contrats configurés',
     'update_active_contracts' => 'Modifier les contrats actifs',
     'cancel_contracts' => 'Annuler les contrats',
+    'cancel_configured_contracts' => 'Annuler les contrats configurés',
+    'cancel_active_contracts' => 'Annuler les contrats actifs',
 
     // Importations et exportations des comptes
     'import_accounts' => 'Importer les données des comptes',

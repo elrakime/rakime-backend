@@ -196,6 +196,8 @@ enum Permission: string
     case UPDATE_CONFIGURED_CONTRACTS = 'contracts.update_configured';
     case UPDATE_ACTIVE_CONTRACTS = 'contracts.update_active';
     case CANCEL_CONTRACTS   = 'contracts.cancel';
+    case CANCEL_CONFIGURED_CONTRACTS = 'contracts.cancel_configured';
+    case CANCEL_ACTIVE_CONTRACTS = 'contracts.cancel_active';
     case EXTEND_CONTRACTS   = 'contracts.extend';
 
     // Installments

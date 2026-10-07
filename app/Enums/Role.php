@@ -199,6 +199,8 @@ enum Role: string
                 Permission::UPDATE_CONFIGURED_CONTRACTS->value,
                 Permission::UPDATE_ACTIVE_CONTRACTS->value,
                 Permission::CANCEL_CONTRACTS->value,
+                Permission::CANCEL_CONFIGURED_CONTRACTS->value,
+                Permission::CANCEL_ACTIVE_CONTRACTS->value,
                 // Payments
                 Permission::VIEW_PAYMENTS->value,
                 Permission::CREATE_PAYMENTS->value,

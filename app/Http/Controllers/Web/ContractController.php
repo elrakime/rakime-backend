@@ -199,7 +199,13 @@ class ContractController extends Controller
             return $response;
         }
 
-        if ($response = $this->authorizePermission(Permission::CANCEL_CONTRACTS->value)) {
+        $cancelPermission = match ($contract->status) {
+            ContractStatus::CONFIGURED => Permission::CANCEL_CONFIGURED_CONTRACTS,
+            ContractStatus::ACTIVE => Permission::CANCEL_ACTIVE_CONTRACTS,
+            default => Permission::CANCEL_CONTRACTS,
+        };
+
+        if ($response = $this->authorizePermission($cancelPermission->value)) {
             return $response;
         }
 

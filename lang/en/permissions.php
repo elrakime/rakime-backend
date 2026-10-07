@@ -90,6 +90,8 @@ return [
     'update_configured_contracts' => 'Update Configured Contracts',
     'update_active_contracts' => 'Update Active Contracts',
     'cancel_contracts' => 'Cancel Contracts',
+    'cancel_configured_contracts' => 'Cancel Configured Contracts',
+    'cancel_active_contracts' => 'Cancel Active Contracts',
 
     // Account exports and imports
     'import_accounts' => 'Import Account Data',

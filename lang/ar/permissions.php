@@ -90,6 +90,8 @@ return [
     'update_configured_contracts' => 'تعديل العقود المهيأة',
     'update_active_contracts' => 'تعديل العقود النشطة',
     'cancel_contracts' => 'إلغاء العقود',
+    'cancel_configured_contracts' => 'إلغاء العقود المهيأة',
+    'cancel_active_contracts' => 'إلغاء العقود النشطة',
 
     // استيراد وتصدير الحسابات
     'import_accounts' => 'استيراد بيانات الحسابات',
