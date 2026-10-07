@@ -10,6 +10,7 @@ use App\Models\Batch;
 use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Contract;
+use App\Models\Draw;
 use App\Models\Installment;
 use App\Models\Sale;
 use App\Models\Stats;
@@ -82,6 +83,7 @@ class StatsService
             'sales'        => $this->salesStats($branchId, $start, $end),
             'contracts'    => $this->contractsStats($branchId, $start, $end),
             'installments' => $this->installmentsStats($branchId, $start, $end),
+            'draws'        => $this->drawsStats($branchId, $start, $end),
             'inventories'  => $this->inventoriesStats($branchId),
             'wallets'      => $this->walletsStats($branchId),
             'clients'      => $this->clientsStats($branchId, $start, $end),
@@ -107,10 +109,12 @@ class StatsService
         $cost   = (float) $totals->sum('purchase_cost');
 
         return [
-            'count'        => (clone $query)->count(),
-            'total_amount' => round($amount, 2),
-            'total_cost'   => round($cost, 2),
-            'total_profit' => round($amount - $cost, 2),
+            'count'              => (clone $query)->count(),
+            'total_amount'       => round($amount, 2),
+            'total_cost'         => round($cost, 2),
+            'total_profit'       => round($amount - $cost, 2),
+            'total_purchase_cost' => round($cost, 2),
+            'net_profit'         => round($amount - $cost, 2),
         ];
     }
 
@@ -136,10 +140,12 @@ class StatsService
         $cost   = (float) abs($totals->sum('purchase_cost'));
 
         return [
-            'count'        => (clone $query)->count(),
-            'total_amount' => round($amount, 2),
-            'total_cost'   => round($cost, 2),
-            'total_profit' => round($amount - $cost, 2),
+            'count'              => (clone $query)->count(),
+            'total_amount'       => round($amount, 2),
+            'total_cost'         => round($cost, 2),
+            'total_profit'       => round($amount - $cost, 2),
+            'total_purchase_cost' => round($cost, 2),
+            'net_profit'         => round($amount - $cost, 2),
         ];
     }
 
@@ -189,6 +195,54 @@ class StatsService
             'total' => [
                 'paid'   => round($paidTotal, 2),
                 'unpaid' => round($unpaidTotal, 2),
+            ],
+        ];
+    }
+
+    /**
+     * Draw counts and totals per status.
+     *
+     * Draws belong to a subscription (which belongs to a contract), so branch
+     * scoping flows through the contract. Settled draws are those paid on time
+     * or paid late; their amount counts as "paid", while postponed and failed
+     * draws remain "unpaid".
+     */
+    private function drawsStats(?int $branchId, ?Carbon $start, ?Carbon $end): array
+    {
+        $query = Draw::query()
+            ->whereHas('subscription.contract', fn ($q) => $q->byUserBranches());
+
+        if ($branchId !== null) {
+            $query->whereHas('subscription.contract', fn ($q) => $q->where('branch_id', $branchId));
+        }
+
+        $this->applyDateRange($query, $start, $end);
+
+        $paidOnTime  = (clone $query)->where('status', DrawStatus::PAID_ON_TIME);
+        $latePayment = (clone $query)->where('status', DrawStatus::LATE_PAYMENT);
+        $postponed   = (clone $query)->where('status', DrawStatus::POSTPONED);
+        $failed      = (clone $query)->where('status', DrawStatus::FAILED);
+
+        $paidTotal = (float) $paidOnTime->sum('amount') + (float) $latePayment->sum('amount');
+
+        $unpaidTotal = (float) $postponed->sum('amount') + (float) $failed->sum('amount');
+
+        $taxTotal = (float) $query->sum('tax_amount');
+
+        $taxedCount = (clone $query)->where('tax_amount', '>', 0)->count();
+
+        return [
+            'count' => [
+                'paid_on_time'  => $paidOnTime->count(),
+                'late_payment'  => $latePayment->count(),
+                'postponed'     => $postponed->count(),
+                'failed'        => $failed->count(),
+                'taxed'         => $taxedCount,
+            ],
+            'total' => [
+                'paid'   => round($paidTotal, 2),
+                'unpaid' => round($unpaidTotal, 2),
+                'tax'    => round($taxTotal, 2),
             ],
         ];
     }
