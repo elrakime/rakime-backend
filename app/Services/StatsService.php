@@ -12,6 +12,7 @@ use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Draw;
 use App\Models\Installment;
+use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Stats;
 use App\Models\Wallet;
@@ -84,6 +85,7 @@ class StatsService
             'contracts'    => $this->contractsStats($branchId, $start, $end),
             'installments' => $this->installmentsStats($branchId, $start, $end),
             'draws'        => $this->drawsStats($branchId, $start, $end),
+            'purchases'    => $this->purchasesStats($branchId, $start, $end),
             'inventories'  => $this->inventoriesStats($branchId),
             'wallets'      => $this->walletsStats($branchId),
             'clients'      => $this->clientsStats($branchId, $start, $end),
@@ -239,6 +241,41 @@ class StatsService
                 'paid'   => round($paidTotal, 2),
                 'unpaid' => round($unpaidTotal, 2),
                 'tax'    => round($taxTotal, 2),
+            ],
+        ];
+    }
+
+    /**
+     * Purchase counts per payment status and total paid/unpaid amounts.
+     *
+     * Payment status is derived (unpaid, partially_paid, paid) from paid_amount
+     * versus net_amount, so it is computed inline via SQL conditions.
+     */
+    private function purchasesStats(?int $branchId, ?Carbon $start, ?Carbon $end): array
+    {
+        $query = Purchase::query()->byUserBranches();
+
+        $this->applyBranch($query, 'branch_id', $branchId);
+        $this->applyDateRange($query, $start, $end);
+
+        $paid      = (clone $query)->whereRaw('paid_amount >= net_amount');
+        $unpaid    = (clone $query)->whereRaw('paid_amount <= 0');
+        $partially = (clone $query)->whereRaw('paid_amount > 0')->whereRaw('paid_amount < net_amount');
+
+        $paidTotal   = (float) $paid->sum('paid_amount');
+        $unpaidTotal = (float) $unpaid->sum('net_amount')
+            + (float) $partially->sum('net_amount')
+            - (float) $partially->sum('paid_amount');
+
+        return [
+            'count' => [
+                'paid'           => $paid->count(),
+                'unpaid'         => $unpaid->count(),
+                'partially_paid' => $partially->count(),
+            ],
+            'total' => [
+                'paid'   => round($paidTotal, 2),
+                'unpaid' => round($unpaidTotal, 2),
             ],
         ];
     }
