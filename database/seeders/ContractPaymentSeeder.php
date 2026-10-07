@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\InstallmentStatus;
 use App\Models\Contract;
 use App\Models\ContractPayment;
 use App\Services\ContractPaymentService;
@@ -11,9 +12,9 @@ class ContractPaymentSeeder extends Seeder
 {
     public function run(): void
     {
-        // Pick a configured/active contract with unpaid installments to settle.
+        // Pick a configured/active contract with pending installments to settle.
         $contract = Contract::whereIn('status', ['configured', 'active'])
-            ->whereHas('installments', fn ($q) => $q->where('status', 'unpaid'))
+            ->whereHas('installments', fn ($q) => $q->where('status', InstallmentStatus::PENDING->value))
             ->first();
 
         if (! $contract) {

@@ -92,7 +92,7 @@ class ContractPaymentService
                 ->get();
 
             if ($installments->count() < $count) {
-                throw new Exception(__('payments.not_enough_unpaid'), 422);
+                throw new Exception(__('payments.not_enough_pending'), 422);
             }
 
             $payment = ContractPayment::create([
