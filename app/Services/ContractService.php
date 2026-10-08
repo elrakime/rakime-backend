@@ -449,7 +449,10 @@ class ContractService
         // Changing the months count resets the contract back to PENDING with no
         // configuration (installments and subscriptions are removed and the
         // deducted stock is restored), so it can be reconfigured from scratch.
-        if (array_key_exists('months_count', $data)) {
+        if (
+            array_key_exists('months_count', $data)
+            && (int) $data['months_count'] !== (int) $contract->months_count
+        ) {
             return $this->resetConfiguredToPending($contract, $data);
         }
 
