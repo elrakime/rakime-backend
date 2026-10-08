@@ -31,6 +31,9 @@ class StockService
                 AllowedFilter::callback('type_id', function ($query, $value) {
                     $query->whereHas('product.type', fn ($q) => $q->where('type_id', $value));
                 }),
+                AllowedFilter::callback('category_id', function ($query, $value) {
+                    $query->whereHas('product.type.category', fn ($q) => $q->where('category_id', $value));
+                }),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
                 }),
