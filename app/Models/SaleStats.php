@@ -7,8 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Stats extends Model
+class SaleStats extends Model
 {
+    protected $table = 'sale_stats';
+
     protected $fillable = [
         'month',
         'branch_id',

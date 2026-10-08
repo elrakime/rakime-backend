@@ -292,6 +292,8 @@ enum Role: string
                 Permission::CREATE_FINANCIAL_RECORDS->value,
                 // Zakat
                 Permission::VIEW_ZAKAT->value,
+                // Stats
+                Permission::VIEW_STATS->value,
             ],
         };
     }

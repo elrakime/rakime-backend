@@ -225,6 +225,9 @@ enum Permission: string
     // Zakat
     case VIEW_ZAKAT = 'zakat.view';
 
+    // Stats
+    case VIEW_STATS = 'stats.view';
+
     public static function keys(): array
     {
         return array_column(self::cases(), 'value');

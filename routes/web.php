@@ -6,7 +6,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CcpController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ZakatController;
-use App\Http\Controllers\StatsController;
+use App\Http\Controllers\Web\Stats\ContractStatsController;
+use App\Http\Controllers\Web\Stats\SaleStatsController;
+use App\Http\Controllers\Web\Stats\StatsController;
 use App\Http\Controllers\Web\AccountController;
 use App\Http\Controllers\Web\AccountDrawLockController;
 use App\Http\Controllers\Web\Auth\AuthController;
@@ -77,8 +79,11 @@ Route::prefix('v1')->group(function () {
         Route::post('import', [AccountExportImportController::class, 'import']);
         Route::post('ccp/info', [CcpController::class, 'info']);
         Route::get('zakat', [ZakatController::class, 'index']);
-        Route::get('stats', [StatsController::class, 'index']);
-        Route::post('stats', [StatsController::class, 'store']);
+        Route::get('stats/sales', [SaleStatsController::class, 'index']);
+        Route::post('stats/sales', [SaleStatsController::class, 'live']);
+        Route::get('stats/contracts', [ContractStatsController::class, 'index']);
+        Route::post('stats/contracts', [ContractStatsController::class, 'live']);
+        Route::post('stats', [StatsController::class, 'index']);
     });
 
     Route::middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
