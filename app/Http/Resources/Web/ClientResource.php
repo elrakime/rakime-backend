@@ -33,6 +33,11 @@ class ClientResource extends JsonResource
             'is_banned'  => $this->is_banned,
             'rating'     => $this->rating,
             'image'      => $this->getFirstMediaUrl('image') ?: null,
+            'documents'  => $this->getMedia('documents')->map(fn ($media) => [
+                'id'  => $media->id,
+                'url' => $media->getUrl(),
+                'name' => $media->file_name,
+            ])->values(),
             'metadata'   => $this->metadata,
             'financial_records' => FinancialRecordResource::collection($this->whenLoaded('financialRecords')),
             'created_at' => $this->created_at,

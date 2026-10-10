@@ -75,6 +75,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('colors', ColorController::class);
         Route::get('clients/delinquent', [ClientController::class, 'delinquent']);
         Route::get('clients/find/{keyword}', [ClientController::class, 'find']);
+        Route::post('clients/{client}/documents', [ClientController::class, 'storeDocument']);
+        Route::delete('clients/{client}/documents/{media}', [ClientController::class, 'destroyDocument']);
         Route::apiResource('clients', ClientController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('inventories', InventoryController::class);

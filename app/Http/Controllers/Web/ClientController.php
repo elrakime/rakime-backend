@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Client\StoreClientDocumentRequest;
 use App\Http\Requests\Web\Client\StoreClientRequest;
 use App\Http\Requests\Web\Client\UpdateClientRequest;
 use App\Http\Resources\Web\ClientResource;
@@ -118,6 +119,48 @@ class ClientController extends Controller
 
         try {
             $this->clientService->delete($client);
+
+            return $this->successResponse(message: __('app.deleted'));
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
+    public function storeDocument(StoreClientDocumentRequest $request, Client $client): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($client->branch_id)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::UPDATE_CLIENTS->value)) {
+            return $response;
+        }
+
+        try {
+            $media = $this->clientService->storeDocument($client, $request);
+
+            return $this->successResponse([
+                'id'   => $media->id,
+                'url'  => $media->getUrl(),
+                'name' => $media->file_name,
+            ], statusCode: 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: $e->getMessage(), statusCode: $e->getCode() ?? 400);
+        }
+    }
+
+    public function destroyDocument(Client $client, int $media): JsonResponse
+    {
+        if ($response = $this->authorizeBranchAccess($client->branch_id)) {
+            return $response;
+        }
+
+        if ($response = $this->authorizePermission(Permission::UPDATE_CLIENTS->value)) {
+            return $response;
+        }
+
+        try {
+            $this->clientService->deleteDocument($client, $media);
 
             return $this->successResponse(message: __('app.deleted'));
         } catch (\Exception $e) {

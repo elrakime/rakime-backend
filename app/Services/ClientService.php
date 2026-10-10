@@ -196,10 +196,16 @@ class ClientService
 
     public function create(array $data, Request $request): Client
     {
-        $client = Client::create(collect($data)->except('image')->toArray());
+        $client = Client::create(collect($data)->except(['image', 'documents'])->toArray());
 
         if ($request->hasFile('image')) {
             $client->addMediaFromRequest('image')->toMediaCollection('image');
+        }
+
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents') as $document) {
+                $client->addMedia($document)->toMediaCollection('documents');
+            }
         }
 
         return $client;
@@ -235,5 +241,21 @@ class ClientService
     public function delete(Client $client): void
     {
         $client->delete();
+    }
+
+    public function storeDocument(Client $client, Request $request): \Spatie\MediaLibrary\MediaCollections\Models\Media
+    {
+        return $client->addMediaFromRequest('document')->toMediaCollection('documents');
+    }
+
+    public function deleteDocument(Client $client, int $mediaId): void
+    {
+        $media = $client->media()->where('id', $mediaId)->first();
+
+        if (! $media) {
+            throw new Exception(__('clients.document_not_found'), 404);
+        }
+
+        $media->delete();
     }
 }
