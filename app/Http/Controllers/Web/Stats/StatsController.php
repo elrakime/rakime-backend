@@ -8,6 +8,7 @@ use App\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Stats\StatsRequest;
 use App\Services\StatsService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
 class StatsController extends Controller
@@ -25,6 +26,8 @@ class StatsController extends Controller
 
         $data = $this->snapshotService->snapshot(
             $request->filled('branch_id') ? $request->integer('branch_id') : null,
+            $request->filled('date_from') ? Carbon::parse($request->date('date_from'))->startOfDay() : null,
+            $request->filled('date_to') ? Carbon::parse($request->date('date_to'))->endOfDay() : null,
         );
 
         return $this->successResponse($data);
