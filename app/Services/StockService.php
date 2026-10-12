@@ -49,6 +49,25 @@ class StockService
             )
             ->allowedSorts(
                 AllowedSort::field('created_at'),
+                AllowedSort::callback('top_seller', function (\Illuminate\Database\Eloquent\Builder $query, bool $ascending) {
+                    $direction = $ascending ? 'asc' : 'desc';
+
+                    $query
+                        ->addSelect('stocks.*')
+                        ->selectSub(
+                            \App\Models\SaleItem::query()
+                                ->selectRaw('COALESCE(SUM(quantity), 0)')
+                                ->whereColumn('sale_items.stock_id', 'stocks.id'),
+                            'sold_quantity',
+                        )
+                        ->selectSub(
+                            \App\Models\ContractItem::query()
+                                ->selectRaw('COALESCE(SUM(quantity), 0)')
+                                ->whereColumn('contract_items.stock_id', 'stocks.id'),
+                            'contract_quantity',
+                        )
+                        ->orderByRaw('(sold_quantity + contract_quantity) ' . $direction);
+                }),
             )
             ->defaultSort('-created_at')
             ->paginate($request->integer('per_page', 15))

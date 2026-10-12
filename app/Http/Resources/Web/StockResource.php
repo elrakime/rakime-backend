@@ -30,6 +30,11 @@ class StockResource extends JsonResource
             'current_quantity' => $this->whenLoaded('currentQuantity', fn () => (int) $this->currentQuantity?->total_current_quantity),
             'initial_quantity' => $this->whenLoaded('initialQuantity', fn () => (int) $this->initialQuantity?->total_initial_quantity),
 
+            'sold_quantity' => $this->when(
+                $this->resource->sold_quantity !== null,
+                fn () => (int) $this->resource->sold_quantity + (int) ($this->resource->contract_quantity ?? 0),
+            ),
+
             'inventory' => new InventoryResource($this->whenLoaded('inventory')),
             'product'   => new ProductResource($this->whenLoaded('product')),
             'batches'   => BatchResource::collection($this->whenLoaded('batches')),
