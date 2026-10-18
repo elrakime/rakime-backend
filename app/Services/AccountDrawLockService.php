@@ -6,6 +6,7 @@ use App\Enums\ContractStatus;
 use App\Models\Account;
 use App\Models\AccountDrawLock;
 use App\Models\Contract;
+use App\Models\StatusHistory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class AccountDrawLockService
                 'month'      => $lockDate,
             ]);
 
-            Contract::query()
+            $contractIds = Contract::query()
                 ->where('account_id', $account->id)
                 ->where('status', ContractStatus::CONFIGURED)
                 ->where(function ($query) use ($lockDate) {
@@ -75,7 +76,25 @@ class AccountDrawLockService
                     })
                     ->orWhereDate('start_date', $lockDate);
                 })
-                ->update(['status' => ContractStatus::ACTIVE]);
+                ->pluck('id');
+
+            if ($contractIds->isNotEmpty()) {
+                Contract::whereIn('id', $contractIds)
+                    ->update(['status' => ContractStatus::ACTIVE]);
+
+                StatusHistory::insert(
+                    $contractIds
+                        ->map(fn (int $id) => [
+                            'statusable_type' => Contract::class,
+                            'statusable_id'   => $id,
+                            'from_status'     => ContractStatus::CONFIGURED->value,
+                            'to_status'       => ContractStatus::ACTIVE->value,
+                            'changed_by'      => auth()->id(),
+                            'changed_at'      => now(),
+                        ])
+                        ->all()
+                );
+            }
 
             return $lock;
         });

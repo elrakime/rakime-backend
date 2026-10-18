@@ -74,13 +74,21 @@ class AccountExportService
     }
 
     /**
-     * Fetch the configured contracts' subscriptions for the registrations export.
+     * Fetch the contracts' subscriptions for the registrations export.
+     *
+     * For a locked month, contracts that went ACTIVE at that lock are used
+     * (their status is no longer CONFIGURED). Otherwise, currently CONFIGURED
+     * contracts are used.
      */
     private function getRegistrations(Account $account, ?string $date, ?array $branchIds)
     {
         $contracts = $account->installmentContracts()
-            ->where('status', ContractStatus::CONFIGURED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
+            ->when(
+                $date !== null && $this->isLockedMonth($account, $date),
+                fn ($query) => $query->where(fn ($q) => $this->whereActivated($q)),
+                fn ($query) => $query->where('status', ContractStatus::CONFIGURED),
+            )
             ->where(function ($query) use ($account, $date) {
                 $this->applyPeriodFilter($query, 'start_date', $account, $date);
             })
@@ -101,8 +109,9 @@ class AccountExportService
     private function getCancellations(Account $account, ?string $date, ?array $branchIds)
     {
         $contracts = $account->installmentContracts()
-            ->where('status', ContractStatus::CONFIGURED)
+            ->where('status', ContractStatus::CANCELLED)
             ->when(! empty($branchIds), fn ($query) => $query->whereIn('branch_id', $branchIds))
+            ->where(fn ($query) => $this->whereActivated($query))
             ->where(function ($query) use ($account, $date) {
                 $this->applyPeriodFilter($query, 'cancel_date', $account, $date);
             })
@@ -281,6 +290,41 @@ class AccountExportService
         }
 
         $query->whereDate($column, $this->resolveTargetDrawDate($account));
+    }
+
+    /**
+     * Restrict the query to contracts that went ACTIVE at some point.
+     *
+     * This is the signal that a contract actually took part in a draw: it
+     * survived its draw lock. It covers contracts still running or finished
+     * (active/completed/closed), contracts whose activation was recorded by the
+     * draw lock, and contracts cancelled after having been activated.
+     */
+    private function whereActivated($query): void
+    {
+        $query
+            ->whereIn('status', [
+                ContractStatus::ACTIVE->value,
+                ContractStatus::COMPLETED->value,
+                ContractStatus::CLOSED->value,
+            ])
+            ->orWhereHas('statusHistories', fn ($q) => $q
+                ->where('to_status', ContractStatus::ACTIVE->value))
+            ->orWhereHas('statusHistories', fn ($q) => $q
+                ->where('to_status', ContractStatus::CANCELLED->value)
+                ->where('from_status', ContractStatus::ACTIVE->value));
+    }
+
+    /**
+     * Determine whether the given "Y-m" month is already locked for the account.
+     */
+    private function isLockedMonth(Account $account, string $date): bool
+    {
+        $lastLock = $account->drawLocks()->latest('month')->first();
+
+        return $lastLock !== null
+            && Carbon::parse($date)->startOfMonth()
+                ->lte(Carbon::parse($lastLock->month)->startOfMonth());
     }
 
     /**
