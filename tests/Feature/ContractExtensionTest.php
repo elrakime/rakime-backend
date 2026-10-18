@@ -108,6 +108,36 @@ test('extending a non-closed/cancelled contract throws', function () {
     app(ContractService::class)->extend($contract, 6);
 })->throws(Exception::class);
 
+test('extending a contract defaults to the same client', function () {
+    $contract = makeContract();
+
+    $extension = app(ContractService::class)->extend($contract, 6);
+
+    expect($extension->client_id)->toBe($contract->client_id);
+});
+
+test('extending a contract can target another client', function () {
+    $contract = makeContract();
+
+    $otherClient = Client::create([
+        'branch_id'  => $contract->branch_id,
+        'wilaya_id'  => $contract->client->wilaya_id,
+        'firstname'  => 'Jane',
+        'lastname'   => 'Roe',
+        'phone'      => '0550' . rand(100000, 999999),
+        'salary'     => 60000,
+        'nin'        => 'NIN' . rand(100000, 999999),
+        'ccp_number' => 'CCP' . rand(100000, 999999),
+        'ccp_key'    => 'key',
+    ]);
+
+    $extension = app(ContractService::class)->extend($contract, 6, $otherClient->id);
+
+    expect($extension->parent_contract_id)->toBe($contract->id);
+    expect($extension->client_id)->toBe($otherClient->id);
+    expect($extension->client_id)->not->toBe($contract->client_id);
+});
+
 test('extending a contract with no remaining amount throws', function () {
     $contract = makeContract(['net_amount' => 0]);
 

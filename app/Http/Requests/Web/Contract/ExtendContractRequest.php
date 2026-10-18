@@ -17,6 +17,7 @@ class ExtendContractRequest extends FormRequest
     {
         return [
             'months_count' => ['required', 'integer', 'min:1'],
+            'client_id'    => ['sometimes', 'integer', 'exists:clients,id'],
         ];
     }
 }

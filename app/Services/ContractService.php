@@ -262,7 +262,7 @@ class ContractService
      * via parent_contract_id. It then follows the normal approve -> configure
      * flow. The source contract's status is left unchanged.
      */
-    public function extend(Contract $contract, int $monthsCount): Contract
+    public function extend(Contract $contract, int $monthsCount, ?int $clientId = null): Contract
     {
         if (! in_array($contract->status, [ContractStatus::CLOSED, ContractStatus::CANCELLED], true)) {
             throw new Exception(__('contracts.cannot_extend'), 422);
@@ -270,6 +270,14 @@ class ContractService
 
         if($contract->isSuperseded()){
             throw new Exception(__('contracts.cannot_extend_superseded'), 422);
+        }
+
+        // The extension targets the same client by default, but may be
+        // reassigned to another client.
+        $client = $clientId !== null ? Client::find($clientId) : $contract->client;
+
+        if (! $client || $client->is_banned) {
+            throw new Exception(__('contracts.client_banned'), 422);
         }
 
         $netAmount    = (float) $contract->net_amount;
@@ -286,10 +294,10 @@ class ContractService
 
         $monthlyAmount = (float) ceil($remaining / $monthsCount);
 
-        return DB::transaction(function () use ($contract, $monthsCount, $remaining, $monthlyAmount) {
+        return DB::transaction(function () use ($contract, $client, $monthsCount, $remaining, $monthlyAmount) {
             $extension = Contract::create([
                 'parent_contract_id' => $contract->id,
-                'client_id'          => $contract->client_id,
+                'client_id'          => $client->id,
                 'account_id'         => $contract->account_id,
                 'branch_id'          => $contract->branch_id,
                 'status'             => ContractStatus::PENDING,

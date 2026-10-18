@@ -233,7 +233,11 @@ class ContractController extends Controller
         $data = $this->validateRequest($request);
 
         try {
-            $contract = $this->contractService->extend($contract, (int) $data['months_count']);
+            $contract = $this->contractService->extend(
+                $contract,
+                (int) $data['months_count'],
+                isset($data['client_id']) ? (int) $data['client_id'] : null,
+            );
 
             return $this->successResponse(new ContractResource($contract), statusCode: 201);
         } catch (\Exception $e) {
