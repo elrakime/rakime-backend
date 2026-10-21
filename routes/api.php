@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login'])->middleware('guest');
-        Route::middleware(['auth:sanctum', 'client.type:web', 'user.active'])->group(function () {
+        Route::middleware(['auth:sanctum', 'client.type:web', 'user.active', 'user.role'])->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);
             Route::put('update-profile', [AuthController::class, 'updateProfile']);
@@ -53,7 +53,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
+    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {
         Route::post('device-tokens', [DeviceTokenController::class, 'register']);
         Route::delete('device-tokens', [DeviceTokenController::class, 'destroy']);
         Route::get('notifications', [NotificationController::class, 'index']);
@@ -61,7 +61,7 @@ Route::prefix('v1')->group(function () {
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
     });
 
-    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active'])->group(function () {
+    Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {
         Route::apiResource('users', UserController::class);
         Route::apiResource('roles', RoleController::class);
         Route::get('permissions', [PermissionController::class, 'index']);
