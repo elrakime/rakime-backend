@@ -32,6 +32,9 @@ class ClientResource extends JsonResource
             'eccp'       => $this->eccp,
             'is_banned'  => $this->is_banned,
             'rating'     => $this->rating,
+            'total_paid' => $this->when($this->relationLoaded('draws'), fn () => $this->total_paid),
+            'total_unpaid' => $this->when($this->relationLoaded('draws'), fn () => $this->total_unpaid),
+            'draws'      => DrawResource::collection($this->whenLoaded('draws')),
             'image'      => $this->getFirstMediaUrl('image') ?: null,
             'documents'  => $this->getMedia('documents')->map(fn ($media) => [
                 'id'  => $media->id,

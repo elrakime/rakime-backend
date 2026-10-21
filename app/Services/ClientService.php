@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Enums\ClientRating;
 use App\Enums\DrawStatus;
 use App\Models\Client;
+use App\Models\Draw;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -178,11 +180,72 @@ class ClientService
             });
         }
 
-        return $query
+        $paginator = $query
             ->with(['branch', 'wilaya'])
             ->orderByDesc('created_at')
             ->paginate($request->integer('per_page', 15))
             ->appends($request->query());
+
+        $this->hydrateDelinquentMetrics($paginator->getCollection(), $parsed);
+
+        return $paginator;
+    }
+
+    /**
+     * Attach per-client delinquent metrics for the given month.
+     *
+     * `total_paid` and `total_unpaid` are the sums of settled (paid on time
+     * or late) and unsettled (postponed or failed) draw amounts whose due_date
+     * falls in the month. `draws` holds every draw of the client.
+     */
+    private function hydrateDelinquentMetrics(Collection $clients, Carbon $month): void
+    {
+        if ($clients->isEmpty()) {
+            return;
+        }
+
+        $clientIds = $clients->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        $drawsByClient = Draw::query()
+            ->join('subscriptions', 'subscriptions.id', '=', 'draws.subscription_id')
+            ->join('contracts', 'contracts.id', '=', 'subscriptions.contract_id')
+            ->whereIn('contracts.client_id', $clientIds)
+            ->orderBy('draws.due_date')
+            ->get(['draws.*', 'contracts.client_id'])
+            ->groupBy(fn (Draw $draw) => (int) $draw->client_id);
+
+        foreach ($clients as $client) {
+            $clientDraws = $drawsByClient->get((int) $client->id, collect());
+
+            $paid = 0.0;
+            $unpaid = 0.0;
+
+            foreach ($clientDraws as $draw) {
+                if ($draw->due_date === null
+                    || $draw->due_date->year !== $month->year
+                    || $draw->due_date->month !== $month->month) {
+                    continue;
+                }
+
+                $amount = (float) $draw->amount;
+
+                if (in_array($draw->status?->value, [
+                    DrawStatus::PAID_ON_TIME->value,
+                    DrawStatus::LATE_PAYMENT->value,
+                ], true)) {
+                    $paid += $amount;
+                } elseif (in_array($draw->status?->value, [
+                    DrawStatus::POSTPONED->value,
+                    DrawStatus::FAILED->value,
+                ], true)) {
+                    $unpaid += $amount;
+                }
+            }
+
+            $client->setAttribute('total_paid', round($paid, 2));
+            $client->setAttribute('total_unpaid', round($unpaid, 2));
+            $client->setRelation('draws', $clientDraws->values());
+        }
     }
 
     public function find(string $keyword): ?Client
