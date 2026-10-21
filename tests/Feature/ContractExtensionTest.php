@@ -116,6 +116,23 @@ test('extending a contract defaults to the same client', function () {
     expect($extension->client_id)->toBe($contract->client_id);
 });
 
+test('configuring an extension preserves its remaining amount', function () {
+    $contract = makeContract();
+    $extension = app(ContractService::class)->extend($contract, 6);
+
+    app(ContractService::class)->approve($extension);
+    $configured = app(ContractService::class)->configure(
+        $extension,
+        1,
+        now()->addMonth()->startOfMonth()->toDateString(),
+    );
+
+    expect($configured->status)->toBe(ContractStatus::CONFIGURED);
+    expect((float) $configured->net_amount)->toBe(10000.0);
+    expect((float) $configured->monthly_amount)->toBe(1667.0);
+    expect((float) $configured->net_profit)->toBe(10000.0);
+});
+
 test('extending a contract can target another client', function () {
     $contract = makeContract();
 

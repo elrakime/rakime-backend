@@ -274,8 +274,9 @@ class Contract extends Model
      * - net_amount     = total_amount - advance_amount
      * - monthly_amount = ceil(net_amount / months_count)
      *
-     * Each is nullable when its inputs are absent (e.g. no items, no
-     * months_count), matching the original ContractService::recalculateAmounts().
+     * Amounts are nullable when their inputs are absent. Extensions have no
+     * items, so their carried net amount is preserved while monthly_amount is
+     * recalculated. net_profit is always non-null.
      */
     public function recalculateAmounts(): void
     {
@@ -285,15 +286,17 @@ class Contract extends Model
             ? null
             : (float) $items->sum(fn ($item) => $item->quantity * $item->price);
 
-        $advanceAmount = (float) ($this->advance_amount ?? 0);
-        $monthsCount   = $this->months_count;
+        if ($items->isEmpty() && $this->isExtension()) {
+            $netAmount = $this->net_amount;
+        } else {
+            $advanceAmount = (float) ($this->advance_amount ?? 0);
+            $netAmount = $totalAmount !== null
+                ? $totalAmount - $advanceAmount
+                : null;
+        }
 
-        $netAmount = $totalAmount !== null
-            ? $totalAmount - $advanceAmount
-            : null;
-
-        $monthlyAmount = ($netAmount !== null && $monthsCount > 0)
-            ? (float) ceil($netAmount / $monthsCount)
+        $monthlyAmount = ($netAmount !== null && $this->months_count > 0)
+            ? (float) ceil($netAmount / $this->months_count)
             : null;
 
         $purchaseCost = $this->purchaseCostAmount();
@@ -303,9 +306,7 @@ class Contract extends Model
             'net_amount'     => $netAmount,
             'monthly_amount' => $monthlyAmount,
             'purchase_cost'  => $purchaseCost,
-            'net_profit'     => $netAmount !== null
-                ? (float) round($netAmount - $purchaseCost, 2)
-                : null,
+            'net_profit'     => (float) round(($netAmount ?? 0) - $purchaseCost, 2),
         ];
 
         static::query()->whereKey($this->getKey())->update($values);
