@@ -159,9 +159,9 @@ Route::prefix('v1')->group(function () {
         Route::post('contracts/{contract}/extend', [ContractController::class, 'extend']);
 
         Route::apiResource('contracts.payments', ContractPaymentController::class)->parameters(['payments' => 'contract_payment'])->only(['index', 'store']);
-        Route::apiResource('contracts.installments', InstallmentController::class)->only(['index']);
-        Route::apiResource('contracts.subscriptions', SubscriptionController::class)->only(['index']);
-        Route::apiResource('contracts.draws', DrawController::class)->only(['index']);
+        Route::apiResource('installments', InstallmentController::class)->only(['index']);
+        Route::apiResource('subscriptions', SubscriptionController::class)->only(['index']);
+        Route::apiResource('draws', DrawController::class)->only(['index']);
 
         Route::get('financial-records', [FinancialRecordController::class, 'index']);
         Route::post('financial-records', [FinancialRecordController::class, 'store']);

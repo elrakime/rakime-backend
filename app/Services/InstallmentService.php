@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Contract;
+use App\Models\Installment;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -13,13 +13,15 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class InstallmentService
 {
-    public function list(Request $request, Contract $contract): LengthAwarePaginator
+    public function list(Request $request): LengthAwarePaginator
     {
-        $query = $contract->installments()->getQuery();
+        $query = Installment::query()
+            ->whereHas('contract', fn ($query) => $query->byUserBranches());
 
         return QueryBuilder::for($query, $request)
             ->with(['contract.client', 'contract.account', 'contract.branch', 'payments', 'draws'])
             ->allowedFilters(
+                AllowedFilter::exact('contract_id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('payment_method'),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Contract;
+use App\Models\Subscription;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -13,13 +13,15 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class SubscriptionService
 {
-    public function list(Request $request, Contract $contract): LengthAwarePaginator
+    public function list(Request $request): LengthAwarePaginator
     {
-        $query = $contract->subscriptions()->getQuery();
+        $query = Subscription::query()
+            ->whereHas('contract', fn ($query) => $query->byUserBranches());
 
         return QueryBuilder::for($query, $request)
             ->with(['contract.client', 'contract.account', 'contract.branch', 'draws'])
             ->allowedFilters(
+                AllowedFilter::exact('contract_id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
                     $query->whereDate('created_at', '>=', $value);
@@ -28,8 +30,10 @@ class SubscriptionService
                     $query->whereDate('created_at', '<=', $value);
                 }),
                 AllowedFilter::callback('search', function ($query, string $value) {
-                    $query->where('reference', 'like', "%{$value}%")
-                        ->orWhere('subscription_number', 'like', "%{$value}%");
+                    $query->where(function ($query) use ($value) {
+                        $query->where('reference', 'like', "%{$value}%")
+                            ->orWhere('subscription_number', 'like', "%{$value}%");
+                    });
                 }),
             )
             ->allowedSorts(
