@@ -59,6 +59,8 @@ class ContractService
                 AllowedFilter::exact('branch_id'),
                 AllowedFilter::exact('client_id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::exact('start_date'),
+                AllowedFilter::exact('end_date'),
                 AllowedFilter::callback('payment_status', function ($query, string $value) {
                     $this->applyPaymentStatusFilter($query, $value);
                 }),
