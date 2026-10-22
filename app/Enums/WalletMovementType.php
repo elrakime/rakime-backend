@@ -12,6 +12,7 @@ enum WalletMovementType: string
     case TRANSFER_OUT        = 'transfer_out';
     case EXPENSE             = 'expense';
     case SALARY              = 'salary';
+    case ZAKAT               = 'zakat';
     case INSTALLMENT_PAYMENT = 'installment_payment';
     case CONTRACT_PAYMENT    = 'contract_payment';
     case DRAW_PAYMENT        = 'draw_payment';
@@ -61,6 +62,7 @@ enum WalletMovementType: string
             self::TRANSFER_OUT        => 'purple',
             self::EXPENSE             => 'orange',
             self::SALARY              => 'cyan',
+            self::ZAKAT               => 'red',
             self::INSTALLMENT_PAYMENT => 'amber',
             self::CONTRACT_PAYMENT    => 'amber',
             self::DRAW_PAYMENT        => 'green',

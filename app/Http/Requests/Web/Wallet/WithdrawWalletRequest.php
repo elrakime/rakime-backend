@@ -20,6 +20,7 @@ class WithdrawWalletRequest extends FormRequest
                 WalletMovementType::WITHDRAWAL->value,
                 WalletMovementType::EXPENSE->value,
                 WalletMovementType::SALARY->value,
+                WalletMovementType::ZAKAT->value,
                 WalletMovementType::ADJUSTMENT->value,
             ])],
             'amount' => ['required', 'numeric', 'min:0.01'],

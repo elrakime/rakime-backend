@@ -178,6 +178,24 @@ class WalletService
     }
 
     /**
+     * Record a zakat payment deduction.
+     */
+    public function zakat(
+        Wallet $wallet,
+        int|float|string $amount,
+        ?string $note = null,
+    ): WalletMovement {
+        $this->guardSufficientBalance($wallet, $amount);
+
+        return $this->recordMovement(
+            $wallet,
+            WalletMovementType::ZAKAT,
+            -abs((float) $amount),
+            $note,
+        );
+    }
+
+    /**
      * Record a balance adjustment (positive or negative).
      */
     public function adjustment(

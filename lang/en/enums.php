@@ -27,6 +27,7 @@ return [
         'TRANSFER_OUT'        => 'Transfer Out',
         'EXPENSE'             => 'Expense',
         'SALARY'              => 'Salary',
+        'zakat'               => 'Zakat',
         'INSTALLMENT_PAYMENT' => 'Installment Payment',
         'CONTRACT_PAYMENT'    => 'Contract Payment',
         'DRAW_PAYMENT'        => 'Draw Payment',

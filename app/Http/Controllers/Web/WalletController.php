@@ -129,6 +129,7 @@ class WalletController extends Controller
                 WalletMovementType::WITHDRAWAL->value => 'withdraw',
                 WalletMovementType::EXPENSE->value    => 'expense',
                 WalletMovementType::SALARY->value     => 'salary',
+                WalletMovementType::ZAKAT->value      => 'zakat',
                 WalletMovementType::ADJUSTMENT->value => 'adjustment',
                 default                               => 'withdraw',
             };

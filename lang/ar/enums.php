@@ -27,6 +27,7 @@ return [
         'TRANSFER_OUT'        => 'تحويل صادر',
         'EXPENSE'             => 'مصروف',
         'SALARY'              => 'راتب',
+        'zakat'               => 'زكاة',
         'INSTALLMENT_PAYMENT' => 'دفع قسط',
         'CONTRACT_PAYMENT'    => 'دفع عقد',
         'DRAW_PAYMENT'        => 'دفع سحب',

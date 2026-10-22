@@ -27,6 +27,7 @@ return [
         'TRANSFER_OUT'        => 'Transfert sortant',
         'EXPENSE'             => 'Dépense',
         'SALARY'              => 'Salaire',
+        'zakat'               => 'Zakat',
         'INSTALLMENT_PAYMENT' => 'Paiement par échéance',
         'CONTRACT_PAYMENT'    => 'Paiement de contrat',
         'DRAW_PAYMENT'        => 'Paiement de prélèvement',
