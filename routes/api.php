@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login'])->middleware('guest');
-        Route::middleware(['auth:sanctum', 'client.type:web', 'user.active', 'user.role'])->group(function () {
+        Route::middleware(['auth:sanctum', 'client.type:mobile', 'user.active', 'user.role'])->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);
             Route::put('update-profile', [AuthController::class, 'updateProfile']);
