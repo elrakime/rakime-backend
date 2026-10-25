@@ -30,6 +30,9 @@ class SubscriptionService
             ])
             ->allowedFilters(
                 AllowedFilter::exact('contract_id'),
+                AllowedFilter::callback('branch_id', function ($query, string $value) {
+                    $query->whereHas('contract', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('installments_status', function ($query, string $value) {
                     $this->applyInstallmentsStatusFilter($query, $value);

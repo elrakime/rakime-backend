@@ -23,6 +23,9 @@ class DrawService
                 AllowedFilter::callback('contract_id', function ($query, string $value) {
                     $query->whereHas('subscription', fn ($query) => $query->where('contract_id', $value));
                 }),
+                AllowedFilter::callback('branch_id', function ($query, string $value) {
+                    $query->whereHas('subscription.contract', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('installment_id'),
                 AllowedFilter::exact('subscription_id'),

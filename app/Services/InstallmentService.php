@@ -22,6 +22,9 @@ class InstallmentService
             ->with(['contract.client', 'contract.account', 'contract.branch', 'payments', 'draws'])
             ->allowedFilters(
                 AllowedFilter::exact('contract_id'),
+                AllowedFilter::callback('branch_id', function ($query, string $value) {
+                    $query->whereHas('contract', fn ($q) => $q->where('branch_id', $value));
+                }),
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('payment_method'),
                 AllowedFilter::callback('created_at_from', function ($query, string $value) {
