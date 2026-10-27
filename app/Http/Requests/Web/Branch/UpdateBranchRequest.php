@@ -17,7 +17,7 @@ class UpdateBranchRequest extends FormRequest
             'shop_name'  => ['sometimes', 'required', 'string', 'max:255'],
             'address'    => ['nullable', 'string'],
             'phone'      => ['nullable', 'string', 'max:255'],
-            'wilaya_id'  => ['nullable', 'integer', 'exists:wilayas,id'],
+            'wilaya_id'  => ['required', 'integer', 'exists:wilayas,id'],
             'image'      => ['nullable', 'image', 'max:2048'],
             'metadata'   => ['nullable', 'json'],
             'accounts'   => ['nullable', 'array'],
